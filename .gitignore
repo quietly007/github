@@ -1,0 +1,4 @@
+# Local backups not synced
+backups/
+TEMP/
+*.tmp
