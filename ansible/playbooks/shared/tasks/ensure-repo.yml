@@ -1,0 +1,131 @@
+---
+- name: Check repo destination
+  ansible.builtin.stat:
+    path: "{{ repo_path }}"
+  register: repo_dest
+
+- name: Set repo allow-init flag
+  ansible.builtin.set_fact:
+    repo_allow_init_nonempty: "{{ item.allow_init_nonempty | default(false) }}"
+
+- name: Check repo git directory
+  ansible.builtin.stat:
+    path: "{{ repo_path }}/.git"
+  register: repo_git
+  when: repo_dest.stat.exists
+
+- name: Check repo destination contents
+  ansible.builtin.command: ls -A "{{ repo_path }}"
+  register: repo_contents
+  changed_when: false
+  failed_when: false
+  when: repo_dest.stat.exists and repo_dest.stat.isdir
+
+- name: Set repo non-empty flag
+  ansible.builtin.set_fact:
+    repo_non_empty: "{{ repo_contents.stdout | default('') | length > 0 }}"
+  when: repo_dest.stat.exists and repo_dest.stat.isdir
+
+- name: Initialize existing directory as git repo (non-empty)
+  ansible.builtin.command: git init
+  args:
+    chdir: "{{ repo_path }}"
+  when:
+    - repo_dest.stat.exists
+    - repo_dest.stat.isdir
+    - repo_non_empty | default(false)
+    - repo_allow_init_nonempty
+    - repo_git is not defined or repo_git.stat is not defined or not repo_git.stat.exists
+
+- name: Check existing origin remote
+  ansible.builtin.command: git -C "{{ repo_path }}" remote get-url origin
+  register: repo_origin
+  changed_when: false
+  failed_when: false
+  when:
+    - repo_dest.stat.exists
+    - repo_dest.stat.isdir
+    - repo_non_empty | default(false)
+    - repo_allow_init_nonempty
+    - repo_git is not defined or repo_git.stat is not defined or not repo_git.stat.exists
+
+- name: Add origin remote for existing directory
+  ansible.builtin.command: git -C "{{ repo_path }}" remote add origin "https://github.com/quietly007/{{ item.name }}.git"
+  when:
+    - repo_dest.stat.exists
+    - repo_dest.stat.isdir
+    - repo_non_empty | default(false)
+    - repo_allow_init_nonempty
+    - repo_git is not defined or repo_git.stat is not defined or not repo_git.stat.exists
+    - repo_origin is defined
+    - repo_origin.rc != 0
+
+- name: Set origin remote for existing directory
+  ansible.builtin.command: git -C "{{ repo_path }}" remote set-url origin "https://github.com/quietly007/{{ item.name }}.git"
+  when:
+    - repo_dest.stat.exists
+    - repo_dest.stat.isdir
+    - repo_non_empty | default(false)
+    - repo_allow_init_nonempty
+    - repo_git is not defined or repo_git.stat is not defined or not repo_git.stat.exists
+    - repo_origin is defined
+    - repo_origin.rc == 0
+
+- name: Fetch origin for existing directory
+  ansible.builtin.command: git -C "{{ repo_path }}" fetch --prune origin main
+  when:
+    - repo_dest.stat.exists
+    - repo_dest.stat.isdir
+    - repo_non_empty | default(false)
+    - repo_allow_init_nonempty
+    - repo_git is not defined or repo_git.stat is not defined or not repo_git.stat.exists
+
+- name: Checkout main for existing directory
+  ansible.builtin.command: git -C "{{ repo_path }}" checkout -B main origin/main
+  when:
+    - repo_dest.stat.exists
+    - repo_dest.stat.isdir
+    - repo_non_empty | default(false)
+    - repo_allow_init_nonempty
+    - repo_git is not defined or repo_git.stat is not defined or not repo_git.stat.exists
+
+- name: Reset existing directory to origin/main
+  ansible.builtin.command: git -C "{{ repo_path }}" reset --hard origin/main
+  when:
+    - repo_dest.stat.exists
+    - repo_dest.stat.isdir
+    - repo_non_empty | default(false)
+    - repo_allow_init_nonempty
+    - repo_git is not defined or repo_git.stat is not defined or not repo_git.stat.exists
+
+- name: Clone repo into empty destination
+  ansible.builtin.git:
+    repo: "https://github.com/quietly007/{{ item.name }}.git"
+    dest: "{{ repo_path }}"
+    version: main
+    update: true
+    force: false
+  when:
+    - not repo_dest.stat.exists or (repo_dest.stat.isdir and not (repo_non_empty | default(false)))
+
+- name: Update repo if .git exists
+  ansible.builtin.git:
+    repo: "https://github.com/quietly007/{{ item.name }}.git"
+    dest: "{{ repo_path }}"
+    version: main
+    update: true
+    force: yes
+  when:
+    - repo_git is defined
+    - repo_git.stat is defined
+    - repo_git.stat.exists
+
+- name: Skip non-empty non-repo destination
+  ansible.builtin.debug:
+    msg: "Skipping {{ item.name }}: destination {{ repo_path }} is non-empty and not a git repo."
+  when:
+    - repo_dest.stat.exists
+    - repo_dest.stat.isdir
+    - repo_non_empty | default(false)
+    - repo_git is not defined or repo_git.stat is not defined or not repo_git.stat.exists
+    - not repo_allow_init_nonempty

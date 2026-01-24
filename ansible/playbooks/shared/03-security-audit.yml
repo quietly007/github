@@ -1,0 +1,45 @@
+---
+# SECURITY AUDIT TOOLS - AIDE + Lynis + Docker Security (Trivy + Docker-Bench)
+# Usage: ansible-playbook -i inventory/production.ini playbooks/shared/03-security-audit.yml -l <host>
+#
+# Installs:
+#   - AIDE (file integrity)
+#   - Lynis (system audit)
+#   - Trivy + Docker-Bench via docker compose (image/container security)
+
+- name: Install Security Audit Tools
+  hosts: all
+  become: true
+  vars_files:
+    - "{{ playbook_dir }}/../../group_vars/all.yml"
+
+  tasks:
+    - name: Install AIDE and Lynis packages
+      ansible.builtin.apt:
+        name:
+          - aide
+          - lynis
+        state: present
+        update_cache: true
+
+    - name: Pull latest from GitHub
+      ansible.builtin.command: git pull
+      args:
+        chdir: "/home/{{ admin_user }}"
+      become_user: "{{ admin_user }}"
+      changed_when: false
+
+    - name: Pull security tool images
+      ansible.builtin.command: docker compose pull
+      args:
+        chdir: "/home/{{ admin_user }}/.docker-compose/security-tools"
+      become_user: "{{ admin_user }}"
+
+    - name: Show status
+      ansible.builtin.debug:
+        msg: |
+          ✅ Security tools installed:
+          - AIDE: apt package (run: aideinit to initialize)
+          - Lynis: apt package (run: lynis audit system)
+          - Trivy: docker (run: docker compose -f ~/.docker-compose/security-tools/docker-compose.yaml run --rm trivy image <image>)
+          - Docker-Bench: docker (run: docker compose -f ~/.docker-compose/security-tools/docker-compose.yaml run --rm docker-bench)

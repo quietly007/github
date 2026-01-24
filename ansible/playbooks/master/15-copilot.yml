@@ -1,0 +1,163 @@
+---
+# COPILOT SETUP - Deploy agent configuration
+# Usage: ansible-playbook -i inventory/production.ini playbooks/15-copilot.yml -l <host>
+# Prerequisites:
+#   - GitHub setup must be run first (repos + .github/copilot-instructions.md)
+#
+# Deploys:
+#   - ~/.github/copilot-instructions.md (server-specific)
+#   - ~/.copilot/scripts/
+#   - ~/.gitignore (workspace ignores)
+#   - Git credentials & config
+#   - Inter-agent SSH keys
+
+- name: Setup Copilot agent environment
+  hosts: all
+  become: false  # Run as qui3tly
+
+  vars_files:
+    - "{{ playbook_dir }}/../../group_vars/all.yml"
+    - "{{ playbook_dir }}/../../host_vars/{{ inventory_hostname }}.yml"
+
+  vars:
+    copilot_dir: "/home/{{ admin_user }}/.copilot"
+    github_dir: "/home/{{ admin_user }}/.github"
+
+  tasks:
+    - name: Ensure .ssh directory exists
+      ansible.builtin.file:
+        path: "/home/{{ admin_user }}/.ssh"
+        state: directory
+        mode: '0700'
+
+    #=== GIT SETUP ===
+    - name: Deploy workspace .gitignore
+      ansible.builtin.template:
+        src: "{{ playbook_dir | dirname }}/templates/gitignore.j2"
+        dest: "/home/{{ admin_user }}/.gitignore"
+        mode: '0644'
+
+    - name: Configure git user
+      community.general.git_config:
+        name: "{{ item.name }}"
+        value: "{{ item.value }}"
+        scope: global
+      loop:
+        - { name: "user.name", value: "{{ git_user }}" }
+        - { name: "user.email", value: "{{ git_email }}" }
+        - { name: "init.defaultBranch", value: "main" }
+        - { name: "credential.helper", value: "store" }
+
+    - name: Check if git repo exists
+      ansible.builtin.stat:
+        path: "/home/{{ admin_user }}/.git"
+      register: git_repo
+
+    - name: Initialize git repo if not exists
+      ansible.builtin.command: git init  # noqa command-instead-of-module
+      args:
+        chdir: "/home/{{ admin_user }}"
+        creates: "/home/{{ admin_user }}/.git/HEAD"
+      when: not git_repo.stat.exists
+      register: git_init
+      changed_when: git_init.rc == 0
+
+    - name: Ensure git remote origin is set
+      community.general.git_config:
+        name: remote.origin.url
+        value: "https://github.com/{{ git_org }}/{{ github_repo }}.git"
+        scope: local
+        repo: "/home/{{ admin_user }}"
+    - name: Create .github directory
+      ansible.builtin.file:
+        path: "{{ github_dir }}"
+        state: directory
+        mode: '0755'
+
+    - name: Check copilot instructions exist (master)
+      ansible.builtin.stat:
+        path: "{{ github_dir }}/copilot-instructions.md"
+      register: copilot_master_src
+      when: inventory_hostname == 'master'
+
+    - name: Fail if copilot instructions missing (master)
+      ansible.builtin.fail:
+        msg: "Missing {{ github_dir }}/copilot-instructions.md (run GitHub setup first)"
+      when:
+        - inventory_hostname == 'master'
+        - not copilot_master_src.stat.exists
+
+    - name: Deploy server-specific copilot instructions
+      ansible.builtin.copy:
+        src: "{{ playbook_dir | dirname }}/files/copilot/copilot-instructions-{{ inventory_hostname }}.md"
+        dest: "{{ github_dir }}/copilot-instructions.md"
+        mode: '0644'
+      when: inventory_hostname == 'lady'
+
+    - name: Copy copilot instructions from master (for master)
+      ansible.builtin.copy:
+        src: "{{ github_dir }}/copilot-instructions.md"
+        dest: "{{ github_dir }}/copilot-instructions.md"
+        mode: '0644'
+        remote_src: true
+      when: inventory_hostname == 'master'
+
+    - name: Ensure copilot scripts directory exists
+      ansible.builtin.file:
+        path: "{{ copilot_dir }}/scripts"
+        state: directory
+        mode: '0700'
+
+    - name: Deploy agent-sync script
+      ansible.builtin.copy:
+        src: "{{ playbook_dir | dirname }}/files/copilot/agent-sync.sh"
+        dest: "{{ copilot_dir }}/scripts/agent-sync.sh"
+        mode: '0755'
+
+    - name: Deploy agent-handshake script
+      ansible.builtin.copy:
+        src: "{{ playbook_dir | dirname }}/files/copilot/agent-handshake.sh"
+        dest: "{{ copilot_dir }}/scripts/agent-handshake.sh"
+        mode: '0755'
+
+    - name: Initialize agent-messages.jsonl if not exists
+      ansible.builtin.copy:
+        content: |
+          {"ts":"{{ ansible_date_time.iso8601 }}","from":"ansible","to":"agent","msg":"Agent messaging initialized"}
+        dest: "{{ copilot_dir }}/agent-messages.jsonl"
+        mode: '0644'
+        force: false
+
+    - name: Setup SSH config for inter-agent communication
+      ansible.builtin.blockinfile:
+        path: "/home/{{ admin_user }}/.ssh/config"
+        create: true
+        mode: '0600'
+        marker: "# {mark} ANSIBLE MANAGED - INTER-AGENT SSH"
+        block: |
+          Host master
+            Port 1006
+            HostName master.qui3tly.cloud
+            User qui3tly
+            IdentityFile ~/.ssh/quietly.its.me
+          
+          Host lady
+            Port 1006
+            HostName lady.qui3tly.cloud
+            User qui3tly
+            IdentityFile ~/.ssh/quietly.its.me
+
+  post_tasks:
+    - name: Copilot setup complete
+      ansible.builtin.debug:
+        msg: |
+          ✅ Copilot agent environment configured for {{ inventory_hostname }}
+          
+          Test agent connectivity:
+            ~/.copilot/scripts/agent-handshake.sh
+          
+          Compare servers:
+            ~/.copilot/scripts/agent-sync.sh compare
+          
+          Send message to twin:
+            ~/.copilot/scripts/agent-sync.sh send "Hello twin!"

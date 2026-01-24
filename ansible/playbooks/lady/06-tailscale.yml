@@ -1,0 +1,109 @@
+---
+# LADY TAILSCALE - VPN Connection
+# Usage: ansible-playbook -i inventory/bootstrap.ini playbooks/lady/06-tailscale.yml
+
+- name: Deploy Tailscale on Lady
+  hosts: lady
+  become: true
+  vars_files:
+    - "{{ playbook_dir }}/../../group_vars/all.yml"
+    - "{{ playbook_dir }}/../../host_vars/lady.yml"
+
+  tasks:
+    - name: Check if Tailscale is installed
+      ansible.builtin.command: which tailscale
+      register: tailscale_installed
+      ignore_errors: true
+      changed_when: false
+
+    - name: Install Tailscale
+      when: tailscale_installed.rc != 0
+      block:
+        - name: Add Tailscale GPG key
+          ansible.builtin.apt_key:
+            url: https://pkgs.tailscale.com/stable/debian/bookworm.noarmor.gpg
+            state: present
+
+        - name: Add Tailscale repository
+          ansible.builtin.apt_repository:
+            repo: "deb https://pkgs.tailscale.com/stable/debian bookworm main"
+            state: present
+
+        - name: Install Tailscale
+          ansible.builtin.apt:
+            name: tailscale
+            state: present
+            update_cache: true
+
+    - name: Enable and start Tailscale
+      ansible.builtin.systemd:
+        name: tailscaled
+        state: started
+        enabled: true
+
+    - name: Add headscale to /etc/hosts (bypass MagicDNS circular dependency)
+      ansible.builtin.lineinfile:
+        path: /etc/hosts
+        line: "213.136.68.108 headscale.quietly.its.me"
+        state: present
+        create: no
+
+    - name: Check Tailscale status
+      ansible.builtin.command: tailscale status
+      register: tailscale_status
+      changed_when: false
+      failed_when: false
+      when: tailscale_installed.rc == 0
+
+    - name: Connect to Headscale with pre-auth key
+      ansible.builtin.shell: |
+        tailscale up \
+          --login-server https://headscale.quietly.its.me \
+          --authkey $(cat /home/{{ admin_user }}/.secrets/headscale/lady-authkey) \
+          --hostname lady \
+          --accept-dns \
+          --accept-routes
+      when:
+        - not ansible_check_mode
+        - tailscale_installed.rc == 0
+        - "'100.64.0' not in (tailscale_status.stdout | default('')) or 'Logged out' in (tailscale_status.stdout | default(''))"
+      become: true
+      register: tailscale_up
+      changed_when: tailscale_up.rc == 0
+
+    - name: Wait for Tailscale connection
+      ansible.builtin.command: tailscale status
+      register: tailscale_final_status
+      until: "'100.64.0' in tailscale_final_status.stdout"
+      retries: 12
+      delay: 5
+      changed_when: false
+      when:
+        - not ansible_check_mode
+        - tailscale_installed.rc == 0
+
+    - name: Check Traefik compose file exists
+      ansible.builtin.stat:
+        path: "{{ compose_dir }}/traefik/docker-compose.yaml"
+      register: traefik_compose
+      when:
+        - not ansible_check_mode
+        - tailscale_installed.rc == 0
+
+    - name: Restore Tailnet-only Traefik port bind after Tailscale
+      ansible.builtin.lineinfile:
+        path: "{{ compose_dir }}/traefik/docker-compose.yaml"
+        regexp: '^\s*-\s*"100\.64\.0\.2:8082:8082"'
+        line: "      - \"100.64.0.2:8082:8082\""
+        insertafter: '^\s*ports:\s*$'
+      when:
+        - not ansible_check_mode
+        - tailscale_installed.rc == 0
+        - traefik_compose.stat.exists
+
+    - name: Display Tailscale final status
+      ansible.builtin.debug:
+        msg: |
+          Tailscale Connected:
+          {{ tailscale_final_status.stdout | default('Status check skipped') }}
+      when: not ansible_check_mode

@@ -1,0 +1,39 @@
+---
+# MASTER ADMIN-PANEL - Flask-based admin interface
+# Usage: ansible-playbook -i inventory/production.ini playbooks/19-admin-panel.yml
+
+- name: Deploy Admin-Panel on Master
+  hosts: master
+  become: true
+  become_user: "{{ admin_user }}"
+  vars_files:
+    - "{{ playbook_dir }}/../../group_vars/all.yml"
+    - "{{ playbook_dir }}/../../host_vars/master.yml"
+
+  tasks:
+    - name: Pull latest from GitHub
+      ansible.builtin.git:
+        repo: "https://github.com/quietly007/quietly.its.me.git"
+        dest: "{{ ansible_env.HOME }}"
+        version: main
+        update: yes
+        force: no
+
+    - name: Check compose file exists
+      ansible.builtin.stat:
+        path: "{{ compose_dir }}/admin-panel/docker-compose.yaml"
+      register: admin_panel_compose
+
+    - name: Fail if compose file missing
+      ansible.builtin.fail:
+        msg: "Compose file missing at {{ compose_dir }}/admin-panel/docker-compose.yaml"
+      when: not admin_panel_compose.stat.exists
+
+    - name: Start Admin-Panel
+      community.docker.docker_compose_v2:
+        project_src: "{{ compose_dir }}/admin-panel"
+        state: present
+
+    - name: Show status
+      ansible.builtin.debug:
+        msg: "Admin-Panel deployed at https://admin.quietly.its.me"

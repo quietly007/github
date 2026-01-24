@@ -1,0 +1,19 @@
+# Shared repo gitignore
+
+# Ansible runtime
+ansible/**/*.retry
+ansible/.ansible/
+ansible/**/__pycache__/
+
+# Copilot runtime
+copilot-shared/temp/
+copilot-shared/backups/
+
+# Projects temp
+projects/**/node_modules/
+projects/**/.DS_Store
+
+# Editor files
+**/.vscode/
+**/*.swp
+**/*.swo

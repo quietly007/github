@@ -1,0 +1,19 @@
+---
+# LADY MONITORING - Compose only: git pull + docker compose up
+- name: Deploy Monitoring Agents on Lady
+  hosts: all
+  become: true
+  become_user: "{{ admin_user }}"
+  vars_files:
+    - "{{ playbook_dir }}/../../group_vars/all.yml"
+  tasks:
+    - name: Pull latest from GitHub
+      ansible.builtin.command: git pull
+      args:
+        chdir: "{{ ansible_env.HOME }}"
+      changed_when: false
+
+    - name: Start Monitoring Agents
+      ansible.builtin.command: docker compose up -d
+      args:
+        chdir: "{{ compose_dir }}/monitoring-agents"

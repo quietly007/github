@@ -1,0 +1,39 @@
+---
+# MASTER FUCKOFF-PAGE - Default landing page for unauthorized requests
+# Usage: ansible-playbook -i inventory/production.ini playbooks/18-fuckoff-page.yml
+
+- name: Deploy Fuckoff-Page on Master
+  hosts: master
+  become: true
+  become_user: "{{ admin_user }}"
+  vars_files:
+    - "{{ playbook_dir }}/../../group_vars/all.yml"
+    - "{{ playbook_dir }}/../../host_vars/master.yml"
+
+  tasks:
+    - name: Pull latest from GitHub
+      ansible.builtin.git:
+        repo: "https://github.com/quietly007/quietly.its.me.git"
+        dest: "{{ ansible_env.HOME }}"
+        version: main
+        update: yes
+        force: no
+
+    - name: Check compose file exists
+      ansible.builtin.stat:
+        path: "{{ compose_dir }}/fuckoff-page/docker-compose.yaml"
+      register: fuckoff_compose
+
+    - name: Fail if compose file missing
+      ansible.builtin.fail:
+        msg: "Compose file missing at {{ compose_dir }}/fuckoff-page/docker-compose.yaml"
+      when: not fuckoff_compose.stat.exists
+
+    - name: Start Fuckoff-Page
+      community.docker.docker_compose_v2:
+        project_src: "{{ compose_dir }}/fuckoff-page"
+        state: present
+
+    - name: Show status
+      ansible.builtin.debug:
+        msg: "Fuckoff-Page deployed - default handler for unmatched requests"

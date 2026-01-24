@@ -1,0 +1,69 @@
+---
+# SITE - Full Master server deployment
+# Usage: ansible-playbook -i inventory/production.ini playbooks/master/site.yml -l master
+#
+# Runs all playbooks in order for complete Master server setup
+# For Lady, use: ansible-playbook -i inventory/production.ini playbooks/lady/site-lady.yml
+
+- name: Shared bootstrap
+  ansible.builtin.import_playbook: ../shared/01-bootstrap.yml
+
+- name: Shared hardening
+  ansible.builtin.import_playbook: ../shared/02-hardening.yml
+
+- name: Shared security audit (AIDE/Lynis)
+  ansible.builtin.import_playbook: ../shared/03-security-audit.yml
+
+- name: Secrets structure
+  ansible.builtin.import_playbook: 00-secrets.yml
+
+- name: GitHub setup
+  ansible.builtin.import_playbook: 20-github.yml
+
+- name: Headscale (native)
+  ansible.builtin.import_playbook: 02-headscale.yml
+
+- name: Tailscale
+  ansible.builtin.import_playbook: 03-tailscale.yml
+
+- name: WireGuard
+  ansible.builtin.import_playbook: 14-wireguard.yml
+
+- name: Traefik
+  ansible.builtin.import_playbook: 04-traefik.yml
+
+- name: CrowdSec
+  ansible.builtin.import_playbook: 09-crowdsec.yml
+
+- name: Portainer
+  ansible.builtin.import_playbook: 05-portainer.yml
+
+- name: Monitoring
+  ansible.builtin.import_playbook: 06-monitoring.yml
+
+- name: Pi-hole
+  ansible.builtin.import_playbook: 10-pihole.yml
+
+- name: Semaphore
+  ansible.builtin.import_playbook: 12-semaphore.yml
+
+- name: Copilot
+  ansible.builtin.import_playbook: 15-copilot.yml
+
+- name: Authelia
+  ansible.builtin.import_playbook: 16-authelia.yml
+
+- name: Headscale UI
+  ansible.builtin.import_playbook: 17-headscale-ui.yml
+
+- name: Fuckoff Page
+  ansible.builtin.import_playbook: 18-fuckoff-page.yml
+
+- name: Admin Panel
+  ansible.builtin.import_playbook: 19-admin-panel.yml
+
+- name: IT-Tools
+  ansible.builtin.import_playbook: 07-it-tools.yml
+
+- name: Gotify
+  ansible.builtin.import_playbook: 08-gotify.yml

@@ -1,0 +1,51 @@
+# Lady server - WORKER node (Mailcow email server)
+# Master clone minus admin services, different domain/cert
+---
+hostname: lady
+domain: quietly.online
+tailnet_hostname: "lady.qui3tly.cloud"  # MagicDNS - survives IP changes!
+public_ip: "207.180.251.111"
+portainer_agent_bind_ip: "100.64.0.2"
+
+# NOT a master - worker only
+is_master: false
+run_headscale: false
+run_pihole: false           # Uses Master's Pi-hole
+run_monitoring_stack: false # No Prometheus/Grafana/Loki (Master has them)
+run_monitoring_agents: true # node-exporter, promtail, cadvisor → report to Master
+run_semaphore: false
+run_admin_services: false   # No headscale-admin, admin-panel, etc.
+
+# Lady-specific services
+run_mailcow: true           # Email server (Postfix, Dovecot, Rspamd, SOGo)
+run_nextcloud: false        # Not currently deployed
+run_unifi: false            # Not currently deployed
+run_uisp: false             # Not currently deployed
+
+# Tailscale config
+tailscale_advertise_routes: ""
+tailscale_exit_node: false
+
+# No WireGuard on worker (Tailscale only)
+wireguard_enabled: false
+
+# Cloudflare API token for DNS challenge (quietly.online zone)
+cf_api_token: "oZB2k6sVgPQyLDSo1AxaJynjdV2f9dNeQJghB_xq"
+
+# Master endpoints - use MagicDNS hostnames!
+master_prometheus: "http://master.qui3tly.cloud:9090"
+master_loki: "http://master.qui3tly.cloud:3100"
+
+# UFW - allow mail ports on Lady (public mail server)
+ufw_rules:
+  - { port: "{{ ssh_port }}", proto: tcp, comment: "SSH" }
+  - { port: "60000:61000", proto: udp, comment: "Mosh" }
+  - { port: 80, proto: tcp, comment: "HTTP" }
+  - { port: 443, proto: tcp, comment: "HTTPS" }
+  - { port: 41641, proto: udp, comment: "Tailscale" }
+  - { port: 25, proto: tcp, comment: "SMTP" }
+  - { port: 465, proto: tcp, comment: "SMTPS" }
+  - { port: 587, proto: tcp, comment: "Submission" }
+  - { port: 993, proto: tcp, comment: "IMAPS" }
+  - { port: 995, proto: tcp, comment: "POPS" }
+  - { port: 4190, proto: tcp, comment: "ManageSieve" }

@@ -1,0 +1,138 @@
+---
+# SHARED MONITORING AGENTS - Deploy exporters on any host (master/lady/madam)
+# Usage: ansible-playbook -i inventory/production.ini playbooks/shared/monitoring-agents.yml
+#
+# Deploys:
+# - node-exporter (system metrics → Prometheus)
+# - cadvisor (container metrics → Prometheus)
+# - promtail (logs → Loki)
+#
+# Compose-only playbook: git pull + docker compose (no inline file creation)
+
+- name: Deploy Monitoring Agents (Exporters)
+  hosts: servers  # Only servers (master, lady, madam) - not Mac
+  become: true
+  become_user: "{{ admin_user }}"
+  vars_files:
+    - "{{ playbook_dir }}/../../group_vars/all.yml"
+
+  vars:
+    monitoring_repo_map:
+      master: "https://github.com/quietly007/quietly.its.me.git"
+      lady: "https://github.com/quietly007/quietly.online.git"
+      madam: "https://github.com/quietly007/quietly.co.me.git"
+
+  tasks:
+    - name: Resolve monitoring repo
+      ansible.builtin.set_fact:
+        monitoring_repo: "{{ monitoring_repo_map[inventory_hostname] | default('') }}"
+
+    - name: Fail if monitoring repo not defined
+      ansible.builtin.fail:
+        msg: "No monitoring repo mapping for host {{ inventory_hostname }}"
+      when: monitoring_repo | length == 0
+
+    - name: Pull latest from GitHub
+      ansible.builtin.git:
+        repo: "{{ monitoring_repo }}"
+        dest: "{{ ansible_env.HOME }}"
+        version: main
+        update: yes
+        force: no
+      when: not ansible_check_mode
+
+    - name: Check compose file exists
+      ansible.builtin.stat:
+        path: "{{ docker_dir }}/monitoring-agents/docker-compose.yaml"
+      register: monitoring_compose
+
+    - name: Fail if compose file missing
+      ansible.builtin.fail:
+        msg: "Compose file missing at {{ docker_dir }}/monitoring-agents/docker-compose.yaml"
+      when: not monitoring_compose.stat.exists
+
+    - name: Check promtail config exists
+      ansible.builtin.stat:
+        path: "{{ docker_dir }}/monitoring-agents/promtail/promtail-config.yml"
+      register: promtail_config
+
+    - name: Fail if promtail config missing
+      ansible.builtin.fail:
+        msg: "Promtail config missing at {{ docker_dir }}/monitoring-agents/promtail/promtail-config.yml"
+      when: not promtail_config.stat.exists
+
+    - name: Start monitoring agents
+      community.docker.docker_compose_v2:
+        project_src: "{{ docker_dir }}/monitoring-agents"
+        state: present
+        pull: always
+        recreate: always
+
+    - name: Wait for node-exporter healthy
+      ansible.builtin.uri:
+        url: "http://localhost:9100/metrics"
+        status_code: 200
+      register: node_exporter_health
+      retries: 10
+      delay: 3
+      until: node_exporter_health.status == 200
+      failed_when: false
+      changed_when: false
+
+    - name: Wait for cadvisor healthy
+      ansible.builtin.uri:
+        url: "http://localhost:8081/healthz"
+        status_code: 200
+      register: cadvisor_health
+      retries: 10
+      delay: 3
+      until: cadvisor_health.status == 200
+      failed_when: false
+      changed_when: false
+
+    - name: Show monitoring agents status
+      ansible.builtin.debug:
+        msg: |
+          Monitoring agents deployed on {{ inventory_hostname }}:
+          - node-exporter: {{ 'HEALTHY' if node_exporter_health.status == 200 else 'STARTING - check logs' }}
+          - cadvisor: {{ 'HEALTHY' if cadvisor_health.status == 200 else 'STARTING - check logs' }}
+          - promtail: RUNNING (check Master's Loki for logs)
+          
+          Verify: docker ps | grep -E "node-exporter|cadvisor|promtail"
+
+# ========================================
+# REMINDER: UPDATE PROMETHEUS TARGETS MANUALLY
+# ========================================
+- name: Reminder to update Prometheus targets
+  hosts: master_group
+  become: true
+  become_user: "{{ admin_user }}"
+  vars_files:
+    - "{{ playbook_dir }}/../../group_vars/all.yml"
+    - "{{ playbook_dir }}/../../host_vars/master.yml"
+
+  tasks:
+    - name: Show next steps
+      ansible.builtin.debug:
+        msg: |
+          ✅ Monitoring agents deployed on all hosts
+          
+          MANUAL STEP REQUIRED:
+          1. Edit ~/.docker/monitoring/prometheus/prometheus.yml
+          2. Add new host targets for madam (when deployed)
+          3. Commit to GitHub: git add + commit + push
+          4. Reload Prometheus: curl -X POST http://localhost:9090/-/reload
+          
+          Verify metrics collection:
+          1. Open Grafana: https://grafana.quietly.its.me
+          2. Check Prometheus targets: https://prometheus.quietly.its.me/targets
+          3. Verify Loki logs: https://grafana.quietly.its.me → Explore → Loki
+
+  handlers:
+    - name: Reload Prometheus
+      ansible.builtin.uri:
+        url: "http://localhost:9090/-/reload"
+        method: POST
+        status_code: 200
+      failed_when: false
+      changed_when: false

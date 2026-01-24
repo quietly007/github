@@ -1,0 +1,93 @@
+---
+# LADY HEALTH CHECK - Verify all services are running
+# Usage: ansible-playbook -i inventory/production.ini playbooks/lady/health-check.yml
+
+- name: Health Check Lady
+  hosts: lady
+  become: true
+  become_user: "{{ admin_user }}"
+  vars_files:
+    - "{{ playbook_dir }}/../../group_vars/all.yml"
+    - "{{ playbook_dir }}/../../host_vars/lady.yml"
+
+  tasks:
+    - name: Get Docker containers status
+      ansible.builtin.command: docker ps --format "table {% raw %}{{.Names}}\t{{.Status}}\t{{.Ports}}{% endraw %}"
+      register: docker_ps
+      changed_when: false
+
+    - name: Display container status
+      ansible.builtin.debug:
+        msg: |
+          ═══════════════════════════════════════════════════════════
+          🐳 DOCKER CONTAINERS
+          ═══════════════════════════════════════════════════════════
+          {{ docker_ps.stdout }}
+
+    - name: Check Traefik health
+      ansible.builtin.uri:
+        url: "https://traefik.{{ domain }}"
+        validate_certs: false
+        status_code: [200, 401, 403]
+      register: traefik_check
+      ignore_errors: true
+
+    - name: Check Portainer health
+      ansible.builtin.uri:
+        url: "https://portainer.{{ domain }}"
+        validate_certs: false
+        status_code: [200, 301, 302]
+      register: portainer_check
+      ignore_errors: true
+
+    - name: Check Nextcloud health
+      ansible.builtin.uri:
+        url: "https://cloud.{{ domain }}"
+        validate_certs: false
+        status_code: [200, 301, 302, 303]
+      register: nextcloud_check
+      ignore_errors: true
+
+    - name: Check UniFi health
+      ansible.builtin.uri:
+        url: "https://unifi.{{ domain }}"
+        validate_certs: false
+        status_code: [200, 301, 302]
+      register: unifi_check
+      ignore_errors: true
+
+    - name: Check UISP health
+      ansible.builtin.uri:
+        url: "https://uisp.{{ domain }}"
+        validate_certs: false
+        status_code: [200, 301, 302]
+      register: uisp_check
+      ignore_errors: true
+
+    - name: Check node-exporter
+      ansible.builtin.uri:
+        url: "http://localhost:9100/metrics"
+        status_code: 200
+      register: node_exporter_check
+      ignore_errors: true
+
+    - name: Display health summary
+      ansible.builtin.debug:
+        msg: |
+          ═══════════════════════════════════════════════════════════
+          ✅ HEALTH CHECK SUMMARY - {{ hostname }} ({{ domain }})
+          ═══════════════════════════════════════════════════════════
+          
+          Core Services:
+            Traefik:       {{ '✅ OK' if traefik_check.status is defined else '❌ FAIL' }}
+            Portainer:     {{ '✅ OK' if portainer_check.status is defined else '❌ FAIL' }}
+          
+          Lady Services:
+            Nextcloud:     {{ '✅ OK' if nextcloud_check.status is defined else '❌ FAIL' }}
+            UniFi:         {{ '✅ OK' if unifi_check.status is defined else '❌ FAIL' }}
+            UISP:          {{ '✅ OK' if uisp_check.status is defined else '❌ FAIL' }}
+          
+          Monitoring Agents:
+            Node Exporter: {{ '✅ OK' if node_exporter_check.status is defined else '❌ FAIL' }}
+          
+          ═══════════════════════════════════════════════════════════

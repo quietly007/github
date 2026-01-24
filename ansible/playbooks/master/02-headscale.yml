@@ -1,0 +1,257 @@
+---
+# HEADSCALE - Native installation of Headscale coordination server
+# Usage: ansible-playbook -i inventory/production.ini playbooks/master/02-headscale.yml
+#
+# This playbook installs Headscale as a native systemd service (NOT Docker)
+# Headscale version: v0.27.1
+# Configuration: /etc/headscale/config.yaml
+# Data directory: /var/lib/headscale/
+
+- name: Install and configure Headscale coordination server
+  hosts: master
+  become: true
+  vars_files:
+    - "{{ playbook_dir }}/../../group_vars/all.yml"
+    - "{{ playbook_dir }}/../../host_vars/master.yml"
+
+  vars:
+    headscale_version: "0.27.1"
+    headscale_user: "headscale"
+    headscale_group: "headscale"
+    headscale_config_dir: "/etc/headscale"
+    headscale_data_dir: "/var/lib/headscale"
+    headscale_binary_path: "/usr/bin/headscale"
+
+  tasks:
+    #=== MASTER DNS BOOTSTRAP (CRITICAL) ===
+    - name: Remove immutable flag from /etc/resolv.conf
+      ansible.builtin.command: chattr -i /etc/resolv.conf
+      when: not ansible_check_mode
+      changed_when: false
+      failed_when: false
+
+    - name: Ensure /etc/resolv.conf uses Cloudflare DNS
+      ansible.builtin.copy:
+        dest: /etc/resolv.conf
+        content: |
+          nameserver 1.1.1.1
+        mode: '0644'
+
+    - name: Set immutable flag on /etc/resolv.conf
+      ansible.builtin.command: chattr +i /etc/resolv.conf
+      when: not ansible_check_mode
+      changed_when: false
+      failed_when: false
+
+    - name: Check if Headscale already installed
+      ansible.builtin.stat:
+        path: "{{ headscale_binary_path }}"
+      register: headscale_bin
+
+    - name: Get installed Headscale version
+      ansible.builtin.command: "{{ headscale_binary_path }} version"
+      register: installed_version
+      when: headscale_bin.stat.exists
+      changed_when: false
+      failed_when: false
+
+    - name: Display current Headscale version
+      ansible.builtin.debug:
+        msg: "Headscale v{{ headscale_version }} already installed and up-to-date"
+      when:
+        - headscale_bin.stat.exists
+        - installed_version.stdout is defined
+        - installed_version.stdout is search('v' + headscale_version)
+
+    - name: Install or upgrade Headscale binary
+      when: not ansible_check_mode and (not headscale_bin.stat.exists or (installed_version.stdout is defined and not (installed_version.stdout is search('v' + headscale_version))))
+      block:
+        - name: Create temporary download directory
+          ansible.builtin.tempfile:
+            state: directory
+            suffix: headscale
+          register: temp_dir
+
+        - name: Download Headscale binary
+          ansible.builtin.get_url:
+            url: "https://github.com/juanfont/headscale/releases/download/v{{ headscale_version }}/headscale_{{ headscale_version }}_linux_amd64"
+            dest: "{{ temp_dir.path }}/headscale"
+            mode: '0755'
+            timeout: 60
+
+        - name: Stop Headscale service if running
+          ansible.builtin.systemd:
+            name: headscale
+            state: stopped
+          failed_when: false
+
+        - name: Install Headscale binary
+          ansible.builtin.copy:
+            src: "{{ temp_dir.path }}/headscale"
+            dest: "{{ headscale_binary_path }}"
+            mode: '0755'
+            owner: root
+            group: root
+            remote_src: true
+
+        - name: Clean up temporary directory
+          ansible.builtin.file:
+            path: "{{ temp_dir.path }}"
+            state: absent
+
+    - name: Create Headscale system user
+      ansible.builtin.user:
+        name: "{{ headscale_user }}"
+        system: true
+        shell: /usr/sbin/nologin
+        home: "{{ headscale_data_dir }}"
+        create_home: false
+        state: present
+
+    - name: Create Headscale directories
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: directory
+        owner: "{{ item.owner }}"
+        group: "{{ item.group }}"
+        mode: "{{ item.mode }}"
+      loop:
+        - { path: "{{ headscale_config_dir }}", owner: "root", group: "root", mode: "0755" }
+        - { path: "{{ headscale_data_dir }}", owner: "{{ headscale_user }}", group: "{{ headscale_group }}", mode: "0750" }
+
+    - name: Check if config.yaml exists
+      ansible.builtin.stat:
+        path: "{{ headscale_config_dir }}/config.yaml"
+      register: config_file
+
+    - name: Deploy Headscale configuration
+      ansible.builtin.template:
+        src: "{{ playbook_dir }}/../../templates/headscale/config.yaml.j2"
+        dest: "{{ headscale_config_dir }}/config.yaml"
+        owner: root
+        group: root
+        mode: '0644'
+        backup: true
+      when: not config_file.stat.exists
+      notify: Restart Headscale
+
+    - name: Display config warning if exists
+      ansible.builtin.debug:
+        msg: "WARNING: config.yaml already exists, not overwriting. Review manually if updates needed."
+      when: config_file.stat.exists
+
+    - name: Create Headscale systemd service
+      ansible.builtin.copy:
+        dest: /lib/systemd/system/headscale.service
+        content: |
+          [Unit]
+          After=network.target
+          Description=headscale coordination server for Tailscale
+          X-Restart-Triggers=/etc/headscale/config.yaml
+
+          [Service]
+          Type=simple
+          User={{ headscale_user }}
+          Group={{ headscale_group }}
+          ExecStart={{ headscale_binary_path }} serve
+          ExecReload=/usr/bin/kill -HUP $MAINPID
+          Restart=always
+          RestartSec=5
+
+          WorkingDirectory={{ headscale_data_dir }}
+          ReadWritePaths={{ headscale_data_dir }}
+
+          AmbientCapabilities=CAP_NET_BIND_SERVICE CAP_CHOWN
+          CapabilityBoundingSet=CAP_NET_BIND_SERVICE CAP_CHOWN
+          LockPersonality=true
+          NoNewPrivileges=true
+          PrivateDevices=true
+          PrivateMounts=true
+          PrivateTmp=true
+          ProcSubset=pid
+          ProtectClock=true
+          ProtectControlGroups=true
+          ProtectHome=true
+          ProtectHostname=true
+          ProtectKernelLogs=true
+          ProtectKernelModules=true
+          ProtectKernelTunables=true
+          ProtectProc=invisible
+          ProtectSystem=strict
+          RemoveIPC=true
+          RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+          RestrictNamespaces=true
+          RestrictRealtime=true
+          RestrictSUIDSGID=true
+          RuntimeDirectory={{ headscale_user }}
+          RuntimeDirectoryMode=0750
+          StateDirectory={{ headscale_user }}
+          StateDirectoryMode=0750
+          SystemCallArchitectures=native
+          SystemCallFilter=@chown
+          SystemCallFilter=@system-service
+          SystemCallFilter=~@privileged
+          UMask=0077
+
+          [Install]
+          WantedBy=multi-user.target
+        owner: root
+        group: root
+        mode: '0644'
+      notify: Restart Headscale
+
+    - name: Reload systemd daemon
+      ansible.builtin.systemd:
+        daemon_reload: true
+
+    - name: Enable and start Headscale service
+      ansible.builtin.systemd:
+        name: headscale
+        enabled: true
+        state: started
+
+    - name: Wait for Headscale to be ready
+      ansible.builtin.wait_for:
+        port: 8085
+        host: 127.0.0.1
+        delay: 2
+        timeout: 30
+
+    - name: Verify Headscale is running
+      ansible.builtin.command: "{{ headscale_binary_path }} version"
+      register: version_check
+      changed_when: false
+
+    - name: Display Headscale version
+      ansible.builtin.debug:
+        msg: "{{ version_check.stdout }}"
+
+    - name: Check Headscale service status
+      ansible.builtin.systemd:
+        name: headscale
+        state: started
+      register: headscale_status
+      failed_when: headscale_status.status.ActiveState != 'active'
+
+    - name: Display success message
+      ansible.builtin.debug:
+        msg: |
+          ✅ Headscale installed successfully!
+          
+          Configuration: {{ headscale_config_dir }}/config.yaml
+          Data directory: {{ headscale_data_dir }}
+          Binary: {{ headscale_binary_path }}
+          Service: headscale.service (active)
+          
+          Next steps:
+          1. Review config: sudo cat {{ headscale_config_dir }}/config.yaml
+          2. Create user: sudo headscale users create <username>
+          3. Generate preauthkey: sudo headscale preauthkeys create -e 1h -u <user> --reusable
+          4. Deploy Tailscale clients with: ansible-playbook playbooks/master/03-tailscale.yml
+
+  handlers:
+    - name: Restart Headscale
+      ansible.builtin.systemd:
+        name: headscale
+        state: restarted
+        daemon_reload: true

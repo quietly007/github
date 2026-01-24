@@ -1,0 +1,133 @@
+---
+# MASTER CROWDSEC - Security and threat detection
+# Usage: ansible-playbook -i inventory/production.ini playbooks/09-crowdsec.yml
+#
+# DR-ready: Creates hub directory, generates credentials and bouncer key if missing
+# Compose-only playbook: git pull + docker compose (collections installed post-start)
+
+- name: Deploy CrowdSec on Master
+  hosts: master
+  become: true
+  become_user: "{{ admin_user }}"
+  vars_files:
+    - "{{ playbook_dir }}/../../group_vars/all.yml"
+    - "{{ playbook_dir }}/../../host_vars/master.yml"
+
+  tasks:
+    - name: Pull latest from GitHub
+      ansible.builtin.git:
+        repo: "https://github.com/quietly007/quietly.its.me.git"
+        dest: "{{ ansible_env.HOME }}"
+        version: main
+        update: yes
+        force: no
+      when: not ansible_check_mode
+
+    - name: Ensure CrowdSec config/data/hub directories exist
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "1000"
+        group: "1000"
+        mode: '0755'
+      loop:
+        - "{{ docker_dir }}/crowdsec/config"
+        - "{{ docker_dir }}/crowdsec/config/hub"
+        - "{{ docker_dir }}/crowdsec/data"
+      become: true
+      become_user: root
+
+    - name: Check local API credentials
+      ansible.builtin.stat:
+        path: "{{ docker_dir }}/crowdsec/config/local_api_credentials.yaml"
+      register: crowdsec_local_creds
+
+    - name: Generate local API credentials
+      ansible.builtin.copy:
+        dest: "{{ docker_dir }}/crowdsec/config/local_api_credentials.yaml"
+        mode: '0600'
+        owner: "1000"
+        group: "1000"
+        content: |
+          url: http://0.0.0.0:8080
+          login: {{ lookup('community.general.random_string', length=32, special=false) }}
+          password: {{ lookup('community.general.random_string', length=64, special=false) }}
+      when: not crowdsec_local_creds.stat.exists
+      no_log: true
+      become: true
+      become_user: root
+
+    - name: Check compose file exists
+      ansible.builtin.stat:
+        path: "{{ compose_dir }}/crowdsec/docker-compose.yaml"
+      register: crowdsec_compose
+
+    - name: Fail if compose file missing
+      ansible.builtin.fail:
+        msg: "Compose file missing at {{ compose_dir }}/crowdsec/docker-compose.yaml"
+      when: not crowdsec_compose.stat.exists
+
+    - name: Check bouncer .env exists
+      ansible.builtin.stat:
+        path: "{{ compose_dir }}/crowdsec/.env"
+      register: crowdsec_env
+
+    - name: Start CrowdSec first (to generate bouncer key)
+      community.docker.docker_compose_v2:
+        project_src: "{{ compose_dir }}/crowdsec"
+        services:
+          - crowdsec
+        state: present
+      when: not ansible_check_mode and not crowdsec_env.stat.exists
+
+    - name: Wait for CrowdSec to be ready
+      ansible.builtin.pause:
+        seconds: 15
+      when: not ansible_check_mode and not crowdsec_env.stat.exists
+
+    - name: Generate bouncer API key
+      ansible.builtin.command:
+        cmd: docker exec crowdsec cscli bouncers add traefik-bouncer -o raw
+      register: bouncer_key
+      when: not ansible_check_mode and not crowdsec_env.stat.exists
+      changed_when: true
+
+    - name: Save bouncer key to .env
+      ansible.builtin.copy:
+        dest: "{{ compose_dir }}/crowdsec/.env"
+        content: "CROWDSEC_BOUNCER_API_KEY={{ bouncer_key.stdout }}"
+        mode: '0600'
+      when: not ansible_check_mode and not crowdsec_env.stat.exists
+
+    - name: Start CrowdSec stack
+      community.docker.docker_compose_v2:
+        project_src: "{{ compose_dir }}/crowdsec"
+        state: present
+      when: not ansible_check_mode
+
+    - name: Wait for CrowdSec healthy
+      ansible.builtin.command:
+        cmd: docker exec crowdsec cscli version
+      register: crowdsec_health
+      retries: 10
+      delay: 5
+      until: crowdsec_health.rc == 0
+      ignore_errors: true
+      changed_when: false
+      when: not ansible_check_mode
+
+    - name: Install CrowdSec collections (traefik, http-cve, linux)
+      ansible.builtin.command:
+        cmd: "docker exec crowdsec cscli collections install {{ item }} --force"
+      loop:
+        - crowdsecurity/traefik
+        - crowdsecurity/http-cve
+        - crowdsecurity/linux
+      register: collections_install
+      changed_when: "'installed' in collections_install.stdout or 'upgraded' in collections_install.stdout"
+      failed_when: false
+      when: not ansible_check_mode
+
+    - name: Show status
+      ansible.builtin.debug:
+        msg: "CrowdSec {{ 'HEALTHY' if (crowdsec_health.rc | default(0)) == 0 else 'NOT HEALTHY - check logs' }}"

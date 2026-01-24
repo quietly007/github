@@ -1,0 +1,74 @@
+---
+# HEALTH CHECK - Verify all services
+# Usage: ansible-playbook -i inventory/production.ini playbooks/health-check.yml -l <host>
+
+- name: Health check all services
+  hosts: all
+  become: true
+  vars_files:
+    - "{{ playbook_dir }}/../../group_vars/all.yml"
+    - "{{ playbook_dir }}/../../host_vars/{{ inventory_hostname }}.yml"
+
+  tasks:
+    - name: Check Docker service
+      ansible.builtin.systemd:
+        name: docker
+        state: started
+      check_mode: true
+      register: docker_status
+
+    - name: Get running containers
+      ansible.builtin.shell: 'docker ps --format "table \{\{.Names\}\}\t\{\{.Status\}\}"'
+      register: containers
+      changed_when: false
+
+    - name: Display containers
+      ansible.builtin.debug:
+        var: containers.stdout_lines
+
+    - name: Check Tailscale status
+      ansible.builtin.command: tailscale status
+      register: tailscale_status
+      changed_when: false
+      failed_when: false
+
+    - name: Display Tailscale
+      ansible.builtin.debug:
+        var: tailscale_status.stdout_lines
+
+    - name: Check disk space
+      ansible.builtin.command: df -h /
+      register: disk_space
+      changed_when: false
+
+    - name: Display disk
+      ansible.builtin.debug:
+        var: disk_space.stdout_lines
+
+    - name: Check memory
+      ansible.builtin.command: free -h
+      register: memory
+      changed_when: false
+
+    - name: Display memory
+      ansible.builtin.debug:
+        var: memory.stdout_lines
+
+    - name: Check UFW status
+      ansible.builtin.command: ufw status
+      register: ufw_status
+      changed_when: false
+
+    - name: Display UFW
+      ansible.builtin.debug:
+        var: ufw_status.stdout_lines
+
+    - name: Check fail2ban
+      ansible.builtin.command: fail2ban-client status
+      register: fail2ban
+      changed_when: false
+      failed_when: false
+
+    - name: Display fail2ban
+      ansible.builtin.debug:
+        var: fail2ban.stdout_lines

@@ -1,0 +1,24 @@
+# Fail2ban jail configuration
+# Managed by Ansible - DO NOT EDIT
+
+[DEFAULT]
+bantime = {{ fail2ban_config.bantime }}
+findtime = {{ fail2ban_config.findtime }}
+maxretry = {{ fail2ban_config.maxretry }}
+backend = systemd
+banaction = ufw
+ignoreip = 127.0.0.1/8 ::1 213.136.68.108 207.180.251.111 100.64.0.0/10
+
+[sshd]
+enabled = true
+port = {{ ssh_port }}
+filter = sshd
+maxretry = {{ fail2ban_config.sshd_maxretry }}
+bantime = {{ fail2ban_config.sshd_bantime }}
+# Uses systemd journal - no logpath needed
+
+[recidive]
+enabled = true
+bantime = 1w
+findtime = 1d
+maxretry = 5

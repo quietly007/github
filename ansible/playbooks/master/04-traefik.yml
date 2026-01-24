@@ -1,0 +1,91 @@
+---
+# MASTER TRAEFIK - Reverse Proxy with SSL
+# Usage: ansible-playbook -i inventory/production.ini playbooks/04-traefik.yml
+#
+# Compose files are in GitHub (quietly.its.me repo)
+# Config files are in ~/.docker/traefik/config/
+# Compose-only playbook: git pull + docker compose (no config generation)
+
+- name: Deploy Traefik on Master
+  hosts: master
+  become: true
+  become_user: "{{ admin_user }}"
+  vars_files:
+    - "{{ playbook_dir }}/../../group_vars/all.yml"
+    - "{{ playbook_dir }}/../../host_vars/master.yml"
+
+  tasks:
+    - name: Pull latest from GitHub
+      ansible.builtin.git:
+        repo: "https://github.com/quietly007/quietly.its.me.git"
+        dest: "{{ ansible_env.HOME }}"
+        version: main
+        update: yes
+        force: no
+      when: not ansible_check_mode
+
+    - name: Check CF token exists
+      ansible.builtin.stat:
+        path: "{{ secrets_dir }}/traefik/cf-token"
+      register: cf_token_file
+
+    - name: Fail if CF token missing
+      ansible.builtin.fail:
+        msg: "CF token not found at {{ secrets_dir }}/traefik/cf-token"
+      when: not cf_token_file.stat.exists
+
+    - name: Check compose file exists
+      ansible.builtin.stat:
+        path: "{{ compose_dir }}/traefik/docker-compose.yaml"
+      register: traefik_compose
+
+    - name: Fail if compose file missing
+      ansible.builtin.fail:
+        msg: "Compose file missing at {{ compose_dir }}/traefik/docker-compose.yaml"
+      when: not traefik_compose.stat.exists
+
+    - name: Check Traefik config files exist
+      ansible.builtin.stat:
+        path: "{{ item }}"
+      loop:
+        - "{{ docker_dir }}/traefik/traefik.yaml"
+        - "{{ docker_dir }}/traefik/config/config.yaml"
+        - "{{ docker_dir }}/traefik/config/traefik-users.txt"
+        - "{{ docker_dir }}/traefik/acme.json"
+      register: traefik_configs
+
+    - name: Fail if Traefik config files missing
+      ansible.builtin.fail:
+        msg: "One or more Traefik config files are missing under {{ docker_dir }}/traefik"
+      when: traefik_configs.results | selectattr('stat.exists', 'equalto', false) | list | length > 0
+
+    - name: Ensure Traefik docker network exists
+      community.docker.docker_network:
+        name: traefik
+        state: present
+
+    - name: Start Traefik
+      community.docker.docker_compose_v2:
+        project_src: "{{ compose_dir }}/traefik"
+        state: present
+
+    - name: Seed health defaults in check mode
+      ansible.builtin.set_fact:
+        traefik_health:
+          status: 0
+      when: ansible_check_mode
+
+    - name: Wait for Traefik healthy
+      ansible.builtin.uri:
+        url: "http://localhost:8080/ping"
+        status_code: 200
+      register: traefik_health
+      retries: 10
+      delay: 5
+      until: traefik_health.status == 200
+      ignore_errors: true
+      when: not ansible_check_mode
+
+    - name: Show status
+      ansible.builtin.debug:
+        msg: "Traefik {{ 'HEALTHY' if (traefik_health.status | default(0)) == 200 else 'NOT HEALTHY - check logs' }}"

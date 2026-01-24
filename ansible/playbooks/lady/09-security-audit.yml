@@ -1,0 +1,12 @@
+---
+# LADY SECURITY AUDIT - AIDE + Lynis wrapper
+# Usage: ansible-playbook -i inventory/production.ini playbooks/lady/09-security-audit.yml
+#
+# This is NOT part of DR - run explicitly after deployment verified
+#
+# Optional vars (defaults to install-only):
+#   -e aide_initialize=true   # Initialize AIDE database
+#   -e lynis_audit=true       # Run Lynis audit
+
+- name: "🔒 Lady Security Audit (AIDE + Lynis)"
+  ansible.builtin.import_playbook: ../shared/03-security-audit.yml

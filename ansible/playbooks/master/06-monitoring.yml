@@ -1,0 +1,62 @@
+---
+# MASTER MONITORING - Grafana, Prometheus, node-exporter, cadvisor, promtail
+# Usage: ansible-playbook -i inventory/production.ini playbooks/06-monitoring.yml
+
+- name: Deploy Monitoring Stack on Master
+  hosts: master
+  become: true
+  become_user: "{{ admin_user }}"
+  vars_files:
+    - "{{ playbook_dir }}/../../group_vars/all.yml"
+    - "{{ playbook_dir }}/../../host_vars/master.yml"
+
+  tasks:
+    - name: Pull latest from GitHub (source of truth for DR)
+      ansible.builtin.git:
+        repo: "https://github.com/quietly007/quietly.its.me.git"
+        dest: "{{ ansible_env.HOME }}"
+        version: main
+        update: yes
+        force: yes  # Force pull from GitHub - GitHub is offsite backup!
+
+    - name: Check compose file exists
+      ansible.builtin.stat:
+        path: "{{ compose_dir }}/monitoring/docker-compose.yaml"
+      register: monitoring_compose
+
+    - name: Fail if compose file missing
+      ansible.builtin.fail:
+        msg: "Compose file missing at {{ compose_dir }}/monitoring/docker-compose.yaml"
+      when: not monitoring_compose.stat.exists
+
+    - name: Check monitoring config files exist
+      ansible.builtin.stat:
+        path: "{{ item }}"
+      loop:
+        - "{{ docker_dir }}/monitoring/prometheus/prometheus.yml"
+        - "{{ docker_dir }}/monitoring/prometheus/alerts/system.yml"
+        - "{{ docker_dir }}/monitoring/alertmanager/alertmanager.yml"
+      register: monitoring_configs
+
+    - name: Fail if monitoring config files missing
+      ansible.builtin.fail:
+        msg: "One or more monitoring config files are missing under {{ docker_dir }}/monitoring"
+      when: monitoring_configs.results | selectattr('stat.exists', 'equalto', false) | list | length > 0
+
+    - name: Start Monitoring Stack
+      community.docker.docker_compose_v2:
+        project_src: "{{ compose_dir }}/monitoring"
+        state: present
+        pull: always
+
+    - name: Wait for services to be healthy
+      ansible.builtin.pause:
+        seconds: 30
+        prompt: "Waiting 30s for monitoring stack to be healthy..."
+
+    - name: Show status
+      ansible.builtin.debug:
+        msg: |
+          Monitoring stack deployed ✅
+          Verify: docker ps | grep -E 'grafana|prometheus|loki|alertmanager'
+          Access: https://grafana.quietly.its.me

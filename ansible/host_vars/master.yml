@@ -1,0 +1,33 @@
+# Master server - CONTROL PLANE
+# Runs all admin/monitoring services, workers report here
+---
+hostname: quietly
+domain: quietly.its.me
+tailnet_ip: "100.64.0.1"
+public_ip: "213.136.68.108"
+github_repo: "quietly.its.me"
+
+# Master is the control plane
+is_master: true
+run_headscale: true
+run_headscale_ui: true        # Headscale web interfaces
+run_pihole: true              # Central DNS for all servers
+run_monitoring_stack: true    # Prometheus, Grafana, Loki, Alertmanager
+run_monitoring_agents: true   # Also runs local agents
+run_semaphore: true
+run_admin_services: true      # headscale-admin, admin-panel, it-tools, gotify
+run_authelia: false            # Identity provider / SSO
+run_fuckoff_page: true        # VPN block page
+run_admin_panel: false         # Custom Flask admin interface
+
+# Tailscale config for master
+tailscale_advertise_routes: ""
+tailscale_exit_node: false
+
+# WireGuard (master is server for LAN bridge)
+wireguard_enabled: true
+wireguard_address: "10.100.0.1/30"
+wireguard_listen_port: 51820
+
+# Cloudflare API token for DNS challenge (quietly.its.me zone)
+cf_api_token: "DxwRepVuTpJJeIQNIa_1OJ9yDjBPKWCrrqB94p68"

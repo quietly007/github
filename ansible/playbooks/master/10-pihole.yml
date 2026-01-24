@@ -1,0 +1,49 @@
+---
+# MASTER PI-HOLE - DNS ad blocking
+# Usage: ansible-playbook -i inventory/production.ini playbooks/10-pihole.yml
+
+- name: Deploy Pi-hole on Master
+  hosts: master
+  become: true
+  become_user: "{{ admin_user }}"
+  vars_files:
+    - "{{ playbook_dir }}/../../group_vars/all.yml"
+    - "{{ playbook_dir }}/../../host_vars/master.yml"
+
+  tasks:
+    - name: Pull latest from GitHub
+      ansible.builtin.git:
+        repo: "https://github.com/quietly007/quietly.its.me.git"
+        dest: "{{ ansible_env.HOME }}"
+        version: main
+        update: yes
+        force: no
+
+    - name: Check compose file exists
+      ansible.builtin.stat:
+        path: "{{ compose_dir }}/pihole/docker-compose.yaml"
+      register: pihole_compose
+
+    - name: Fail if compose file missing
+      ansible.builtin.fail:
+        msg: "Compose file missing at {{ compose_dir }}/pihole/docker-compose.yaml"
+      when: not pihole_compose.stat.exists
+
+    - name: Start Pi-hole
+      community.docker.docker_compose_v2:
+        project_src: "{{ compose_dir }}/pihole"
+        state: present
+
+    - name: Wait for Pi-hole healthy
+      ansible.builtin.uri:
+        url: "http://localhost:8081/admin"
+        status_code: 200
+      register: pihole_health
+      retries: 10
+      delay: 5
+      until: pihole_health.status == 200
+      ignore_errors: true
+
+    - name: Show status
+      ansible.builtin.debug:
+        msg: "Pi-hole {{ 'HEALTHY' if pihole_health.status == 200 else 'NOT HEALTHY' }}"

@@ -1,0 +1,39 @@
+---
+# MASTER GOTIFY - Push notifications
+# Usage: ansible-playbook -i inventory/production.ini playbooks/08-gotify.yml
+
+- name: Deploy Gotify on Master
+  hosts: master
+  become: true
+  become_user: "{{ admin_user }}"
+  vars_files:
+    - "{{ playbook_dir }}/../../group_vars/all.yml"
+    - "{{ playbook_dir }}/../../host_vars/master.yml"
+
+  tasks:
+    - name: Pull latest from GitHub
+      ansible.builtin.git:
+        repo: "https://github.com/quietly007/quietly.its.me.git"
+        dest: "{{ ansible_env.HOME }}"
+        version: main
+        update: yes
+        force: no
+
+    - name: Check compose file exists
+      ansible.builtin.stat:
+        path: "{{ compose_dir }}/gotify/docker-compose.yaml"
+      register: gotify_compose
+
+    - name: Fail if compose file missing
+      ansible.builtin.fail:
+        msg: "Compose file missing at {{ compose_dir }}/gotify/docker-compose.yaml"
+      when: not gotify_compose.stat.exists
+
+    - name: Start Gotify
+      community.docker.docker_compose_v2:
+        project_src: "{{ compose_dir }}/gotify"
+        state: present
+
+    - name: Show status
+      ansible.builtin.debug:
+        msg: "Gotify deployed at https://gotify.quietly.its.me"

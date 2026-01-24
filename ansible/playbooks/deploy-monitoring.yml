@@ -1,0 +1,281 @@
+---
+# MONITORING DEPLOYMENT - Full monitoring stack for qui3tly.cloud
+# Usage: ansible-playbook -i inventory/production.ini playbooks/deploy-monitoring.yml
+#
+# Deploys:
+# 1. Master: Prometheus, Grafana, Loki, Alertmanager (collection + visualization)
+# 2. All hosts: node-exporter, cadvisor, promtail (agents → report to Master)
+#
+# Order: Master first (collectors), then agents on all hosts
+
+- name: Deploy Full Monitoring Stack
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Show deployment plan
+      ansible.builtin.debug:
+        msg: |
+          ═══════════════════════════════════════════════════════════════
+          MONITORING STACK DEPLOYMENT - qui3tly.cloud
+          ═══════════════════════════════════════════════════════════════
+          
+          Phase 1: Deploy Master monitoring stack
+            - Prometheus (metrics collection)
+            - Grafana (dashboards)
+            - Loki (log aggregation)
+            - Alertmanager (alert routing)
+          
+          Phase 2: Deploy monitoring agents on all hosts
+            - node-exporter (system metrics)
+            - cadvisor (container metrics)
+            - promtail (log shipping)
+          
+          Phase 3: Verify connectivity and metrics collection
+          
+          Ready to proceed...
+
+# ═══════════════════════════════════════════════════════════════
+# PHASE 1: MASTER MONITORING STACK
+# ═══════════════════════════════════════════════════════════════
+- name: Phase 1 - Deploy Master Monitoring Stack
+  import_playbook: master/06-monitoring.yml
+
+# ═══════════════════════════════════════════════════════════════
+# PHASE 2: MONITORING AGENTS ON WORKER NODES ONLY
+# Master already has exporters from monitoring stack
+# ═══════════════════════════════════════════════════════════════
+- name: Phase 2 - Deploy Monitoring Agents on Workers
+  hosts: workers
+  become: true
+  become_user: "{{ admin_user }}"
+  gather_facts: true
+  any_errors_fatal: false  # Continue even if some hosts unreachable
+  vars_files:
+    - "{{ playbook_dir }}/../group_vars/all.yml"
+
+  tasks:
+    - name: Create monitoring agent directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - "{{ docker_dir }}/monitoring-agents"
+        - "{{ docker_dir }}/monitoring-agents/promtail"
+
+    - name: Deploy Promtail config
+      ansible.builtin.copy:
+        dest: "{{ docker_dir }}/monitoring-agents/promtail/promtail-config.yml"
+        content: |
+          server:
+            http_listen_port: 9080
+            grpc_listen_port: 0
+
+          positions:
+            filename: /tmp/positions.yaml
+
+          clients:
+            - url: http://master.qui3tly.cloud:3100/loki/api/v1/push
+
+          scrape_configs:
+            - job_name: system
+              static_configs:
+                - targets: [localhost]
+                  labels:
+                    job: varlogs
+                    host: {{ inventory_hostname }}
+                    __path__: /var/log/*log
+            - job_name: containers
+              static_configs:
+                - targets: [localhost]
+                  labels:
+                    job: containerlogs
+                    host: {{ inventory_hostname }}
+                    __path__: /var/lib/docker/containers/*/*.log
+        mode: '0644'
+
+    - name: Deploy monitoring agents compose file
+      ansible.builtin.copy:
+        dest: "{{ docker_dir }}/monitoring-agents/docker-compose.yaml"
+        content: |
+          # Monitoring Agents for worker nodes
+          services:
+            node-exporter:
+              image: prom/node-exporter:v1.9.0
+              container_name: node-exporter
+              restart: unless-stopped
+              command:
+                - '--path.procfs=/host/proc'
+                - '--path.sysfs=/host/sys'
+                - '--path.rootfs=/rootfs'
+                - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+              volumes:
+                - /proc:/host/proc:ro
+                - /sys:/host/sys:ro
+                - /:/rootfs:ro
+              network_mode: host
+              pid: host
+              healthcheck:
+                test: ["CMD", "wget", "-q", "--spider", "http://localhost:9100/metrics"]
+                interval: 30s
+                timeout: 10s
+                retries: 3
+            cadvisor:
+              image: gcr.io/cadvisor/cadvisor:v0.52.1
+              container_name: cadvisor
+              restart: unless-stopped
+              privileged: true
+              volumes:
+                - /:/rootfs:ro
+                - /var/run:/var/run:ro
+                - /sys:/sys:ro
+                - /var/lib/docker/:/var/lib/docker:ro
+                - /dev/disk/:/dev/disk:ro
+              ports:
+                - "8081:8080"
+              devices:
+                - /dev/kmsg
+              healthcheck:
+                test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/healthz"]
+                interval: 30s
+                timeout: 10s
+                retries: 3
+            promtail:
+              image: grafana/promtail:3.4.2
+              container_name: promtail
+              restart: unless-stopped
+              command: -config.file=/etc/promtail/promtail-config.yml
+              volumes:
+                - /home/qui3tly/.docker/monitoring-agents/promtail/promtail-config.yml:/etc/promtail/promtail-config.yml:ro
+                - /var/log:/var/log:ro
+                - /var/lib/docker/containers:/var/lib/docker/containers:ro
+              network_mode: host
+        mode: '0644'
+
+    - name: Stop existing monitoring agents (idempotent)
+      ansible.builtin.shell: |
+        docker stop node-exporter cadvisor promtail 2>/dev/null || true
+        docker rm node-exporter cadvisor promtail 2>/dev/null || true
+      args:
+        executable: /bin/bash
+      changed_when: false
+      failed_when: false
+
+    - name: Start monitoring agents
+      community.docker.docker_compose_v2:
+        project_src: "{{ docker_dir }}/monitoring-agents"
+        state: present
+        pull: always
+        recreate: always
+
+    - name: Seed health defaults in check mode
+      ansible.builtin.set_fact:
+        node_exporter_health: { status: 0 }
+        cadvisor_health: { status: 0 }
+      when: ansible_check_mode
+
+    - name: Wait for node-exporter healthy
+      ansible.builtin.uri:
+        url: "http://localhost:9100/metrics"
+        status_code: 200
+      register: node_exporter_health
+      retries: 10
+      delay: 3
+      until: node_exporter_health.status == 200
+      failed_when: false
+      changed_when: false
+      when: not ansible_check_mode
+
+    - name: Wait for cadvisor healthy
+      ansible.builtin.uri:
+        url: "http://localhost:8081/healthz"
+        status_code: 200
+      register: cadvisor_health
+      retries: 10
+      delay: 3
+      until: cadvisor_health.status == 200
+      failed_when: false
+      changed_when: false
+      when: not ansible_check_mode
+
+    - name: Show monitoring agents status
+      ansible.builtin.debug:
+        msg: |
+          Monitoring agents deployed on {{ inventory_hostname }}:
+          - node-exporter: {{ 'HEALTHY' if (node_exporter_health.status | default(0)) == 200 else 'STARTING' }}
+          - cadvisor: {{ 'HEALTHY' if (cadvisor_health.status | default(0)) == 200 else 'STARTING' }}
+          - promtail: RUNNING
+
+# ═══════════════════════════════════════════════════════════════
+# PHASE 3: VERIFICATION
+# ═══════════════════════════════════════════════════════════════
+- name: Phase 3 - Verify Monitoring Stack
+  hosts: master_group
+  become: true
+  become_user: "{{ admin_user }}"
+  vars_files:
+    - "{{ playbook_dir }}/../group_vars/all.yml"
+    - "{{ playbook_dir }}/../host_vars/master.yml"
+
+  tasks:
+    - name: Prometheus verification (skip in check mode)
+      when: not ansible_check_mode
+      block:
+        - name: Wait for Prometheus to collect metrics
+          ansible.builtin.pause:
+            seconds: 30
+            prompt: "Waiting 30s for Prometheus to scrape targets..."
+
+        - name: Check Prometheus targets
+          ansible.builtin.shell: |
+            docker exec prometheus wget -qO- 'http://localhost:9090/api/v1/targets'
+          register: prometheus_targets_raw
+          changed_when: false
+
+        - name: Parse Prometheus API response
+          ansible.builtin.set_fact:
+            prometheus_json: "{{ prometheus_targets_raw.stdout | from_json }}"
+
+        - name: Parse target states
+          ansible.builtin.set_fact:
+            active_targets: "{{ prometheus_json.data.activeTargets | length }}"
+            up_targets: "{{ prometheus_json.data.activeTargets | selectattr('health', 'equalto', 'up') | list | length }}"
+            down_targets: "{{ prometheus_json.data.activeTargets | selectattr('health', 'equalto', 'down') | list | length }}"
+
+        - name: Show monitoring stack status
+          ansible.builtin.debug:
+            msg: |
+              ═══════════════════════════════════════════════════════════════
+              MONITORING STACK DEPLOYED ✅
+              ═══════════════════════════════════════════════════════════════
+              
+              Prometheus Targets:
+                Total: {{ active_targets }}
+                UP: {{ up_targets }}
+                DOWN: {{ down_targets }}
+              
+              Services:
+                Grafana:      https://grafana.quietly.its.me
+                Prometheus:   https://prometheus.quietly.its.me
+                Loki:         https://loki.quietly.its.me
+                Alertmanager: https://alertmanager.quietly.its.me
+              
+              Next Steps:
+                1. Login to Grafana: https://grafana.quietly.its.me
+                   User: qui3tly
+                   Pass: (from ~/.secrets/grafana/admin_password)
+                2. Verify Prometheus targets: 
+                   https://prometheus.quietly.its.me/targets
+                   All should show "UP" status
+                3. Check Loki logs in Grafana:
+                   Explore → Loki → {host="master"}
+                4. Test alerts:
+                   https://prometheus.quietly.its.me/alerts
+                   https://alertmanager.quietly.its.me
+
+        - name: Fail if targets are down
+          ansible.builtin.fail:
+            msg: "{{ down_targets }} Prometheus targets are DOWN! Check https://prometheus.quietly.its.me/targets"
+          when: 
+            - down_targets | int > 0
+            - up_targets | int < 5  # Require at least 5 UP targets (Traefik is optional)

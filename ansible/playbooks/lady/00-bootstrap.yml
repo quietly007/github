@@ -1,0 +1,309 @@
+---
+# LADY BOOTSTRAP - Fresh Server Setup
+# Usage: ansible-playbook -i inventory/bootstrap.ini playbooks/lady/00-bootstrap.yml
+#
+# Prerequisites (configure during Contabo install):
+#   - SSH on port 1006
+#   - User qui3tly with key
+#   - Password login disabled
+#
+# This playbook will:
+#   - Purge cloud-init
+#   - Remove Contabo admin account
+#   - Install Docker + packages
+#   - Configure UFW firewall
+#   - Create standard directories
+
+- name: Bootstrap Lady server
+  hosts: lady
+  become: true
+  vars_files:
+    - "{{ playbook_dir }}/../../group_vars/all.yml"
+    - "{{ playbook_dir }}/../../host_vars/lady.yml"
+
+  pre_tasks:
+    - name: Display bootstrap info
+      ansible.builtin.debug:
+        msg: |
+          ═══════════════════════════════════════════════════════════
+          🚀 LADY BOOTSTRAP
+          ═══════════════════════════════════════════════════════════
+          Hostname: {{ hostname }}
+          Domain: {{ domain }}
+          Public IP: {{ public_ip }}
+          Role: Worker (Nextcloud, UniFi, UISP)
+          ═══════════════════════════════════════════════════════════
+
+  tasks:
+    #=== CLEANUP CONTABO DEFAULTS ===
+    - name: Stop and disable cloud-init services
+      ansible.builtin.systemd:
+        name: "{{ item }}"
+        state: stopped
+        enabled: false
+      loop:
+        - cloud-init
+        - cloud-init-local
+        - cloud-config
+        - cloud-final
+      failed_when: false
+
+    - name: Purge cloud-init
+      ansible.builtin.apt:
+        name: cloud-init
+        state: absent
+        purge: true
+
+    - name: Remove cloud-init directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /etc/cloud
+        - /var/lib/cloud
+        - /var/log/cloud-init.log
+        - /var/log/cloud-init-output.log
+
+    - name: Check if admin user exists
+      ansible.builtin.getent:
+        database: passwd
+        key: admin
+      register: admin_user_check
+      ignore_errors: true
+
+    - name: Kill processes owned by admin
+      ansible.builtin.shell: pkill -u admin || true
+      when: admin_user_check is succeeded
+      changed_when: false
+
+    - name: Remove admin user (Contabo default)
+      ansible.builtin.user:
+        name: admin
+        state: absent
+        remove: true
+        force: true
+      when: admin_user_check is succeeded
+
+    - name: Remove admin group if exists
+      ansible.builtin.group:
+        name: admin
+        state: absent
+      failed_when: false
+
+    #=== SUDO NOPASSWD ===
+    - name: Allow qui3tly passwordless sudo
+      ansible.builtin.copy:
+        content: "{{ admin_user }} ALL=(ALL) NOPASSWD: ALL\n"
+        dest: "/etc/sudoers.d/{{ admin_user }}"
+        mode: '0440'
+        validate: 'visudo -cf %s'
+
+    #=== SWAP FILE ===
+    - name: Check if swap file exists
+      ansible.builtin.stat:
+        path: /swapfile
+      register: swap_file
+
+    - name: Create swap file (2GB)
+      ansible.builtin.command: dd if=/dev/zero of=/swapfile bs=1M count=2048
+      when: not swap_file.stat.exists and not ansible_check_mode
+      changed_when: true
+
+    - name: Set swap file permissions
+      ansible.builtin.file:
+        path: /swapfile
+        mode: '0600'
+      when: not swap_file.stat.exists and not ansible_check_mode
+
+    - name: Format swap file
+      ansible.builtin.command: mkswap /swapfile
+      when: not swap_file.stat.exists and not ansible_check_mode
+      changed_when: true
+
+    - name: Enable swap
+      ansible.builtin.command: swapon /swapfile
+      when: not swap_file.stat.exists and not ansible_check_mode
+      changed_when: true
+
+    - name: Add swap to fstab
+      ansible.builtin.lineinfile:
+        path: /etc/fstab
+        line: '/swapfile none swap sw 0 0'
+        state: present
+
+    #=== TIMEZONE & LOCALE ===
+    - name: Set timezone to Europe/Berlin
+      community.general.timezone:
+        name: Europe/Berlin
+
+    - name: Generate locale
+      community.general.locale_gen:
+        name: en_US.UTF-8
+        state: present
+
+    #=== SYSCTL TUNING ===
+    - name: Apply sysctl hardening
+      ansible.posix.sysctl:
+        name: "{{ item.name }}"
+        value: "{{ item.value }}"
+        sysctl_file: /etc/sysctl.d/50-hardening.conf
+        reload: true
+      loop:
+        - { name: 'net.ipv4.ip_forward', value: '1' }
+        - { name: 'net.ipv4.conf.all.forwarding', value: '1' }
+        - { name: 'net.ipv4.tcp_syncookies', value: '1' }
+        - { name: 'net.ipv4.conf.all.rp_filter', value: '1' }
+        - { name: 'net.core.somaxconn', value: '65536' }
+        - { name: 'vm.swappiness', value: '10' }
+        - { name: 'net.ipv6.conf.all.disable_ipv6', value: '1' }
+        - { name: 'net.ipv6.conf.default.disable_ipv6', value: '1' }
+        - { name: 'net.ipv6.conf.lo.disable_ipv6', value: '1' }
+
+    #=== SYSTEM SETUP ===
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Install essential packages
+      ansible.builtin.apt:
+        name: "{{ essential_packages }}"
+        state: present
+
+    - name: Set hostname
+      ansible.builtin.hostname:
+        name: "{{ hostname }}"
+
+    - name: Update /etc/hosts
+      ansible.builtin.lineinfile:
+        path: /etc/hosts
+        regexp: '^127\.0\.1\.1'
+        line: "127.0.1.1 {{ hostname }}"
+
+    #=== SSH HARDENING ===
+    - name: Backup sshd_config
+      ansible.builtin.copy:
+        src: /etc/ssh/sshd_config
+        dest: /etc/ssh/sshd_config.bak
+        remote_src: true
+        mode: '0600'
+
+    - name: Ensure SSH hardening
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      loop:
+        - { regexp: '^#?Port ', line: "Port {{ ssh_port }}" }
+        - { regexp: '^#?PasswordAuthentication ', line: "PasswordAuthentication no" }
+        - { regexp: '^#?PermitRootLogin ', line: "PermitRootLogin no" }
+        - { regexp: '^#?PubkeyAuthentication ', line: "PubkeyAuthentication yes" }
+        - { regexp: '^#?X11Forwarding ', line: "X11Forwarding no" }
+        - { regexp: '^#?MaxAuthTries ', line: "MaxAuthTries 3" }
+        - { regexp: '^#?ClientAliveInterval ', line: "ClientAliveInterval 300" }
+        - { regexp: '^#?ClientAliveCountMax ', line: "ClientAliveCountMax 2" }
+      notify: Reload SSH
+
+    #=== UFW FIREWALL ===
+    - name: Configure UFW rules
+      community.general.ufw:
+        rule: allow
+        port: "{{ item.port }}"
+        proto: "{{ item.proto }}"
+        comment: "{{ item.comment }}"
+      loop: "{{ ufw_rules }}"
+
+    - name: Allow Tailnet range
+      community.general.ufw:
+        rule: allow
+        from_ip: 100.64.0.0/10
+        comment: "Tailscale VPN"
+
+    - name: Allow Docker networks
+      community.general.ufw:
+        rule: allow
+        from_ip: "{{ item }}"
+        comment: "Docker internal"
+      loop:
+        - 172.16.0.0/12
+        - 10.0.0.0/8
+
+    - name: Enable UFW
+      community.general.ufw:
+        state: enabled
+        policy: deny
+
+    #=== DOCKER INSTALL ===
+    - name: Install Docker prerequisites
+      ansible.builtin.apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+        state: present
+
+    - name: Add Docker GPG key
+      ansible.builtin.apt_key:
+        url: https://download.docker.com/linux/debian/gpg
+        state: present
+
+    - name: Add Docker repository
+      ansible.builtin.apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
+        state: present
+
+    - name: Install Docker
+      ansible.builtin.apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-compose-plugin
+        state: present
+        update_cache: true
+
+    - name: Add user to docker group
+      ansible.builtin.user:
+        name: "{{ admin_user }}"
+        groups: docker
+        append: true
+
+    - name: Reset SSH connection to pick up docker group
+      ansible.builtin.meta: reset_connection
+
+    - name: Start and enable Docker
+      ansible.builtin.systemd:
+        name: docker
+        state: started
+        enabled: true
+
+    #=== DIRECTORY STRUCTURE ===
+    - name: Create standard directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ admin_user }}"
+        group: "{{ admin_user }}"
+        mode: '0755'
+      loop:
+        - "/home/{{ admin_user }}/.docker-compose"
+        - "/home/{{ admin_user }}/.docker"
+        - "/home/{{ admin_user }}/.docs"
+        - "/home/{{ admin_user }}/.copilot"
+        - "/home/{{ admin_user }}/.copilot/backups"
+
+    - name: Create secrets directory (restricted)
+      ansible.builtin.file:
+        path: "/home/{{ admin_user }}/.secrets"
+        state: directory
+        owner: "{{ admin_user }}"
+        group: "{{ admin_user }}"
+        mode: '0700'
+
+  handlers:
+    - name: Reload SSH
+      ansible.builtin.systemd:
+        name: sshd
+        state: reloaded

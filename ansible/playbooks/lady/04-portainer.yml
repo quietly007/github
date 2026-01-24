@@ -1,0 +1,19 @@
+---
+# LADY PORTAINER - Compose only: git pull + docker compose up
+- name: Deploy Portainer Agent on Lady
+  hosts: all
+  become: true
+  become_user: "{{ admin_user }}"
+  vars_files:
+    - "{{ playbook_dir }}/../../group_vars/all.yml"
+  tasks:
+    - name: Pull latest from GitHub
+      ansible.builtin.command: git pull
+      args:
+        chdir: "{{ ansible_env.HOME }}"
+      changed_when: false
+
+    - name: Start Portainer Agent
+      ansible.builtin.command: docker compose up -d
+      args:
+        chdir: "{{ compose_dir }}/portainer"

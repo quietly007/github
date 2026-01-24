@@ -1,0 +1,41 @@
+---
+# MASTER HEADSCALE-UI - VPN management interface
+# Usage: ansible-playbook -i inventory/production.ini playbooks/17-headscale-ui.yml
+#
+# NOTE: Uses gurucomputing/headscale-ui (third-party, no official UI exists)
+
+- name: Deploy Headscale-UI on Master
+  hosts: master
+  become: true
+  become_user: "{{ admin_user }}"
+  vars_files:
+    - "{{ playbook_dir }}/../../group_vars/all.yml"
+    - "{{ playbook_dir }}/../../host_vars/master.yml"
+
+  tasks:
+    - name: Pull latest from GitHub
+      ansible.builtin.git:
+        repo: "https://github.com/quietly007/quietly.its.me.git"
+        dest: "{{ ansible_env.HOME }}"
+        version: main
+        update: yes
+        force: no
+
+    - name: Check compose file exists
+      ansible.builtin.stat:
+        path: "{{ compose_dir }}/headscale-ui/docker-compose.yaml"
+      register: headscale_ui_compose
+
+    - name: Fail if compose file missing
+      ansible.builtin.fail:
+        msg: "Compose file missing at {{ compose_dir }}/headscale-ui/docker-compose.yaml"
+      when: not headscale_ui_compose.stat.exists
+
+    - name: Start Headscale-UI
+      community.docker.docker_compose_v2:
+        project_src: "{{ compose_dir }}/headscale-ui"
+        state: present
+
+    - name: Show status
+      ansible.builtin.debug:
+        msg: "Headscale-UI deployed at https://hs-ui.quietly.its.me"

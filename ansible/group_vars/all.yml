@@ -1,0 +1,183 @@
+# Global variables - apply to ALL servers
+---
+# User
+admin_user: qui3tly
+admin_email: tihomir.raznatovic@gmail.com
+
+# SSH
+ssh_port: 1006
+
+# Network ranges
+tailnet_range: "100.64.0.0/10"
+wireguard_range: "10.10.0.0/30"
+docker_range: "172.16.0.0/12"
+
+# Directories (identical on all servers)
+docker_dir: "/home/{{ admin_user }}/.docker"
+compose_dir: "/home/{{ admin_user }}/.docker-compose"
+secrets_dir: "/home/{{ admin_user }}/.secrets"
+backup_dir: "/home/{{ admin_user }}/.copilot/backups"
+
+# Headscale (all clients connect here)
+headscale_url: "https://headscale.quietly.its.me"
+
+# Docker versions (pinned - NO :latest tags, NO :stable tags)
+# Last reviewed: 2026-01-16
+docker_images:
+  # === OFFICIAL IMAGES (vendor maintained) ===
+  traefik: "traefik:v3.6.6"
+  portainer: "portainer/portainer-ce:2.33.6"
+  portainer_agent: "portainer/agent:2.33.6"
+  grafana: "grafana/grafana:11.4.0"
+  prometheus: "prom/prometheus:v2.54.1"
+  loki: "grafana/loki:3.3.2"
+  promtail: "grafana/promtail:3.4.2"
+  alertmanager: "prom/alertmanager:v0.27.0"
+  node_exporter: "prom/node-exporter:v1.9.0"
+  cadvisor: "gcr.io/cadvisor/cadvisor:v0.52.1"
+  pihole: "pihole/pihole:2025.11.1"
+  gotify: "gotify/server:2.5.0"
+  authelia: "authelia/authelia:4.39.15"
+  crowdsec: "crowdsecurity/crowdsec:v1.6.8"
+  cloudflared: "cloudflare/cloudflared:2024.12.2"
+  headscale: "headscale/headscale:v0.27.1"
+  tailscale: "tailscale/tailscale:v1.92.5"
+  semaphore: "semaphoreui/semaphore:v2.10.22"
+  mariadb: "mariadb:11.7"
+  mongo: "mongo:7.0"
+  nextcloud: "nextcloud:29-apache"
+  nginx: "nginx:1.27-alpine"
+  
+  # === THIRD-PARTY IMAGES (community maintained - no official alternative) ===
+  # WARNING: These have NO official vendor images. Monitor for deprecation.
+  # Reviewed: 2026-01-16
+  bouncer: "fbonalair/traefik-crowdsec-bouncer:0.5.0"        # Only Traefik bouncer container
+  it_tools: "corentinth/it-tools:2024.10.22-7ca5933"         # THE it-tools project
+  headscale_ui: "ghcr.io/gurucomputing/headscale-ui:2025.08.23"  # Headscale has no official UI
+  headscale_admin: "goodieshq/headscale-admin:0.26.0"        # Alternative Headscale UI
+  ofelia: "mcuadros/ofelia:0.3.20"                           # Job scheduler - no alternative
+
+# Sysctl hardening (identical on all)
+sysctl_settings:
+  # Network security
+  net.ipv4.tcp_syncookies: 1
+  net.ipv4.tcp_max_syn_backlog: 4096
+  net.ipv4.conf.all.rp_filter: 1
+  net.ipv4.conf.default.rp_filter: 1
+  net.ipv4.conf.all.accept_redirects: 0
+  net.ipv4.conf.default.accept_redirects: 0
+  net.ipv4.conf.all.send_redirects: 0
+  net.ipv4.conf.default.send_redirects: 0
+  net.ipv4.icmp_echo_ignore_broadcasts: 1
+  net.ipv4.icmp_ignore_bogus_error_responses: 1
+  net.ipv4.conf.all.log_martians: 1
+  net.ipv4.conf.all.accept_source_route: 0
+  net.ipv4.ip_forward: 1
+  # Disable IPv6
+  net.ipv6.conf.all.disable_ipv6: 1
+  net.ipv6.conf.default.disable_ipv6: 1
+  net.ipv6.conf.lo.disable_ipv6: 1
+  # TCP performance
+  net.core.somaxconn: 65536
+  net.core.netdev_max_backlog: 16384
+  net.ipv4.tcp_fin_timeout: 15
+  net.ipv4.tcp_keepalive_time: 300
+  net.core.rmem_max: 16777216
+  net.core.wmem_max: 16777216
+  # Memory
+  vm.swappiness: 10
+  vm.dirty_ratio: 15
+  vm.dirty_background_ratio: 5
+
+# UFW rules (identical on all)
+ufw_rules:
+  - { port: "{{ ssh_port }}", proto: tcp, comment: "SSH" }
+  - { port: "60000:61000", proto: udp, comment: "Mosh" }
+  - { port: 80, proto: tcp, comment: "HTTP" }
+  - { port: 443, proto: tcp, comment: "HTTPS" }
+  - { port: 41641, proto: udp, comment: "Tailscale" }
+
+# Essential packages (identical on all)
+essential_packages:
+  - curl
+  - wget
+  - git
+  - vim
+  - htop
+  - tmux
+  - mosh
+  - ufw
+  - fail2ban
+  - unattended-upgrades
+  - apt-transport-https
+  - ca-certificates
+  - gnupg
+  - lsb-release
+  - jq
+  - tree
+  - rsync
+  - python3-pip
+
+# Fail2ban settings (identical on all)
+fail2ban_config:
+  bantime: 1h
+  findtime: 10m
+  maxretry: 5
+  sshd_maxretry: 3
+  sshd_bantime: 24h
+
+# Docker daemon settings (identical on all)
+docker_daemon_config:
+  log-driver: json-file
+  log-opts:
+    max-size: 10m
+    max-file: "3"
+  default-ulimits:
+    nofile:
+      Name: nofile
+      Hard: 65536
+      Soft: 65536
+  no-new-privileges: true
+  live-restore: true
+
+# Secrets directory structure (by role)
+secrets_structure_master:
+  - traefik
+  - monitoring
+  - pihole
+  - gotify
+  - crowdsec
+  - authelia
+  - semaphore
+  - portainer
+  - cloudflared
+  - headscale
+  - github
+  - wireguard
+
+secrets_structure_lady:
+  - cloudflare
+  - traefik
+  - portainer
+  - mailcow
+  - headscale
+  - github
+  - monitoring
+
+# GitHub settings
+git_org: quietly007
+git_user: "GitHub Actions"
+git_email: "actions@quietly.its.me"
+github_push_enabled: true
+
+# Timezone
+timezone: "Europe/Berlin"
+
+# Native services (installed on host, not Docker)
+native_services:
+  - headscale
+  - tailscale
+
+# Cloudflare API token - NEVER commit secrets to git!
+# Use: lookup('file', '~/.secrets/traefik/cf-token')
+# cf_api_token: REMOVED - was exposed in git history!

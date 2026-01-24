@@ -1,0 +1,36 @@
+---
+# UISP - Ubiquiti ISP management (Lady only)
+# Usage: ansible-playbook -i inventory/production.ini playbooks/lady/22-uisp.yml
+
+- name: Deploy UISP
+  hosts: lady
+  become: true
+  vars_files:
+    - "{{ playbook_dir }}/../../group_vars/all.yml"
+    - "{{ playbook_dir }}/../../host_vars/lady.yml"
+  become_user: "{{ admin_user }}"
+
+  tasks:
+    - name: Pull latest from GitHub
+      ansible.builtin.git:
+        repo: "https://github.com/quietly007/quietly.online.git"
+        dest: "{{ ansible_env.HOME }}"
+        version: main
+        update: yes
+        force: no
+      when: not ansible_check_mode
+
+    - name: Check compose file exists
+      ansible.builtin.stat:
+        path: "{{ compose_dir }}/uisp/docker-compose.yaml"
+      register: uisp_compose
+
+    - name: Fail if compose file missing
+      ansible.builtin.fail:
+        msg: "Compose file missing at {{ compose_dir }}/uisp/docker-compose.yaml"
+      when: not uisp_compose.stat.exists
+
+    - name: Start UISP
+      community.docker.docker_compose_v2:
+        project_src: "{{ compose_dir }}/uisp"
+        state: present

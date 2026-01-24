@@ -1,0 +1,224 @@
+---
+# LADY HARDENING - Security hardening
+# Usage: ansible-playbook -i inventory/production.ini playbooks/lady/01-hardening.yml
+
+- name: Harden Lady server
+  hosts: lady
+  become: true
+  vars_files:
+    - "{{ playbook_dir }}/../../group_vars/all.yml"
+    - "{{ playbook_dir }}/../../host_vars/lady.yml"
+
+  tasks:
+    #=== FAIL2BAN ===
+    - name: Install fail2ban
+      ansible.builtin.apt:
+        name: fail2ban
+        state: present
+
+    - name: Configure fail2ban for SSH
+      ansible.builtin.copy:
+        dest: /etc/fail2ban/jail.local
+        mode: '0644'
+        content: |
+          [DEFAULT]
+          bantime = 1h
+          findtime = 10m
+          maxretry = 3
+          backend = systemd
+          ignoreip = 127.0.0.1/8 ::1 213.136.68.108 100.64.0.0/10
+          
+          [sshd]
+          enabled = true
+          port = {{ ssh_port }}
+          filter = sshd
+          logpath = /var/log/auth.log
+          maxretry = 3
+          bantime = 24h
+      notify: Restart fail2ban
+
+    - name: Start and enable fail2ban
+      ansible.builtin.systemd:
+        name: fail2ban
+        state: started
+        enabled: true
+
+    #=== AUTOMATIC UPDATES ===
+    - name: Install unattended-upgrades
+      ansible.builtin.apt:
+        name:
+          - unattended-upgrades
+          - apt-listchanges
+        state: present
+
+    - name: Configure unattended-upgrades
+      ansible.builtin.copy:
+        dest: /etc/apt/apt.conf.d/50unattended-upgrades
+        mode: '0644'
+        content: |
+          Unattended-Upgrade::Allowed-Origins {
+              "${distro_id}:${distro_codename}";
+              "${distro_id}:${distro_codename}-security";
+          };
+          Unattended-Upgrade::AutoFixInterruptedDpkg "true";
+          Unattended-Upgrade::Remove-Unused-Kernel-Packages "true";
+          Unattended-Upgrade::Remove-Unused-Dependencies "true";
+          Unattended-Upgrade::Automatic-Reboot "false";
+
+    - name: Enable automatic updates
+      ansible.builtin.copy:
+        dest: /etc/apt/apt.conf.d/20auto-upgrades
+        mode: '0644'
+        content: |
+          APT::Periodic::Update-Package-Lists "1";
+          APT::Periodic::Unattended-Upgrade "1";
+          APT::Periodic::AutocleanInterval "7";
+
+    #=== KERNEL HARDENING ===
+    - name: Apply kernel hardening
+      ansible.posix.sysctl:
+        name: "{{ item.name }}"
+        value: "{{ item.value }}"
+        sysctl_file: /etc/sysctl.d/60-security.conf
+        reload: true
+      loop:
+        # Disable ICMP redirects
+        - { name: 'net.ipv4.conf.all.accept_redirects', value: '0' }
+        - { name: 'net.ipv4.conf.default.accept_redirects', value: '0' }
+        - { name: 'net.ipv6.conf.all.accept_redirects', value: '0' }
+        # Disable source routing
+        - { name: 'net.ipv4.conf.all.accept_source_route', value: '0' }
+        - { name: 'net.ipv6.conf.all.accept_source_route', value: '0' }
+        # Disable IPv6
+        - { name: 'net.ipv6.conf.all.disable_ipv6', value: '1' }
+        - { name: 'net.ipv6.conf.default.disable_ipv6', value: '1' }
+        - { name: 'net.ipv6.conf.lo.disable_ipv6', value: '1' }
+        # Log martian packets
+        - { name: 'net.ipv4.conf.all.log_martians', value: '1' }
+        # Ignore ICMP broadcasts
+        - { name: 'net.ipv4.icmp_echo_ignore_broadcasts', value: '1' }
+        # Protect against SYN floods
+        - { name: 'net.ipv4.tcp_max_syn_backlog', value: '4096' }
+
+    #=== GRUB IPV6 DISABLE ===
+    - name: Set grub backup dir
+      ansible.builtin.set_fact:
+        grub_backup_dir: "/home/{{ admin_user }}/.copilot/backups/grub_ipv6_disable_{{ lookup('pipe', 'date -u +%Y%m%dT%H%M%SZ') }}"
+
+    - name: Ensure grub backup dir exists
+      ansible.builtin.file:
+        path: "{{ grub_backup_dir }}"
+        state: directory
+        mode: '0700'
+
+    - name: Backup /etc/default/grub
+      ansible.builtin.copy:
+        src: /etc/default/grub
+        dest: "{{ grub_backup_dir }}/grub"
+        remote_src: true
+        mode: '0600'
+      when: not ansible_check_mode
+
+    - name: Read GRUB_CMDLINE_LINUX_DEFAULT
+      ansible.builtin.command: bash -lc "grep -E '^GRUB_CMDLINE_LINUX_DEFAULT=' /etc/default/grub"
+      register: grub_cmdline
+      changed_when: false
+      failed_when: false
+
+    - name: Ensure GRUB_CMDLINE_LINUX_DEFAULT includes ipv6.disable=1
+      ansible.builtin.lineinfile:
+        path: /etc/default/grub
+        regexp: '^GRUB_CMDLINE_LINUX_DEFAULT='
+        line: "GRUB_CMDLINE_LINUX_DEFAULT=\"{{ (grub_cmdline.stdout | regex_replace('^GRUB_CMDLINE_LINUX_DEFAULT=\"(.*)\"$', '\\1') if grub_cmdline.rc == 0 else 'quiet') }} ipv6.disable=1\""
+        create: true
+        mode: '0644'
+      when: "'ipv6.disable=1' not in grub_cmdline.stdout"
+      notify: Update grub
+
+    #=== DOCKER DAEMON ===
+    - name: Ensure docker config dir exists
+      ansible.builtin.file:
+        path: /etc/docker
+        state: directory
+        mode: '0755'
+
+    - name: Configure Docker daemon
+      ansible.builtin.copy:
+        dest: /etc/docker/daemon.json
+        mode: '0644'
+        content: |
+          {
+            "log-driver": "json-file",
+            "log-opts": {
+              "max-size": "10m",
+              "max-file": "3"
+            },
+            "default-ulimits": {
+              "nofile": {
+                "Name": "nofile",
+                "Hard": 65536,
+                "Soft": 65536
+              }
+            },
+            "ipv6": false,
+            "ip6tables": false,
+            "no-new-privileges": true,
+            "live-restore": true
+          }
+      notify: Reload docker
+
+    #=== FILE PERMISSIONS ===
+    - name: Secure cron directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        mode: '0700'
+      loop:
+        - /etc/cron.d
+        - /etc/cron.daily
+        - /etc/cron.hourly
+        - /etc/cron.monthly
+        - /etc/cron.weekly
+
+    - name: Secure /etc/shadow
+      ansible.builtin.file:
+        path: /etc/shadow
+        mode: '0600'
+
+    #=== REMOVE UNNECESSARY SERVICES ===
+    - name: Stop and disable unnecessary services
+      ansible.builtin.systemd:
+        name: "{{ item }}"
+        state: stopped
+        enabled: false
+      loop:
+        - cups
+        - avahi-daemon
+      failed_when: false
+
+    #=== AUDIT LOGGING ===
+    - name: Install auditd
+      ansible.builtin.apt:
+        name: auditd
+        state: present
+
+    - name: Start and enable auditd
+      ansible.builtin.systemd:
+        name: auditd
+        state: started
+        enabled: true
+      failed_when: false  # Service may be 'audit' on some systems
+
+  handlers:
+    - name: Update grub
+      ansible.builtin.command: update-grub
+      changed_when: true
+
+    - name: Reload docker
+      ansible.builtin.systemd:
+        name: docker
+        state: reloaded
+
+    - name: Restart fail2ban
+      ansible.builtin.systemd:
+        name: fail2ban
+        state: restarted

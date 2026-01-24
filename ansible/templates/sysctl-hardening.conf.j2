@@ -1,0 +1,5 @@
+# Quietly Cloud Server Hardening
+# Managed by Ansible - DO NOT EDIT
+{% for key, value in sysctl_settings.items() %}
+{{ key }} = {{ value }}
+{% endfor %}

@@ -1,0 +1,107 @@
+---
+# TAILSCALE - Connect to Headscale VPN
+# Usage: ansible-playbook -i inventory/production.ini playbooks/03-tailscale.yml -l <host> -e tailscale_authkey=xxx
+#
+# Requires:
+#   - tailscale_authkey: Preauthkey from Headscale (pass via -e)
+#   - Generate key: sudo headscale preauthkeys create -e 1h -u <USER_ID> --reusable
+
+- name: Install and configure Tailscale
+  hosts: all
+  become: true
+  vars_files:
+    - "{{ playbook_dir }}/../../group_vars/all.yml"
+    - "{{ playbook_dir }}/../../host_vars/{{ inventory_hostname }}.yml"
+
+  tasks:
+    - name: Check if Tailscale installed
+      ansible.builtin.stat:
+        path: /usr/bin/tailscale
+      register: tailscale_bin
+
+    - name: Install Tailscale
+      when: not tailscale_bin.stat.exists
+      block:
+        - name: Add Tailscale GPG key
+          ansible.builtin.get_url:
+            url: "https://pkgs.tailscale.com/stable/debian/{{ ansible_distribution_release }}.noarmor.gpg"
+            dest: /usr/share/keyrings/tailscale-archive-keyring.gpg
+            mode: '0644'
+
+        - name: Add Tailscale repository
+          ansible.builtin.apt_repository:
+            repo: "deb [signed-by=/usr/share/keyrings/tailscale-archive-keyring.gpg] https://pkgs.tailscale.com/stable/debian {{ ansible_distribution_release }} main"
+            filename: tailscale
+            state: present
+
+        - name: Install Tailscale package
+          ansible.builtin.apt:
+            name: tailscale
+            state: present
+            update_cache: true
+
+    - name: Enable tailscaled
+      ansible.builtin.systemd:
+        name: tailscaled
+        enabled: true
+        state: started
+
+    - name: Check Tailscale connection status
+      ansible.builtin.command: tailscale status --json
+      register: ts_check
+      changed_when: false
+      failed_when: false
+
+    - name: Parse Tailscale status
+      ansible.builtin.set_fact:
+        tailscale_logged_in: "{{ (ts_check.stdout | from_json).BackendState | default('') == 'Running' }}"
+      when: ts_check.rc == 0 and ts_check.stdout != ''
+      failed_when: false
+
+    - name: Set default if not logged in
+      ansible.builtin.set_fact:
+        tailscale_logged_in: false
+      when: tailscale_logged_in is not defined
+
+    - name: Connect to Headscale
+      ansible.builtin.command: >
+        tailscale up
+        --login-server={{ headscale_url }}
+        --authkey={{ tailscale_authkey }}
+        --accept-routes
+        --accept-dns=false
+        {% if tailscale_advertise_routes | default('') | length > 0 %}--advertise-routes={{ tailscale_advertise_routes }}{% endif %}
+        {% if tailscale_exit_node | default(false) %}--advertise-exit-node{% endif %}
+        --reset
+      when: 
+        - tailscale_authkey is defined
+        - not tailscale_logged_in
+      register: tailscale_up
+      changed_when: tailscale_up.rc == 0
+
+    - name: Tailscale already connected
+      ansible.builtin.debug:
+        msg: "✅ Tailscale already connected - skipping auth"
+      when: tailscale_logged_in
+
+    - name: Tailscale needs manual auth
+      ansible.builtin.debug:
+        msg: |
+          ⚠️  Tailscale installed but NOT connected!
+          Run manually:
+            1. Generate key: sudo headscale preauthkeys create -e 1h -u <USER_ID> --reusable
+            2. Connect: ansible-playbook -i inventory/production.ini playbooks/03-tailscale.yml -l {{ inventory_hostname }} -e tailscale_authkey=<KEY>
+      when:
+        - not tailscale_logged_in
+        - tailscale_authkey is not defined
+
+    - name: Get final Tailscale status
+      ansible.builtin.command: tailscale status
+      register: ts_status
+      changed_when: false
+      failed_when: false
+
+    - name: Show status
+      ansible.builtin.debug:
+        var: ts_status.stdout_lines
+      when: ts_status.rc == 0

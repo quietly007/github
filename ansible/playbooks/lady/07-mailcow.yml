@@ -1,0 +1,783 @@
+---
+# LADY MAILCOW - Secure Mail Server Stack
+# Usage: ansible-playbook -i inventory/bootstrap.ini playbooks/lady/07-mailcow.yml
+#
+# Deploys Mailcow-Dockerized with full security:
+# - DANE (TLSA records required in DNS)
+# - MTA-STS (strict TLS policy)
+# - TLS-RPT (TLS reporting)
+# - DKIM, SPF, DMARC (auto-generated)
+# - TLS 1.2+ only, modern ciphers
+#
+# Admin credentials: ~/.secrets/mailcow/admin.env (on Master)
+
+- name: Deploy Mailcow on Lady
+  hosts: lady
+  become: true
+  vars_files:
+    - "{{ playbook_dir }}/../../group_vars/all.yml"
+    - "{{ playbook_dir }}/../../host_vars/lady.yml"
+
+  vars:
+    mailcow_hostname: "mail.quietly.online"
+    mailcow_domain: "quietly.online"
+    mailcow_timezone: "Europe/London"
+    mailcow_branch: "master"
+    mailcow_root: "{{ docker_dir }}/mailcow"
+    mailcow_repo_dir: "{{ docker_dir }}/mailcow/repo"
+    mailcow_data_dir: "{{ docker_dir }}/mailcow/data"
+    mailcow_conf_path: "{{ docker_dir }}/mailcow/mailcow.conf"
+    mailcow_compose_dir: "{{ compose_dir }}/mailcow"
+    mailcow_compose_file: "{{ compose_dir }}/mailcow/docker-compose.yaml"
+    mailcow_override_file: "{{ compose_dir }}/mailcow/docker-compose.override.yml"
+    mta_sts_root: "{{ docker_dir }}/mta-sts"
+    mta_sts_compose_dir: "{{ compose_dir }}/mta-sts"
+    # Admin credentials (loaded from secrets)
+    mailcow_admin_user: "qui3tly"
+    # MTA-STS policy
+    mta_sts_mode: "enforce"  # testing → enforce after validation
+    mta_sts_max_age: "2419200"  # 4 weeks
+
+  tasks:
+    # ============================================================
+    # LOAD SECRETS FROM TARGET HOST
+    # ============================================================
+    - name: Read Mailcow admin credentials from target
+      ansible.builtin.slurp:
+        src: "/home/{{ admin_user }}/.secrets/mailcow/admin.env"
+      register: mailcow_secrets_raw
+
+    - name: Parse Mailcow admin credentials
+      ansible.builtin.set_fact:
+        mailcow_admin_user: "{{ (mailcow_secrets_raw.content | b64decode | regex_search('MAILCOW_ADMIN_USER=(.+)', '\\1'))[0] }}"
+        mailcow_admin_pass: "{{ (mailcow_secrets_raw.content | b64decode | regex_search('MAILCOW_ADMIN_PASS=(.+)', '\\1'))[0] }}"
+
+    # ============================================================
+    # MAILCOW CORE DEPLOYMENT
+    # ============================================================
+    - name: Create Mailcow directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ admin_user }}"
+        group: "{{ admin_user }}"
+        mode: '0755'
+      loop:
+        - "{{ mailcow_compose_dir }}"
+        - "{{ mailcow_root }}"
+        - "{{ mailcow_repo_dir }}"
+        - "{{ mailcow_data_dir }}"
+
+    - name: Check if Mailcow config exists
+      ansible.builtin.stat:
+        path: "{{ mailcow_conf_path }}"
+      register: mailcow_conf
+
+    - name: Check Mailcow repo
+      ansible.builtin.stat:
+        path: "{{ mailcow_repo_dir }}/.git"
+      register: mailcow_repo_git
+
+    - name: Clone Mailcow repository
+      when: not mailcow_repo_git.stat.exists
+      ansible.builtin.git:
+        repo: "https://github.com/mailcow/mailcow-dockerized"
+        dest: "{{ mailcow_repo_dir }}"
+        version: "{{ mailcow_branch }}"
+        force: false
+
+    - name: Check Mailcow data directory
+      ansible.builtin.stat:
+        path: "{{ mailcow_data_dir }}/conf"
+      register: mailcow_data_conf
+
+    - name: Seed Mailcow data directory from repo
+      when: not mailcow_data_conf.stat.exists
+      ansible.builtin.copy:
+        src: "{{ mailcow_repo_dir }}/data/"
+        dest: "{{ mailcow_data_dir }}/"
+        remote_src: true
+
+    - name: Link mailcow.conf into repo
+      ansible.builtin.file:
+        src: "{{ mailcow_conf_path }}"
+        dest: "{{ mailcow_repo_dir }}/mailcow.conf"
+        state: link
+        force: true
+
+    - name: Link .env to mailcow.conf in repo
+      ansible.builtin.file:
+        src: "{{ mailcow_conf_path }}"
+        dest: "{{ mailcow_repo_dir }}/.env"
+        state: link
+        force: true
+
+    - name: Install Mailcow prerequisites
+      ansible.builtin.apt:
+        name:
+          - jq
+        state: present
+        update_cache: true
+
+    - name: Generate Mailcow config
+      when: not mailcow_conf.stat.exists
+      ansible.builtin.shell: |
+        cd {{ mailcow_repo_dir }}
+        ./generate_config.sh <<EOF
+        {{ mailcow_hostname }}
+        {{ mailcow_timezone }}
+        EOF
+      args:
+        creates: "{{ mailcow_conf_path }}"
+
+    # ============================================================
+    # MAILCOW CONFIGURATION - SECURITY HARDENED
+    # ============================================================
+    - name: Configure Mailcow core settings
+      ansible.builtin.lineinfile:
+        path: "{{ mailcow_conf_path }}"
+        regexp: "^{{ item.key }}="
+        line: "{{ item.key }}={{ item.value }}"
+      loop:
+        # Webmail via Traefik (localhost only)
+        - { key: "HTTP_PORT", value: "8880" }
+        - { key: "HTTPS_PORT", value: "8843" }
+        - { key: "HTTP_BIND", value: "127.0.0.1" }
+        - { key: "HTTPS_BIND", value: "127.0.0.1" }
+        # Mail ports - SSL/TLS for client apps (public)
+        - { key: "SMTP_PORT", value: "25" }
+        - { key: "SMTPS_PORT", value: "465" }
+        - { key: "SUBMISSION_PORT", value: "587" }
+        - { key: "IMAP_PORT", value: "127.0.0.1:143" }
+        - { key: "IMAPS_PORT", value: "993" }
+        - { key: "POP_PORT", value: "127.0.0.1:110" }
+        - { key: "POPS_PORT", value: "995" }
+        - { key: "SIEVE_PORT", value: "4190" }
+        # Admin only on localhost
+        - { key: "DOVEADM_PORT", value: "127.0.0.1:19991" }
+        # Let's Encrypt for SMTP/IMAP TLS via Cloudflare DNS-01
+        - { key: "SKIP_LETS_ENCRYPT", value: "n" }
+        - { key: "LE_STAGING", value: "n" }
+        - { key: "ACME_CONTACT", value: "admin@{{ mailcow_domain }}" }
+        - { key: "ENABLE_SSL_SNI", value: "y" }
+        - { key: "SKIP_HTTP_VERIFICATION", value: "y" }
+        # Full stack
+        - { key: "SKIP_CLAMD", value: "n" }
+        - { key: "SKIP_SOGO", value: "n" }
+        - { key: "SKIP_SOLR", value: "y" }
+        # Security
+        - { key: "ALLOW_ADMIN_EMAIL_LOGIN", value: "n" }
+        - { key: "ACL_ANYONE", value: "disallow" }
+        # Disable IPv6
+        - { key: "SNAT6_TO_SOURCE", value: "" }
+        - { key: "IPV6_NETWORK", value: "" }
+        - { key: "IPV4_NETWORK", value: "172.23.1" }
+        - { key: "ENABLE_IPV6", value: "n" }
+      notify: Restart mailcow
+    
+    - name: Read Cloudflare token from secrets
+      ansible.builtin.slurp:
+        src: "/home/{{ admin_user }}/.secrets/cloudflare/cf-token"
+      register: cf_token_raw
+
+    - name: Set Cloudflare token variable
+      ansible.builtin.set_fact:
+        cf_token: "{{ cf_token_raw.content | b64decode | trim }}"
+
+    - name: Configure Mailcow to use Cloudflare DNS-01 challenge
+      ansible.builtin.blockinfile:
+        path: "{{ mailcow_conf_path }}"
+        marker: "# {mark} ANSIBLE MANAGED - Cloudflare DNS-01"
+        block: |
+          # Cloudflare DNS-01 challenge for Let's Encrypt (no HTTP needed!)
+          # Uses CF_Token (API token, recommended) or CF_Key+CF_Email (Global API Key)
+          ACME_PROVIDER=cloudflare
+          CF_Token={{ cf_token }}
+        mode: '0600'
+      notify: Restart mailcow
+
+    - name: Force PHP-FPM to listen on IPv4 only
+      ansible.builtin.replace:
+        path: "{{ mailcow_data_dir }}/conf/phpfpm/php-fpm.d/pools.conf"
+        regexp: 'listen = \[::\]:(9001|9002)'
+        replace: 'listen = 0.0.0.0:\1'
+      notify: Restart mailcow
+
+    - name: Remove invalid IPv6-derived listen lines in Mailcow nginx template
+      ansible.builtin.replace:
+        path: "{{ mailcow_data_dir }}/conf/nginx/templates/nginx.conf.j2"
+        regexp: '(?m)^(\\1#|\s*listen 0\.0\.0\.0:).*$\n'
+        replace: ''
+      notify: Restart mailcow
+
+    - name: Set Mailcow nginx IPv4 listen for active configs
+      ansible.builtin.lineinfile:
+        path: "{{ item.path }}"
+        regexp: '^listen '
+        line: "{{ item.line }}"
+        create: true
+        mode: '0644'
+      loop:
+        - { path: "{{ mailcow_data_dir }}/conf/nginx/listen_plain.active", line: "listen 0.0.0.0:8880;" }
+        - { path: "{{ mailcow_data_dir }}/conf/nginx/listen_ssl.active", line: "listen 0.0.0.0:8843 ssl;" }
+      notify: Restart mailcow
+
+    # ============================================================
+    # TLS HARDENING (Postfix + Dovecot)
+    # ============================================================
+    - name: Create Postfix and Dovecot extra config directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - "{{ mailcow_data_dir }}/conf/postfix"
+        - "{{ mailcow_data_dir }}/conf/dovecot/extra.cf.d"
+
+    - name: Deploy Postfix TLS hardening (DANE + MTA-STS compatible)
+      ansible.builtin.copy:
+        content: |
+          # TLS hardening (inbound only) - remove DHE/FFDHE and legacy suites
+          smtpd_tls_eecdh_grade = ultra
+          smtpd_tls_ciphers = high
+          smtpd_tls_mandatory_ciphers = high
+          tls_high_cipherlist = ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256
+          smtpd_tls_session_cache_database = btree:${data_directory}/smtpd_scache
+          smtpd_tls_session_cache_timeout = 3600s
+        dest: "{{ mailcow_data_dir }}/conf/postfix/extra.cf"
+        mode: '0644'
+      notify: Restart mailcow
+
+    - name: Remove previous Postfix user overrides from main.cf
+      ansible.builtin.replace:
+        path: "{{ mailcow_data_dir }}/conf/postfix/main.cf"
+        regexp: '(?s)\n# User Overrides\n.*$'
+        replace: '\n# User Overrides\n'
+      notify: Restart mailcow
+
+    - name: Deploy Dovecot TLS hardening
+      ansible.builtin.copy:
+        content: |
+          # TLS 1.2+ only
+          ssl_min_protocol = TLSv1.2
+          ssl_prefer_server_ciphers = yes
+          ssl_cipher_list = ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384
+        dest: "{{ mailcow_data_dir }}/conf/dovecot/extra.cf.d/99-tls-hardening.conf"
+        mode: '0644'
+      notify: Restart mailcow
+
+    # ============================================================
+    # TLSA AUTO-UPDATE (DANE) ON CERT RENEWAL
+    # ============================================================
+    - name: Install Mailcow TLSA update script
+      ansible.builtin.copy:
+        dest: /usr/local/bin/mailcow-update-tlsa.py
+        mode: '0750'
+        owner: root
+        group: root
+        content: |
+          #!/usr/bin/env python3
+          import json
+          import os
+          import subprocess
+          import sys
+          import urllib.parse
+          import urllib.request
+
+          TOKEN_FILE = "/home/qui3tly/.secrets/traefik/cf-token"
+          ZONE_NAME = "quietly.online"
+          CERT_PATH = "/home/qui3tly/.docker/mailcow/data/assets/ssl/mail.quietly.online/cert.pem"
+          RECORDS = ["_25._tcp.mail", "_465._tcp.mail", "_587._tcp.mail", "_993._tcp.mail"]
+          TTL = 300
+
+          def die(msg):
+            print(msg, file=sys.stderr)
+            sys.exit(1)
+
+          if not os.path.exists(TOKEN_FILE):
+            die(f"Cloudflare token missing: {TOKEN_FILE}")
+          if not os.path.exists(CERT_PATH):
+            die(f"Mailcow cert missing: {CERT_PATH}")
+
+          token = open(TOKEN_FILE, "r", encoding="utf-8").read().strip()
+          if not token:
+            die("Cloudflare token is empty")
+
+          try:
+            tlsa_hash = subprocess.check_output(
+              "openssl x509 -in {} -pubkey -noout | openssl pkey -pubin -outform DER | openssl sha256".format(CERT_PATH),
+              shell=True,
+              text=True
+            ).strip().split()[-1]
+          except Exception as exc:
+            die(f"Failed to compute TLSA hash: {exc}")
+
+          def cf_request(method, path, payload=None):
+            url = "https://api.cloudflare.com/client/v4" + path
+            data = None
+            if payload is not None:
+              data = json.dumps(payload).encode("utf-8")
+            req = urllib.request.Request(
+              url,
+              data=data,
+              method=method,
+              headers={
+                "Authorization": f"Bearer {token}",
+                "Content-Type": "application/json",
+              },
+            )
+            try:
+              with urllib.request.urlopen(req) as resp:
+                return json.loads(resp.read().decode("utf-8"))
+            except Exception as exc:
+              try:
+                body = exc.read().decode("utf-8")
+              except Exception:
+                body = str(exc)
+              die(f"Cloudflare API error: {body}")
+
+          zone_q = urllib.parse.quote(ZONE_NAME)
+          zones = cf_request("GET", f"/zones?name={zone_q}&status=active")
+          if not zones.get("success") or not zones.get("result"):
+            die("Failed to resolve Cloudflare zone ID")
+          zone_id = zones["result"][0]["id"]
+
+          for record in RECORDS:
+            name = f"{record}.{ZONE_NAME}"
+            qname = urllib.parse.quote(name)
+            existing = cf_request("GET", f"/zones/{zone_id}/dns_records?type=TLSA&name={qname}")
+            payload = {
+              "type": "TLSA",
+              "name": name,
+              "ttl": TTL,
+              "data": {
+                "usage": 3,
+                "selector": 1,
+                "matching_type": 1,
+                "certificate": tlsa_hash,
+              },
+            }
+            if existing.get("success") and existing.get("result"):
+              record_id = existing["result"][0]["id"]
+              cf_request("PUT", f"/zones/{zone_id}/dns_records/{record_id}", payload)
+            else:
+              cf_request("POST", f"/zones/{zone_id}/dns_records", payload)
+
+          print("TLSA update complete")
+
+    - name: Install Mailcow TLSA update systemd service
+      ansible.builtin.copy:
+        dest: /etc/systemd/system/mailcow-tlsa.service
+        mode: '0644'
+        owner: root
+        group: root
+        content: |
+          [Unit]
+          Description=Update Mailcow TLSA DNS records
+          After=network-online.target
+          Wants=network-online.target
+
+          [Service]
+          Type=oneshot
+          ExecStart=/usr/local/bin/mailcow-update-tlsa.py
+
+    - name: Install Mailcow TLSA update systemd timer
+      ansible.builtin.copy:
+        dest: /etc/systemd/system/mailcow-tlsa.timer
+        mode: '0644'
+        owner: root
+        group: root
+        content: |
+          [Unit]
+          Description=Daily Mailcow TLSA update
+
+          [Timer]
+          OnBootSec=10m
+          OnUnitActiveSec=1d
+          Persistent=true
+
+          [Install]
+          WantedBy=timers.target
+
+    - name: Enable Mailcow TLSA update timer
+      ansible.builtin.systemd:
+        name: mailcow-tlsa.timer
+        enabled: true
+        state: started
+        daemon_reload: true
+
+    # ============================================================
+    # CERTIFICATE EXTRACTION FROM TRAEFIK
+    # ============================================================
+    - name: Install cert extraction script
+      ansible.builtin.copy:
+        src: mailcow-extract-traefik-cert.py
+        dest: /usr/local/bin/mailcow-extract-traefik-cert.py
+        mode: '0755'
+        owner: root
+        group: root
+
+    # ============================================================
+    # MTA-STS TXT RECORD AUTO-UPDATE
+    # ============================================================
+    - name: Install MTA-STS TXT update script
+      ansible.builtin.copy:
+        src: mailcow-update-mta-sts-txt.py
+        dest: /usr/local/bin/mailcow-update-mta-sts-txt.py
+        mode: '0755'
+        owner: root
+        group: root
+
+    - name: Update TLSA service to include cert extraction and MTA-STS TXT update
+      ansible.builtin.copy:
+        dest: /etc/systemd/system/mailcow-tlsa.service
+        mode: '0644'
+        owner: root
+        group: root
+        content: |
+          [Unit]
+          Description=Update Mailcow TLSA and MTA-STS DNS records
+          After=network-online.target
+          Wants=network-online.target
+
+          [Service]
+          Type=oneshot
+          ExecStartPre=/usr/local/bin/mailcow-extract-traefik-cert.py
+          ExecStart=/usr/local/bin/mailcow-update-tlsa.py
+          ExecStartPost=/usr/local/bin/mailcow-update-mta-sts-txt.py
+          StandardOutput=journal
+          StandardError=journal
+          SyslogIdentifier=mailcow-dns-update
+
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: Reload systemd daemon
+      ansible.builtin.systemd:
+        daemon_reload: true
+
+    # ============================================================
+    # MTA-STS + SECURITY.TXT SERVER
+    # ============================================================
+    - name: Create MTA-STS directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ admin_user }}"
+        group: "{{ admin_user }}"
+        mode: '0755'
+      loop:
+        - "{{ mta_sts_compose_dir }}"
+        - "{{ mta_sts_root }}/.well-known"
+        - "{{ mta_sts_root }}/conf.d"
+
+    - name: Deploy MTA-STS policy file
+      ansible.builtin.copy:
+        content: |
+          version: STSv1
+          mode: {{ mta_sts_mode }}
+          mx: {{ mailcow_hostname }}
+          max_age: {{ mta_sts_max_age }}
+        dest: "{{ mta_sts_root }}/.well-known/mta-sts.txt"
+        mode: '0644'
+
+    - name: Deploy security.txt (RFC 9116)
+      ansible.builtin.copy:
+        content: |
+          # Security Policy for {{ mailcow_domain }}
+          # https://securitytxt.org/
+          
+          Contact: mailto:security@{{ mailcow_domain }}
+          Expires: {{ (ansible_date_time.year | int + 1) }}-12-31T23:59:59.000Z
+          Encryption: https://{{ mailcow_domain }}/.well-known/pgp-key.txt
+          Preferred-Languages: en
+          Canonical: https://{{ mailcow_domain }}/.well-known/security.txt
+          Policy: https://{{ mailcow_domain }}/security-policy
+        dest: "{{ mta_sts_root }}/.well-known/security.txt"
+        mode: '0644'
+
+    - name: Deploy security policy page
+      ansible.builtin.copy:
+        content: |
+          # Security Policy
+          If you believe you have found a security issue, please report it to: security@{{ mailcow_domain }}.
+          We aim to acknowledge reports within 72 hours and will provide status updates as remediation progresses.
+        dest: "{{ mta_sts_root }}/security-policy"
+        mode: '0644'
+
+    - name: Deploy PGP public key placeholder
+      ansible.builtin.copy:
+        content: |
+          PGP public key for security@{{ mailcow_domain }} will be published here.
+          Contact security@{{ mailcow_domain }} for a secure exchange in the meantime.
+        dest: "{{ mta_sts_root }}/.well-known/pgp-key.txt"
+        mode: '0644'
+
+    - name: Deploy MTA-STS nginx IPv4-only config
+      ansible.builtin.copy:
+        content: |
+          server {
+            listen 80;
+            server_name _;
+
+            location /.well-known/ {
+              root /usr/share/nginx/html;
+            }
+
+            location = /security-policy {
+              root /usr/share/nginx/html;
+            }
+
+            location / {
+              return 404;
+            }
+          }
+        dest: "{{ mta_sts_root }}/conf.d/default.conf"
+        mode: '0644'
+
+    - name: Deploy MTA-STS nginx container
+      ansible.builtin.copy:
+        content: |
+          services:
+            mta-sts:
+              image: nginx:1.27-alpine
+              container_name: mta-sts
+              restart: unless-stopped
+              volumes:
+                - {{ mta_sts_root }}/.well-known:/usr/share/nginx/html/.well-known:ro
+                - {{ mta_sts_root }}/security-policy:/usr/share/nginx/html/security-policy:ro
+                - {{ mta_sts_root }}/conf.d/default.conf:/etc/nginx/conf.d/default.conf:ro
+              labels:
+                - "traefik.enable=true"
+                # MTA-STS endpoint
+                - "traefik.http.routers.mta-sts.rule=Host(`mta-sts.{{ mailcow_domain }}`)"
+                - "traefik.http.routers.mta-sts.entrypoints=https"
+                - "traefik.http.routers.mta-sts.tls=true"
+                - "traefik.http.routers.mta-sts.tls.certresolver=cloudflare"
+                - "traefik.http.services.mta-sts.loadbalancer.server.port=80"
+                # security.txt on main domain
+                - "traefik.http.routers.security-txt.rule=Host(`{{ mailcow_domain }}`) && Path(`/.well-known/security.txt`)"
+                - "traefik.http.routers.security-txt.entrypoints=https"
+                - "traefik.http.routers.security-txt.tls=true"
+                - "traefik.http.routers.security-txt.tls.certresolver=cloudflare"
+                - "traefik.http.routers.security-txt.service=mta-sts"
+                # pgp-key.txt on main domain
+                - "traefik.http.routers.security-pgp.rule=Host(`{{ mailcow_domain }}`) && Path(`/.well-known/pgp-key.txt`)"
+                - "traefik.http.routers.security-pgp.entrypoints=https"
+                - "traefik.http.routers.security-pgp.tls=true"
+                - "traefik.http.routers.security-pgp.tls.certresolver=cloudflare"
+                - "traefik.http.routers.security-pgp.service=mta-sts"
+                # security-policy on main domain
+                - "traefik.http.routers.security-policy.rule=Host(`{{ mailcow_domain }}`) && Path(`/security-policy`)"
+                - "traefik.http.routers.security-policy.entrypoints=https"
+                - "traefik.http.routers.security-policy.tls=true"
+                - "traefik.http.routers.security-policy.tls.certresolver=cloudflare"
+                - "traefik.http.routers.security-policy.service=mta-sts"
+              networks:
+                - traefik
+          
+          networks:
+            traefik:
+              external: true
+        dest: "{{ mta_sts_compose_dir }}/docker-compose.yaml"
+        mode: '0644'
+
+    - name: Start MTA-STS container
+      community.docker.docker_compose_v2:
+        project_src: "{{ mta_sts_compose_dir }}"
+        state: present
+
+    # ============================================================
+    # TRAEFIK OVERRIDE FOR MAILCOW WEBMAIL
+    # ============================================================
+    - name: Deploy Traefik override for Mailcow
+      ansible.builtin.copy:
+        content: |
+          services:
+            nginx-mailcow:
+              labels:
+                - "traefik.enable=true"
+                - "traefik.http.routers.mailcow.rule=Host(`{{ mailcow_hostname }}`)"
+                - "traefik.http.routers.mailcow.entrypoints=https"
+                - "traefik.http.routers.mailcow.middlewares=public@file"
+                - "traefik.http.routers.mailcow.tls=true"
+                - "traefik.http.routers.mailcow.tls.certresolver=cloudflare"
+                - "traefik.http.services.mailcow.loadbalancer.server.port=8843"
+                - "traefik.http.services.mailcow.loadbalancer.server.scheme=https"
+                - "traefik.http.routers.mailcow-autoconfig.rule=Host(`autoconfig.{{ mailcow_domain }}`) || Host(`autodiscover.{{ mailcow_domain }}`)"
+                - "traefik.http.routers.mailcow-autoconfig.entrypoints=https"
+                - "traefik.http.routers.mailcow-autoconfig.tls=true"
+                - "traefik.http.routers.mailcow-autoconfig.tls.certresolver=cloudflare"
+                - "traefik.http.routers.mailcow-autoconfig.service=mailcow"
+                - "traefik.docker.network=traefik"
+              networks:
+                - traefik
+            
+            # Add Cloudflare DNS-01 credentials to ACME container
+            acme-mailcow:
+              environment:
+                - CF_Token={{ cf_token }}
+                - ACME_PROVIDER=cloudflare
+            
+            # Pin Ofelia version
+            ofelia-mailcow:
+              image: mcuadros/ofelia:0.3.20
+          
+          networks:
+            traefik:
+              external: true
+        dest: "{{ mailcow_override_file }}"
+        owner: "{{ admin_user }}"
+        group: "{{ admin_user }}"
+        mode: '0644'
+      notify: Restart mailcow
+
+    # ============================================================
+    # START MAILCOW
+    # ============================================================
+    - name: Copy Mailcow compose file to compose directory
+      ansible.builtin.copy:
+        src: "{{ mailcow_repo_dir }}/docker-compose.yml"
+        dest: "{{ mailcow_compose_file }}"
+        remote_src: true
+        mode: '0644'
+
+    - name: Update Mailcow compose file data paths
+      ansible.builtin.replace:
+        path: "{{ mailcow_compose_file }}"
+        regexp: '\./data'
+        replace: "{{ mailcow_data_dir }}"
+
+    - name: Remove stale Mailcow network if present
+      ansible.builtin.command: docker network rm mailcow_mailcow-network
+      failed_when: false
+
+    - name: Start Mailcow
+      ansible.builtin.command: >-
+        docker compose
+        --env-file {{ mailcow_conf_path }}
+        -f {{ mailcow_compose_file }}
+        -f {{ mailcow_override_file }}
+        up -d
+      args:
+        chdir: "{{ mailcow_compose_dir }}"
+
+    - name: Wait for Mailcow to be ready
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:8880"
+        status_code: [200, 301, 302]
+        use_proxy: false
+        validate_certs: false
+        follow_redirects: none
+      register: result
+      until: result.status in [200, 301, 302]
+      retries: 60
+      delay: 10
+      ignore_errors: true
+
+    # ============================================================
+    # CREATE ADMIN USER
+    # ============================================================
+    - name: Check if admin user exists
+      ansible.builtin.shell: |
+        docker exec -i $(docker ps -qf name=mailcowdockerized-php-fpm) \
+          php -r "require '/web/inc/vars.inc.php'; \$pdo = new PDO('mysql:host=mysql;dbname=' . \$database_name, \$database_user, \$database_pass); \$stmt = \$pdo->query(\"SELECT username FROM admin WHERE username='{{ mailcow_admin_user }}'\"); echo \$stmt->rowCount();"
+      register: admin_exists
+      changed_when: false
+      failed_when: false
+
+    - name: Create Mailcow admin user
+      when: admin_exists.stdout | default('0') | int == 0
+      ansible.builtin.shell: |
+        docker exec -i $(docker ps -qf name=mailcowdockerized-php-fpm) php << 'EOPHP'
+        <?php
+        require '/web/inc/vars.inc.php';
+        $pdo = new PDO('mysql:host=mysql;dbname=' . $database_name, $database_user, $database_pass);
+        $password_hashed = password_hash('{{ mailcow_admin_pass }}', PASSWORD_BCRYPT);
+        $stmt = $pdo->prepare('INSERT INTO admin (username, password, superadmin, active, created, modified) VALUES (?, ?, 1, 1, NOW(), NOW())');
+        $stmt->execute(['{{ mailcow_admin_user }}', $password_hashed]);
+        echo 'Admin user created successfully';
+        ?>
+        EOPHP
+      no_log: true
+
+    - name: Display admin login info
+      ansible.builtin.debug:
+        msg: |
+          ╔════════════════════════════════════════════════════════════╗
+          ║  MAILCOW ADMIN ACCESS                                      ║
+          ╠════════════════════════════════════════════════════════════╣
+          ║  URL:  https://{{ mailcow_hostname }}                      ║
+          ║  User: {{ mailcow_admin_user }}                            ║
+          ║  Pass: (stored in ~/.secrets/mailcow/admin.env)            ║
+          ╚════════════════════════════════════════════════════════════╝
+
+    # ============================================================
+    # POST-DEPLOY: DNS RECORDS CHECKLIST
+    # ============================================================
+    - name: Display required DNS records
+      ansible.builtin.debug:
+        msg: |
+          ╔══════════════════════════════════════════════════════════════════════════╗
+          ║              REQUIRED DNS RECORDS FOR {{ mailcow_domain }}               ║
+          ╠══════════════════════════════════════════════════════════════════════════╣
+          ║ Add these records in Cloudflare (DNS only, NOT proxied!):                ║
+          ╠══════════════════════════════════════════════════════════════════════════╣
+          ║ BASIC EMAIL (Required)                                                   ║
+          ╠══════════════════════════════════════════════════════════════════════════╣
+          ║ A       mail                    {{ public_ip }}                          ║
+          ║ MX      @                       mail.{{ mailcow_domain }} (10)           ║
+          ║ TXT     @                       v=spf1 mx -all                           ║
+          ║ TXT     _dmarc                  v=DMARC1; p=reject; rua=mailto:dmarc@... ║
+          ║ TXT     dkim._domainkey         (get from Mailcow admin UI)              ║
+          ║ CNAME   autoconfig              mail.{{ mailcow_domain }}                ║
+          ║ CNAME   autodiscover            mail.{{ mailcow_domain }}                ║
+          ║ SRV     _autodiscover._tcp      10 10 443 mail.{{ mailcow_domain }}      ║
+          ╠══════════════════════════════════════════════════════════════════════════╣
+          ║ MTA-STS + TLS-RPT (Required)                                             ║
+          ╠══════════════════════════════════════════════════════════════════════════╣
+          ║ A       mta-sts                 {{ public_ip }}                          ║
+          ║ TXT     _mta-sts                v=STSv1; id=20260118                     ║
+          ║ TXT     _smtp._tls              v=TLSRPTv1; rua=mailto:tlsrpt@...        ║
+          ╠══════════════════════════════════════════════════════════════════════════╣
+          ║ BIMI - Brand Logo in Email Clients (Optional but recommended)            ║
+          ╠══════════════════════════════════════════════════════════════════════════╣
+          ║ TXT     default._bimi           v=BIMI1; l=https://{{ mailcow_domain }}/ ║
+          ║                                 assets/bimi-logo.svg                     ║
+          ║                                                                          ║
+          ║ BIMI Requirements:                                                       ║
+          ║ 1. DMARC policy MUST be p=quarantine or p=reject                         ║
+          ║ 2. Logo MUST be SVG Tiny 1.2 format (square, no text)                    ║
+          ║ 3. For Gmail: VMC certificate required (DigiCert/Entrust ~$1500/yr)      ║
+          ║ 4. For Apple Mail/Yahoo: Logo works without VMC                          ║
+          ║                                                                          ║
+          ║ Convert logo: https://bimigroup.org/bimi-generator/                      ║
+          ╠══════════════════════════════════════════════════════════════════════════╣
+          ║ DANE - DNSSEC TLS Verification (Requires DNSSEC on domain)               ║
+          ╠══════════════════════════════════════════════════════════════════════════╣
+          ║ TLSA    _25._tcp.mail           3 1 1 <cert-hash>                        ║
+          ║ TLSA    _465._tcp.mail          3 1 1 <cert-hash>                        ║
+          ║ TLSA    _587._tcp.mail          3 1 1 <cert-hash>                        ║
+          ║ TLSA    _993._tcp.mail          3 1 1 <cert-hash>                        ║
+          ║                                                                          ║
+          ║ Generate TLSA hash after cert is issued:                                 ║
+          ║ openssl x509 -in cert.pem -pubkey -noout | \                             ║
+          ║   openssl pkey -pubin -outform DER | \                                   ║
+          ║   openssl sha256 | cut -d' ' -f2                                         ║
+          ╠══════════════════════════════════════════════════════════════════════════╣
+          ║ SECURITY.TXT (Already deployed)                                          ║
+          ╠══════════════════════════════════════════════════════════════════════════╣
+          ║ Accessible at: https://{{ mailcow_domain }}/.well-known/security.txt     ║
+          ║ Update Contact: security@{{ mailcow_domain }}                            ║
+          ╚══════════════════════════════════════════════════════════════════════════╝
+
+  handlers:
+    - name: Restart mailcow
+      ansible.builtin.command: >-
+        docker compose
+        --env-file {{ mailcow_conf_path }}
+        -f {{ mailcow_compose_file }}
+        -f {{ mailcow_override_file }}
+        up -d
+      args:
+        chdir: "{{ mailcow_compose_dir }}"

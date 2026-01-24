@@ -1,0 +1,90 @@
+---
+# HEADSCALE IP FIX (DR) - Reset node IP allocation by deleting node + VACUUM
+# Usage: ansible-playbook -i inventory/production.ini playbooks/master/21-headscale-ip-fix.yml -l master -e headscale_node_name=lady
+#
+# Run ONLY when a worker is restored from backup and must retain its prior Tailnet IP.
+# Master must be fully functional before running this.
+
+- name: Reset Headscale node IP allocation (Master only)
+  hosts: master
+  become: true
+  vars_files:
+    - "{{ playbook_dir }}/../../group_vars/all.yml"
+    - "{{ playbook_dir }}/../../host_vars/master.yml"
+
+  vars:
+    headscale_db_path: /var/lib/headscale/db.sqlite
+
+  tasks:
+    - name: Require node name
+      ansible.builtin.assert:
+        that:
+          - headscale_node_name is defined
+          - headscale_node_name | length > 0
+        fail_msg: "Provide -e headscale_node_name=<hostname> (example: lady)"
+
+    - name: Ensure sqlite3 is installed
+      ansible.builtin.apt:
+        name: sqlite3
+        state: present
+        update_cache: true
+
+    - name: Verify Headscale DB exists
+      ansible.builtin.stat:
+        path: "{{ headscale_db_path }}"
+      register: headscale_db
+
+    - name: Fail if Headscale DB missing
+      ansible.builtin.fail:
+        msg: "Headscale DB not found at {{ headscale_db_path }}"
+      when: not headscale_db.stat.exists
+
+    - name: Check node exists
+      ansible.builtin.command:
+        cmd: "sqlite3 {{ headscale_db_path }} \"SELECT id, hostname FROM nodes WHERE hostname='{{ headscale_node_name }}';\""
+      register: node_check
+      changed_when: false
+
+    - name: Fail if node not found
+      ansible.builtin.fail:
+        msg: "Headscale node '{{ headscale_node_name }}' not found in DB. Aborting."
+      when: node_check.stdout | trim == ""
+
+    - name: Stop Headscale
+      ansible.builtin.systemd:
+        name: headscale
+        state: stopped
+
+    - name: Backup Headscale DB
+      ansible.builtin.copy:
+        src: "{{ headscale_db_path }}"
+        dest: "{{ backup_dir }}/headscale_db_{{ headscale_node_name }}_{{ lookup('pipe', 'date -u +%Y%m%dT%H%M%SZ') }}.sqlite"
+        remote_src: true
+        mode: '0600'
+
+    - name: Delete node record
+      ansible.builtin.command:
+        cmd: "sqlite3 {{ headscale_db_path }} \"DELETE FROM nodes WHERE hostname='{{ headscale_node_name }}';\""
+      changed_when: true
+
+    - name: VACUUM database to reset autoincrement
+      ansible.builtin.command:
+        cmd: "sqlite3 {{ headscale_db_path }} 'VACUUM;'"
+      changed_when: true
+
+    - name: Start Headscale
+      ansible.builtin.systemd:
+        name: headscale
+        state: started
+
+    - name: Verify node removed
+      ansible.builtin.command:
+        cmd: "sqlite3 {{ headscale_db_path }} \"SELECT id, hostname FROM nodes WHERE hostname='{{ headscale_node_name }}';\""
+      register: node_check_after
+      changed_when: false
+
+    - name: Show result
+      ansible.builtin.debug:
+        msg: |
+          ✅ Headscale node '{{ headscale_node_name }}' removed and DB vacuumed.
+          Next: reconnect the client with a new preauth key to reclaim the prior IP.

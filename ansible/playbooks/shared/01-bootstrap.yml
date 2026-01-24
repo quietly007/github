@@ -1,0 +1,370 @@
+---
+# BOOTSTRAP - Fresh Server Setup
+# Usage: ansible-playbook -i inventory/fresh.ini playbooks/01-bootstrap.yml -l lady
+#
+# Prerequisites (configure during Contabo install):
+#   - SSH on port 1006
+#   - Initial login via admin/password (admin:RaMpulstilckin123!)
+#   - After initial access, switch to qui3tly SSH key-only
+#
+# This playbook will:
+#   - Purge cloud-init
+#   - Remove Contabo admin account
+#   - Install Docker + packages
+#   - Configure UFW firewall
+#   - Create standard directories
+
+- name: Bootstrap fresh server
+  hosts: all
+  become: true
+  vars_files:
+    - "{{ playbook_dir }}/../../group_vars/all.yml"
+    - "{{ playbook_dir }}/../../host_vars/{{ inventory_hostname }}.yml"
+
+  tasks:
+    #=== CLEANUP CONTABO DEFAULTS ===
+    - name: Stop and disable cloud-init services
+      ansible.builtin.systemd:
+        name: "{{ item }}"
+        state: stopped
+        enabled: false
+      loop:
+        - cloud-init
+        - cloud-init-local
+        - cloud-config
+        - cloud-final
+      failed_when: false
+
+    - name: Purge cloud-init
+      ansible.builtin.apt:
+        name: cloud-init
+        state: absent
+        purge: true
+
+    - name: Remove cloud-init directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /etc/cloud
+        - /var/lib/cloud
+        - /var/log/cloud-init.log
+        - /var/log/cloud-init-output.log
+
+    - name: Check if admin user exists
+      ansible.builtin.getent:
+        database: passwd
+        key: admin
+      register: admin_user_check
+      failed_when: false
+
+    - name: Kill processes owned by admin
+      ansible.builtin.shell: pkill -u admin || true
+      when: admin_user_check is succeeded
+      changed_when: false
+
+    - name: Remove admin user (Contabo default)
+      ansible.builtin.user:
+        name: admin
+        state: absent
+        remove: true
+        force: true
+      when: admin_user_check is succeeded
+
+    - name: Remove admin group if exists
+      ansible.builtin.group:
+        name: admin
+        state: absent
+      failed_when: false
+
+    #=== SUDO NOPASSWD ===
+    - name: Allow qui3tly passwordless sudo
+      ansible.builtin.copy:
+        content: "{{ admin_user }} ALL=(ALL) NOPASSWD: ALL\n"
+        dest: "/etc/sudoers.d/{{ admin_user }}"
+        mode: '0440'
+        validate: 'visudo -cf %s'
+
+    #=== SWAP FILE ===
+    - name: Check if swap file exists
+      ansible.builtin.stat:
+        path: /swapfile
+      register: swap_file
+
+    - name: Create swap file (2GB)
+      ansible.builtin.command: dd if=/dev/zero of=/swapfile bs=1M count=2048
+      when: not swap_file.stat.exists
+      changed_when: true
+
+    - name: Set swap file permissions
+      ansible.builtin.file:
+        path: /swapfile
+        mode: '0600'
+      when: not swap_file.stat.exists
+
+    - name: Format swap file
+      ansible.builtin.command: mkswap /swapfile
+      when: not swap_file.stat.exists
+      changed_when: true
+
+    - name: Enable swap
+      ansible.builtin.command: swapon /swapfile
+      when: not swap_file.stat.exists
+      changed_when: true
+
+    - name: Add swap to fstab
+      ansible.builtin.lineinfile:
+        path: /etc/fstab
+        line: '/swapfile none swap sw 0 0'
+        state: present
+
+    #=== TIMEZONE & LOCALE ===
+    - name: Set timezone to Europe/Berlin
+      community.general.timezone:
+        name: Europe/Berlin
+
+    - name: Generate locale
+      community.general.locale_gen:
+        name: en_US.UTF-8
+        state: present
+
+    #=== SYSCTL HARDENING ===
+    - name: Apply sysctl hardening
+      ansible.posix.sysctl:
+        name: "{{ item.name }}"
+        value: "{{ item.value }}"
+        sysctl_file: /etc/sysctl.d/50-hardening.conf
+        reload: true
+      loop:
+        - { name: 'net.ipv4.ip_forward', value: '1' }
+        - { name: 'net.ipv4.conf.all.forwarding', value: '1' }
+        - { name: 'net.ipv4.tcp_syncookies', value: '1' }
+        - { name: 'net.ipv4.conf.all.rp_filter', value: '1' }
+        - { name: 'net.core.somaxconn', value: '65536' }
+        - { name: 'vm.swappiness', value: '10' }
+
+    #=== SYSTEM SETUP ===
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Install essential packages
+      ansible.builtin.apt:
+        name: "{{ essential_packages }}"
+        state: present
+
+    - name: Set hostname
+      ansible.builtin.hostname:
+        name: "{{ hostname }}"
+
+    - name: Update /etc/hosts
+      ansible.builtin.lineinfile:
+        path: /etc/hosts
+        regexp: '^127\.0\.1\.1'
+        line: "127.0.1.1 {{ hostname }}"
+
+    #=== SSH HARDENING ===
+    - name: Backup sshd_config
+      ansible.builtin.copy:
+        src: /etc/ssh/sshd_config
+        dest: /etc/ssh/sshd_config.bak
+        remote_src: true
+        mode: '0600'
+
+    - name: Ensure SSH hardening (port already 1006 from install)
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      loop:
+        - { regexp: '^#?Port ', line: "Port {{ ssh_port }}" }
+        - { regexp: '^#?PasswordAuthentication ', line: "PasswordAuthentication no" }
+        - { regexp: '^#?PermitRootLogin ', line: "PermitRootLogin no" }
+        - { regexp: '^#?PubkeyAuthentication ', line: "PubkeyAuthentication yes" }
+        - { regexp: '^#?X11Forwarding ', line: "X11Forwarding no" }
+        - { regexp: '^#?MaxAuthTries ', line: "MaxAuthTries 3" }
+        - { regexp: '^#?ClientAliveInterval ', line: "ClientAliveInterval 300" }
+        - { regexp: '^#?ClientAliveCountMax ', line: "ClientAliveCountMax 2" }
+      notify: Reload SSH
+
+    #=== UFW FIREWALL ===
+    - name: Configure UFW rules
+      community.general.ufw:
+        rule: allow
+        port: "{{ item.port }}"
+        proto: "{{ item.proto }}"
+        comment: "{{ item.comment }}"
+      loop: "{{ ufw_rules }}"
+
+    - name: Allow Tailnet range
+      community.general.ufw:
+        rule: allow
+        from_ip: "{{ tailnet_range }}"
+        comment: "Tailnet VPN"
+
+    - name: UFW default deny incoming
+      community.general.ufw:
+        direction: incoming
+        default: deny
+
+    - name: UFW default allow outgoing
+      community.general.ufw:
+        direction: outgoing
+        default: allow
+
+    - name: Enable UFW
+      community.general.ufw:
+        state: enabled
+
+    #=== DOCKER ===
+    - name: Add Docker GPG key
+      ansible.builtin.apt_key:
+        url: https://download.docker.com/linux/debian/gpg
+        state: present
+
+    - name: Add Docker repository
+      ansible.builtin.apt_repository:
+        repo: "deb https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable"
+        state: present
+
+    - name: Install Docker
+      ansible.builtin.apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-compose-plugin
+        state: present
+        update_cache: true
+
+    - name: Add user to docker group
+      ansible.builtin.user:
+        name: "{{ admin_user }}"
+        groups: docker
+        append: true
+
+    - name: Reset SSH connection to pick up docker group
+      ansible.builtin.meta: reset_connection
+
+    - name: Enable Docker
+      ansible.builtin.systemd:
+        name: docker
+        enabled: true
+        state: started
+
+    #=== DIRECTORIES ===
+    - name: Create standard directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ admin_user }}"
+        group: "{{ admin_user }}"
+        mode: '0755'
+      loop:
+        - "{{ docker_dir }}"
+        - "{{ compose_dir }}"
+        - "{{ backup_dir }}"
+
+    - name: Create secrets directory
+      ansible.builtin.file:
+        path: "{{ secrets_dir }}"
+        state: directory
+        owner: "{{ admin_user }}"
+        group: "{{ admin_user }}"
+        mode: '0700'
+
+    #=== COPILOT STRUCTURE ===
+    - name: Create .copilot directories
+      ansible.builtin.file:
+        path: "/home/{{ admin_user }}/.copilot/{{ item.dir }}"
+        state: directory
+        owner: "{{ admin_user }}"
+        group: "{{ admin_user }}"
+        mode: "{{ item.mode }}"
+      loop:
+        - { dir: "", mode: "0755" }
+        - { dir: "backups", mode: "0755" }
+        - { dir: "scripts", mode: "0700" }
+        - { dir: "logging", mode: "0755" }
+        - { dir: "cron", mode: "0755" }
+        - { dir: "skills", mode: "0755" }
+
+    - name: Initialize memories.jsonl
+      ansible.builtin.copy:
+        content: |
+          {"ts":"{{ ansible_date_time.iso8601 }}","action":"bootstrap","target":"{{ hostname }}","result":"Server bootstrapped via Ansible"}
+        dest: "/home/{{ admin_user }}/.copilot/memories.jsonl"
+        owner: "{{ admin_user }}"
+        group: "{{ admin_user }}"
+        mode: '0644'
+        force: false
+
+    - name: Create .copilot README
+      ansible.builtin.copy:
+        content: |
+          # Copilot Agent Directory
+          
+          This directory contains files for GitHub Copilot agent sessions.
+          
+          ## Structure
+          - `memories.jsonl` - Audit log of agent actions
+          - `backups/` - Pre-change backups
+          - `scripts/` - Helper scripts
+          - `logging/` - Script output logs
+          - `cron/` - Scheduled task scripts
+          - `skills/` - Agent skill definitions
+          
+          See ~/.governance/ for policies.
+        dest: "/home/{{ admin_user }}/.copilot/README.md"
+        owner: "{{ admin_user }}"
+        group: "{{ admin_user }}"
+        mode: '0644'
+        force: false
+
+    #=== GOVERNANCE STRUCTURE ===
+    - name: Create .governance directory
+      ansible.builtin.file:
+        path: "/home/{{ admin_user }}/.governance"
+        state: directory
+        owner: "{{ admin_user }}"
+        group: "{{ admin_user }}"
+        mode: '0755'
+
+    #=== REPORTS STRUCTURE ===
+    - name: Create .reports directories
+      ansible.builtin.file:
+        path: "/home/{{ admin_user }}/.reports/{{ item }}"
+        state: directory
+        owner: "{{ admin_user }}"
+        group: "{{ admin_user }}"
+        mode: '0755'
+      loop:
+        - ""
+        - "audits"
+        - "secrets"
+        - "security"
+
+    #=== DOCS STRUCTURE ===
+    - name: Create .docs directory
+      ansible.builtin.file:
+        path: "/home/{{ admin_user }}/.docs"
+        state: directory
+        owner: "{{ admin_user }}"
+        group: "{{ admin_user }}"
+        mode: '0755'
+
+  handlers:
+    - name: Reload SSH
+      ansible.builtin.systemd:
+        name: sshd
+        state: reloaded
+
+  post_tasks:
+    - name: Bootstrap complete
+      ansible.builtin.debug:
+        msg: |
+          ✅ Bootstrap complete for {{ hostname }}
+          SSH on port {{ ssh_port }}
+          Cloud-init purged, admin account removed
+          Next: ansible-playbook -i inventory/production.ini playbooks/02-hardening.yml -l {{ inventory_hostname }}

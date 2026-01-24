@@ -1,0 +1,84 @@
+---
+# MASTER FRESH INSTALL - Complete control plane setup
+# Usage: ansible-playbook -i inventory/bootstrap.ini playbooks/shared/fresh-install.yml -l master
+#
+# This playbook performs a fresh install of MASTER:
+# 1. Bootstrap (Docker, dirs, packages)
+# 2. Hardening (UFW, fail2ban, sysctl)
+# 3. Security audit (AIDE/Lynis)
+# 4. Secrets + GitHub
+# 5. Headscale (native) + Tailscale + WireGuard
+# 6. Core services (Traefik, CrowdSec, Portainer)
+# 7. Monitoring stack (Prometheus, Grafana, Loki, Alertmanager)
+# 8. Admin services (Pi-hole, IT-Tools, Gotify, Semaphore)
+#
+# Prerequisites:
+# - Fresh Debian 12 server
+# - SSH key deployed for qui3tly user (run 00-initial-access.yml first)
+# - Port 1006 SSH accessible
+
+# ═══════════════════════════════════════════════════════════════════
+# PHASE 1: BOOTSTRAP
+# ═══════════════════════════════════════════════════════════════════
+- import_playbook: 01-bootstrap.yml
+
+# ═══════════════════════════════════════════════════════════════════
+# PHASE 2: HARDENING
+# ═══════════════════════════════════════════════════════════════════
+- import_playbook: 02-hardening.yml
+
+# ═══════════════════════════════════════════════════════════════════
+# PHASE 3: SECURITY AUDIT
+# ═══════════════════════════════════════════════════════════════════
+- import_playbook: 03-security-audit.yml
+
+# ═══════════════════════════════════════════════════════════════════
+# PHASE 4: SECRETS + GITHUB
+# ═══════════════════════════════════════════════════════════════════
+- import_playbook: ../master/00-secrets.yml
+
+- import_playbook: ../master/20-github.yml
+
+# ═══════════════════════════════════════════════════════════════════
+# PHASE 5: CONNECTIVITY
+# ═══════════════════════════════════════════════════════════════════
+- import_playbook: ../master/02-headscale.yml
+
+- import_playbook: ../master/03-tailscale.yml
+
+- import_playbook: ../master/14-wireguard.yml
+
+# ═══════════════════════════════════════════════════════════════════
+# PHASE 6: CORE SERVICES
+# ═══════════════════════════════════════════════════════════════════
+- import_playbook: ../master/04-traefik.yml
+
+- import_playbook: ../master/09-crowdsec.yml
+
+- import_playbook: ../master/05-portainer.yml
+
+# ═══════════════════════════════════════════════════════════════════
+# PHASE 7: MONITORING STACK
+# ═══════════════════════════════════════════════════════════════════
+- import_playbook: ../master/06-monitoring.yml
+
+# ═══════════════════════════════════════════════════════════════════
+# PHASE 8: ADMIN SERVICES
+# ═══════════════════════════════════════════════════════════════════
+- import_playbook: ../master/10-pihole.yml
+
+- import_playbook: ../master/07-it-tools.yml
+
+- import_playbook: ../master/08-gotify.yml
+
+- import_playbook: ../master/12-semaphore.yml
+
+# ═══════════════════════════════════════════════════════════════════
+# PHASE 9: COPILOT SETUP
+# ═══════════════════════════════════════════════════════════════════
+- import_playbook: ../master/15-copilot.yml
+
+# ═══════════════════════════════════════════════════════════════════
+# PHASE 10: VERIFICATION
+# ═══════════════════════════════════════════════════════════════════
+- import_playbook: health-check.yml

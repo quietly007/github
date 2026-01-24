@@ -1,0 +1,100 @@
+---
+# WIREGUARD - P2P bridge to EdgeRouter
+# Usage: ansible-playbook -i inventory/production.ini playbooks/14-wireguard.yml -l <host>
+#
+# Only runs if wireguard_enabled: true
+
+- name: Deploy WireGuard
+  hosts: all
+  become: true
+
+  vars_files:
+    - "{{ playbook_dir }}/../../group_vars/all.yml"
+    - "{{ playbook_dir }}/../../host_vars/{{ inventory_hostname }}.yml"
+
+  tasks:
+    - name: Skip if WireGuard disabled
+      ansible.builtin.meta: end_play
+      when: not wireguard_enabled | default(false)
+
+    - name: Install WireGuard
+      ansible.builtin.apt:
+        name: wireguard
+        state: present
+        update_cache: true
+
+    - name: Create WireGuard directory
+      ansible.builtin.file:
+        path: /etc/wireguard
+        state: directory
+        mode: '0700'
+
+    - name: Generate WireGuard keys if not exist
+      ansible.builtin.shell: |
+        set -o pipefail
+        if [ ! -f /etc/wireguard/privatekey ]; then
+          wg genkey | tee /etc/wireguard/privatekey | wg pubkey > /etc/wireguard/publickey
+          chmod 600 /etc/wireguard/privatekey
+        fi
+      args:
+        creates: /etc/wireguard/privatekey
+        executable: /bin/bash
+
+    - name: Check if private key exists
+      ansible.builtin.stat:
+        path: /etc/wireguard/privatekey
+      register: wg_key_check
+
+    - name: Read private key
+      ansible.builtin.slurp:
+        src: /etc/wireguard/privatekey
+      register: wg_privatekey
+      when: wg_key_check.stat.exists
+
+    - name: Check EdgeRouter public key secret
+      ansible.builtin.stat:
+        path: "{{ secrets_dir }}/wireguard/edgerouter.txt"
+      register: edgerouter_pubkey_file
+
+    - name: Read EdgeRouter public key secret
+      ansible.builtin.slurp:
+        src: "{{ secrets_dir }}/wireguard/edgerouter.txt"
+      register: edgerouter_pubkey_raw
+      when: edgerouter_pubkey_file.stat.exists
+
+    - name: Parse EdgeRouter public key
+      ansible.builtin.set_fact:
+        edgerouter_wg_pubkey: >-
+          {{
+            (edgerouter_pubkey_raw.content | b64decode
+              | regex_search('(?m)^\s*PublicKey\s*=\s*([A-Za-z0-9+/=]+)\s*$', '\\1'))
+            | default((edgerouter_pubkey_raw.content | b64decode | trim).splitlines()[0], true)
+          }}
+      when: edgerouter_pubkey_file.stat.exists
+
+    - name: Require EdgeRouter public key
+      ansible.builtin.assert:
+        that:
+          - edgerouter_wg_pubkey is defined
+          - edgerouter_wg_pubkey | length > 0
+        fail_msg: "EdgeRouter WireGuard public key missing. Provide {{ secrets_dir }}/wireguard/edgerouter.txt (raw key or 'PublicKey = ...')."
+
+    - name: Deploy WireGuard config
+      ansible.builtin.template:
+        src: "{{ playbook_dir | dirname }}/templates/wireguard.conf.j2"
+        dest: /etc/wireguard/wg0.conf
+        mode: '0600'
+      when: wg_key_check.stat.exists
+      notify: Restart WireGuard
+
+    - name: Enable WireGuard service
+      ansible.builtin.systemd:
+        name: wg-quick@wg0
+        enabled: true
+        state: started
+
+  handlers:
+    - name: Restart WireGuard
+      ansible.builtin.systemd:
+        name: wg-quick@wg0
+        state: restarted

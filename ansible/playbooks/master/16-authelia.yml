@@ -1,0 +1,78 @@
+---
+# AUTHELIA - Identity Provider / SSO
+# Usage: ansible-playbook -i inventory/production.ini playbooks/16-authelia.yml -l master
+#
+# Provides forward auth for Traefik protected services
+
+- name: Deploy Authelia
+  hosts: master
+  become: true
+  become_user: "{{ admin_user }}"
+
+  vars_files:
+    - "{{ playbook_dir }}/../../group_vars/all.yml"
+    - "{{ playbook_dir }}/../../host_vars/{{ inventory_hostname }}.yml"
+
+  tasks:
+    - name: Skip if not enabled
+      ansible.builtin.meta: end_play
+      when: not run_authelia | default(false)
+
+    - name: Pull latest from GitHub
+      ansible.builtin.git:
+        repo: "https://github.com/quietly007/quietly.its.me.git"
+        dest: "{{ ansible_env.HOME }}"
+        version: main
+        update: yes
+        force: no
+
+    - name: Check compose file exists
+      ansible.builtin.stat:
+        path: "{{ compose_dir }}/authelia/docker-compose.yaml"
+      register: authelia_compose
+
+    - name: Fail if compose file missing
+      ansible.builtin.fail:
+        msg: "Compose file missing at {{ compose_dir }}/authelia/docker-compose.yaml"
+      when: not authelia_compose.stat.exists
+
+    - name: Check Authelia config exists
+      ansible.builtin.stat:
+        path: "{{ docker_dir }}/authelia/configuration.yml"
+      register: authelia_config
+
+    - name: Fail if Authelia config missing
+      ansible.builtin.fail:
+        msg: "Authelia config missing at {{ docker_dir }}/authelia/configuration.yml"
+      when: not authelia_config.stat.exists
+
+    - name: Check Authelia secrets exist
+      ansible.builtin.stat:
+        path: "{{ secrets_dir }}/authelia/{{ item }}"
+      loop:
+        - jwt
+        - session
+        - storage
+      register: authelia_secrets
+
+    - name: Fail if Authelia secrets missing
+      ansible.builtin.fail:
+        msg: "Authelia secrets missing under {{ secrets_dir }}/authelia/"
+      when: authelia_secrets.results | selectattr('stat.exists', 'equalto', false) | list | length > 0
+
+    - name: Start Authelia
+      community.docker.docker_compose_v2:
+        project_src: "{{ compose_dir }}/authelia"
+        state: present
+
+    - name: Wait for Authelia health
+      ansible.builtin.uri:
+        url: "http://localhost:9091/api/health"
+        status_code: 200
+      register: result
+      until: result.status == 200
+      retries: 30
+      delay: 2
+      ignore_errors: true
+
+  handlers: []

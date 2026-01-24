@@ -1,0 +1,211 @@
+---
+# INITIAL ACCESS - Two-phase server setup from fresh Contabo install
+# 
+# Phase 1: Connect as admin:port22 → create qui3tly, change port to 1006
+# Phase 2: Connect as qui3tly:port1006 → deploy keys, disable password, remove admin
+#
+# Usage: ansible-playbook -i inventory/initial.ini playbooks/00-initial-access.yml
+
+- name: Clean old SSH host keys (runs on localhost)
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: Remove old known_hosts entries
+      ansible.builtin.shell: |
+        ssh-keygen -f ~/.ssh/known_hosts -R "{{ hostvars[item].ansible_host }}" 2>/dev/null || true
+        ssh-keygen -f ~/.ssh/known_hosts -R "[{{ hostvars[item].ansible_host }}]:22" 2>/dev/null || true
+        ssh-keygen -f ~/.ssh/known_hosts -R "[{{ hostvars[item].ansible_host }}]:1006" 2>/dev/null || true
+      loop: "{{ groups['servers'] }}"
+      changed_when: false
+      failed_when: false
+
+# ═══════════════════════════════════════════════════════════════════════════
+# PHASE 1: Connect as admin on port 22, create qui3tly, change port to 1006
+# ═══════════════════════════════════════════════════════════════════════════
+- name: "Phase 1: Setup as admin (port 22)"
+  hosts: servers
+  become: true
+  gather_facts: true
+
+  vars:
+    new_user: qui3tly
+    new_user_password: "RaMpulstilckin123!"
+    ssh_port: 1006
+
+  tasks:
+    - name: "Phase 1 - Starting"
+      ansible.builtin.debug:
+        msg: |
+          ═══════════════════════════════════════════════════════════
+          🔑 PHASE 1: ADMIN SETUP (port 22)
+          ═══════════════════════════════════════════════════════════
+          Target: {{ inventory_hostname }} ({{ ansible_host }})
+          Current user: {{ ansible_user }}
+          Creating: {{ new_user }}
+          ═══════════════════════════════════════════════════════════
+
+    - name: Create qui3tly user with password
+      ansible.builtin.user:
+        name: "{{ new_user }}"
+        password: "{{ new_user_password | password_hash('sha512') }}"
+        shell: /bin/bash
+        groups: sudo
+        append: true
+        create_home: true
+        state: present
+
+    - name: Allow qui3tly passwordless sudo
+      ansible.builtin.copy:
+        dest: "/etc/sudoers.d/{{ new_user }}"
+        content: "{{ new_user }} ALL=(ALL) NOPASSWD: ALL\n"
+        mode: '0440'
+        validate: 'visudo -cf %s'
+
+    - name: Change SSH port to 1006
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?Port '
+        line: "Port {{ ssh_port }}"
+
+    - name: Restart SSH to apply new port
+      ansible.builtin.systemd:
+        name: sshd
+        state: restarted
+
+    - name: Wait for new SSH port to be available
+      ansible.builtin.wait_for:
+        host: "{{ ansible_host }}"
+        port: "{{ ssh_port }}"
+        timeout: 30
+      delegate_to: localhost
+      become: false
+
+    - name: "Phase 1 - Complete"
+      ansible.builtin.debug:
+        msg: |
+          ═══════════════════════════════════════════════════════════
+          ✅ PHASE 1 COMPLETE
+          ═══════════════════════════════════════════════════════════
+          User {{ new_user }} created with password
+          SSH port changed to {{ ssh_port }}
+          Continuing to Phase 2...
+          ═══════════════════════════════════════════════════════════
+
+# ═══════════════════════════════════════════════════════════════════════════
+# PHASE 2: Connect as qui3tly on port 1006, deploy keys, secure, remove admin
+# ═══════════════════════════════════════════════════════════════════════════
+- name: "Phase 2: Secure as qui3tly (port 1006)"
+  hosts: servers
+  become: true
+  gather_facts: false
+
+  vars:
+    ansible_user: qui3tly
+    ansible_port: 1006
+    ansible_ssh_pass: "RaMpulstilckin123!"
+    new_user: qui3tly
+    ssh_port: 1006
+
+  tasks:
+    - name: "Phase 2 - Starting"
+      ansible.builtin.debug:
+        msg: |
+          ═══════════════════════════════════════════════════════════
+          🔐 PHASE 2: SECURITY SETUP (port 1006)
+          ═══════════════════════════════════════════════════════════
+          Connected as: {{ ansible_user }}
+          Port: {{ ansible_port }}
+          ═══════════════════════════════════════════════════════════
+
+    - name: Create .ssh directory
+      ansible.builtin.file:
+        path: "/home/{{ new_user }}/.ssh"
+        state: directory
+        owner: "{{ new_user }}"
+        group: "{{ new_user }}"
+        mode: '0700'
+
+    - name: Deploy authorized_keys
+      ansible.builtin.copy:
+        dest: "/home/{{ new_user }}/.ssh/authorized_keys"
+        owner: "{{ new_user }}"
+        group: "{{ new_user }}"
+        mode: '0600'
+        content: |
+          ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC+V1WuyEC9OX2SMOBtZHr36NJWWUZSvsOJEpEF74LaKWs4MVODX9x0w19Gf3dxcGkx9g9Llj/gLGUSNumxMIdE+PIy/k2kMJkA2qEAETIDqDKGDBEwWhbuQsF4XbH7MEPwdTq46NvfXVdY5Vj/VXgZifwUWbOcuTKLqU6MfpkMkQNAAV4T6kZD6XwF/z4nroEFXbLbCrQN2OBawVU/1tc256J+uQoyX0CrD+s1JJF/upnzpRwCAxw72dz76gC0fr+mNs6KqxOEM59QJ6du4/SmkQGUg5rrdGAY+TqiLK0HmcJk1dlXcxWTU4CGMgXpNgkGY+IOui/gVEoUE1jv9dJ4pB+o/6VBDQoo97QWKQAFUpSkaW+q4t5XlwIIUBO6VDOk5L+NNG+ZQYmazJ4XYc9q4OGISE/YEbzYk/OdgGvaJjftBC1QU1/441t5oRqRll+MqnNS6ViImsKjbvqfjDIwo13d7RwZKS64gjOHH78kt5T4rHu4QJHSa9/8Lb0cCDM= quietly-mac
+          ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCxkHSOF2rWmeTWuOGDddMAEyJVK3IntKrmVXg2/JJNaEfBBoEF+lXMANmcIFMH7j96hqhtaLzDdKyuh5p48Lx6QN/DDNz85SID0hZplxdLxlgV9EzWY59cY9y29IsCdlZIU9bJYcP6GUo5TEvpKVXS9oLhwE1stl0Iw+pY4q8Es5ocbWmvHz8wtLQe94a4BBHlaYGzqR3vKQFDykAwbCmsCUFPzcWs1j/3DbPZwdJmM3ojVtsfHcV5P0/q78FXfe6bMXi9VHMw4gkKmT1K8QwtNHbn6/LSbPhYxr86ze1EU8AIDJUeQJuR+wiK6LLL5uS/XQF3lT3V4yYce1bTc0S18gmXqz+9tCq+GZgRi8aGhNlNEp6MZpxCdplym0zh1nhPQlaz9AcdO8ovBkkR0tZFhznt7WCSXpOmvvRrno0J1tIR2m9LFzJRrp4I+87/XRNJ1QFrzGI1HMYz4nIK2PUB4/oumYQtrTcLYimfbUCvisGQQWxLu2jpyOkKcOARLks= quietly-home
+          ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCw8TvCTwyZT6/FB2V0UjMvU5UB2m5grpiZR0PAGTf/x3Ks89fC4VEl5q9g+DAPzb8g3niEwlyW1lSsfmj/zoikEhtKLEX4xfaDCXXqTF37YVYGdqOL8wSy3udV6fZb8juHnUaL//gzsqiUfMQQX5ND87RCIjWFhVCXmcGaGynQQs+XDLM7xtNj1aD/eqpgiUj8YgqkzyUlDqZtMs5VS0ZAKnSzXP23d/52U6QGttU3Vjumafp4MdpvcyzKHTF/4jB32oVp3QR+7heIgAtAn9dIdcIKlIbgCQ3w61cWyKDhSgxIMms8aTyM0cOiunu1CRQ1//y4FhoD9Mv6Z71PbZffIhwNH57lYcLQlubdJRgCEeXNCRKQv2v4KGBwAwZVTX5DYUor4G52ic6KuxPMqsLrr3yjSBtpCvxPLpZRCNW75mKhVreIpss69fuHOa0Gkq+AHv3mBfR+CIiaZbelEtU+9yLEaS14fRmY31DT8wLERdRGm6Me0E8i/9xIevLx7Y8= quietly.online
+          ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCdGMy7z5SFaNahF+GYBeeUwYaBgvh9H+PBMFAN6j40eQ3OPbdCW+W3hCs/7epYr93dbnXaJPTpMaa7LBoIfIgDSILQly0Hjx5F511+4on0bc4/YLjHgH2pz6VZMpj7xBNCB7iKC7LsGWPjUFbPkS8C9uCb4tlPho2rkKx/6NyEvPW06ByQCr8ddIJdNaxZkle9IU/lA2iAbfRsf9pUxz1+SwoqedxWMvs/2giI4oMGU09KWu5nN2ubIt0C9V9MKiPBeGrMt9NFNoEBjf+gyhJK6rhPOjxT0lcB1G4DoOU3ATNvwkj6wQo5CFZ8pehPA3K2bqydgd4eNNX3dBGQjjy3eey9q9f8h2aCm5UU1wsE+LuhN2gU/4LP0eckoxl46hp7yDlyWls1KhyUx+TjCNKB5tM3Eala70JoxZwZX5PHst8vPR0Dp3Us05MS89BVDJz4BpA+dsOMF5c8jNRyjU/hpBjBSj37TzJrUpBHiI2UJTm/3ExtBwKQlK8qg4PfMOc= quietly.co.me
+          ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCuKRcvtjtGRciqMO76KHXSuC3R09KmB75zpigbpgRovnKe5YCWELXmzqf30Rdo1eko2WFsCkUE+xHEMWdpOeeNydBV8mQ7MAeUyjJ0yI38Z3wt21Usq21fueuqANKPhG+JP3VmVb7ACF2CUw/3NvsI8NStAnKl7stu6+jDl6tdPNTA27iYkpH/s83Bw7FOOZpYsSK77Oit1axBcuo4+VwAiOMgBM56Ik2ut3R+e68qdCk8mXqXX0NebQPyl0BgxtZgPJ+Ul7XKx28nv7h9g/lw0Vb8savD/aVkcfNP/r8ascf3Xj/khsRWXvEYRVIDOXcmMdAyVP4ODCa8VRDD0DU9ouQLmwt/9bgLYQaA5wT0bU0ACRm2Cajqt8ZgzRrUWVkSWmTJ4rU6xjG+Vs6v8iSyU0cnMW65TQRHMLwxFKS3/hxiXziWxRGq6IB74bQ/AchGbKvCf0xfysv+mZ7kD4TubVd7RaWXpydkSIUDm56pqS2iPk3CeXRURhmzVcgmbF8= qui3tly.com
+          ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCQqCgeNQ4Wgv4y4HxaksB7UbnOPL8wjJvebxkxLK0aDUpdIppQHO7QiofD+dPSXrX65ONYrjQReXUIZi55ocVAz5gjceEhVblN0H9Mjj/btfZfxo3IEi46m+w446keugSDmKnr7ACzA5Is8o64LLpGM+gIK9CJIA4q2G++xAbG95DITktRbNbLEG/ZkWRXqKBdj4JIj+HZugahqOHDq4ejHaXCGgTvUgtgLcA4MsFRVMo1okQeBeZr2OZY9S1wYBtVpKbJMIvlEmo+mSxIw2XN/g2bOE//pmUDgox7USVk6Y03OF942IUm/u6vhgRZwo0p007bbIhbQ5Bw8ww17woDOthM5Y++xIbhJqHlBNbYpjx0p8Yh5XdVsCcLIzXx/Dqf3IMvvnMfq3/NkAoNnw8yn0i6pYnjNp30j8mro6YJvLOl40IbDyQ17Ii5z8fWnxom0XwG3gcVCxhWgv6GvuZsgrFDr5T7/4yTepnPLY3gwR+S9BCM0NW0VIUpsSvV1F8= quietly.its.me
+          ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOdldkN1ystNhfG2mgxgxp5KOQMTKW/9lN4wYmk5lfLY admin-panel-container
+
+    - name: Verify SSH key access works
+      ansible.builtin.wait_for:
+        host: "{{ ansible_host }}"
+        port: "{{ ssh_port }}"
+        timeout: 10
+      delegate_to: localhost
+      become: false
+
+    - name: Disable password authentication
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?PasswordAuthentication '
+        line: "PasswordAuthentication no"
+
+    - name: Disable root login
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?PermitRootLogin '
+        line: "PermitRootLogin no"
+
+    - name: Enable pubkey authentication
+      ansible.builtin.lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^#?PubkeyAuthentication '
+        line: "PubkeyAuthentication yes"
+
+    - name: Reload SSH to apply security settings
+      ansible.builtin.systemd:
+        name: sshd
+        state: reloaded
+
+    - name: Kill admin user sessions
+      ansible.builtin.shell: pkill -u admin || true
+      changed_when: false
+      failed_when: false
+
+    - name: Remove admin user
+      ansible.builtin.user:
+        name: admin
+        state: absent
+        remove: true
+        force: true
+
+    - name: Remove admin group
+      ansible.builtin.group:
+        name: admin
+        state: absent
+      failed_when: false
+
+    - name: "Phase 2 - Complete"
+      ansible.builtin.debug:
+        msg: |
+          ═══════════════════════════════════════════════════════════
+          ✅ INITIAL ACCESS COMPLETE
+          ═══════════════════════════════════════════════════════════
+          
+          Server: {{ inventory_hostname }} ({{ ansible_host }})
+          User: {{ new_user }}
+          SSH Port: {{ ssh_port }}
+          SSH Key: ✅ Deployed
+          Password Auth: ❌ Disabled
+          Admin User: 🗑️ Removed
+          
+          Next: Run bootstrap playbook
+          ansible-playbook -i inventory/bootstrap.ini playbooks/01-bootstrap.yml -l lady
+          
+          ═══════════════════════════════════════════════════════════

@@ -1,0 +1,61 @@
+---
+# HEADSCALE - VPN control plane (Master only, native service)
+# Usage: ansible-playbook -i inventory/production.ini playbooks/13-headscale.yml -l <host>
+#
+# Note: Headscale runs as native service, not Docker
+
+- name: Deploy Headscale
+  hosts: all
+  become: true
+
+  vars_files:
+    - "{{ playbook_dir }}/../../group_vars/all.yml"
+    - "{{ playbook_dir }}/../../host_vars/{{ inventory_hostname }}.yml"
+
+  tasks:
+    - name: Skip if not master
+      ansible.builtin.meta: end_play
+      when: not run_headscale | default(false)
+
+    - name: Check if Headscale installed
+      ansible.builtin.stat:
+        path: /usr/bin/headscale
+      register: headscale_bin
+
+    - name: Install Headscale
+      when: not headscale_bin.stat.exists
+      block:
+        - name: Download Headscale
+          ansible.builtin.get_url:
+            url: "https://github.com/juanfont/headscale/releases/download/v0.27.1/headscale_0.27.1_linux_amd64.deb"
+            dest: /tmp/headscale.deb
+            mode: '0644'
+
+        - name: Install Headscale package
+          ansible.builtin.apt:
+            deb: /tmp/headscale.deb
+
+    - name: Create Headscale config directory
+      ansible.builtin.file:
+        path: /etc/headscale
+        state: directory
+        mode: '0755'
+
+    - name: Deploy Headscale config
+      ansible.builtin.template:
+        src: "{{ playbook_dir | dirname }}/templates/headscale-config.yaml.j2"
+        dest: /etc/headscale/config.yaml
+        mode: '0644'
+      notify: Restart headscale
+
+    - name: Enable Headscale service
+      ansible.builtin.systemd:
+        name: headscale
+        enabled: true
+        state: started
+
+  handlers:
+    - name: Restart headscale
+      ansible.builtin.systemd:
+        name: headscale
+        state: restarted

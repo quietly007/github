@@ -1,0 +1,77 @@
+---
+# DISASTER RECOVERY - Full Master Deployment
+# Usage: ansible-playbook -i inventory/bootstrap.ini playbooks/master/site-dr.yml -l master
+#
+# This is the ONE-BUTTON deployment for a fresh Master rebuild.
+# Runs ALL core + compose-only playbooks in the required order.
+#
+# Prerequisites:
+#   - Fresh Debian 12 with SSH on port 1006
+#   - User qui3tly with SSH key access
+#   - Secrets copied to ~/.secrets/ on target
+
+- name: "DR DEPLOYMENT - Phase 1: Bootstrap"
+  ansible.builtin.import_playbook: ../shared/01-bootstrap.yml
+
+- name: "DR DEPLOYMENT - Phase 2: Hardening"
+  ansible.builtin.import_playbook: ../shared/02-hardening.yml
+
+- name: "DR DEPLOYMENT - Phase 3: Security Audit (AIDE/Lynis)"
+  ansible.builtin.import_playbook: ../shared/03-security-audit.yml
+
+- name: "DR DEPLOYMENT - Phase 4: Secrets Structure"
+  ansible.builtin.import_playbook: 00-secrets.yml
+
+- name: "DR DEPLOYMENT - Phase 5: GitHub Setup"
+  ansible.builtin.import_playbook: 20-github.yml
+
+- name: "DR DEPLOYMENT - Phase 6: Headscale (native)"
+  ansible.builtin.import_playbook: 02-headscale.yml
+
+- name: "DR DEPLOYMENT - Phase 7: Tailscale"
+  ansible.builtin.import_playbook: 03-tailscale.yml
+
+- name: "DR DEPLOYMENT - Phase 8: WireGuard"
+  ansible.builtin.import_playbook: 14-wireguard.yml
+
+- name: "DR DEPLOYMENT - Phase 9: Traefik"
+  ansible.builtin.import_playbook: 04-traefik.yml
+
+- name: "DR DEPLOYMENT - Phase 10: CrowdSec"
+  ansible.builtin.import_playbook: 09-crowdsec.yml
+
+- name: "DR DEPLOYMENT - Phase 11: Portainer"
+  ansible.builtin.import_playbook: 05-portainer.yml
+
+- name: "DR DEPLOYMENT - Phase 12: Monitoring Stack"
+  ansible.builtin.import_playbook: 06-monitoring.yml
+
+- name: "DR DEPLOYMENT - Phase 13: Pi-hole"
+  ansible.builtin.import_playbook: 10-pihole.yml
+
+- name: "DR DEPLOYMENT - Phase 14: Semaphore"
+  ansible.builtin.import_playbook: 12-semaphore.yml
+
+- name: "DR DEPLOYMENT - Phase 15: Copilot Environment"
+  ansible.builtin.import_playbook: 15-copilot.yml
+
+- name: "DR DEPLOYMENT - Phase 16: Authelia"
+  ansible.builtin.import_playbook: 16-authelia.yml
+
+- name: "DR DEPLOYMENT - Phase 17: Headscale UI"
+  ansible.builtin.import_playbook: 17-headscale-ui.yml
+
+- name: "DR DEPLOYMENT - Phase 18: Fuckoff Page"
+  ansible.builtin.import_playbook: 18-fuckoff-page.yml
+
+- name: "DR DEPLOYMENT - Phase 19: Admin Panel"
+  ansible.builtin.import_playbook: 19-admin-panel.yml
+
+- name: "DR DEPLOYMENT - Phase 20: IT-Tools"
+  ansible.builtin.import_playbook: 07-it-tools.yml
+
+- name: "DR DEPLOYMENT - Phase 21: Gotify"
+  ansible.builtin.import_playbook: 08-gotify.yml
+
+- name: "DR DEPLOYMENT - Final: Health Check"
+  ansible.builtin.import_playbook: ../shared/health-check.yml

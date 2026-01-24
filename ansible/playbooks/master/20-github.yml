@@ -1,0 +1,216 @@
+---
+# GITHUB - Setup Git and GitHub CLI for all servers
+# Usage: ansible-playbook -i inventory/production.ini playbooks/20-github.yml -l <host>
+#
+# This playbook will:
+#   - Install git and GitHub CLI
+#   - Configure gitconfig (user, credential helper)
+#   - Clone/update required repos
+#   - Setup copilot-instructions symlink
+
+- name: Setup GitHub environment
+  hosts: all
+  become: false
+  vars_files:
+    - "{{ playbook_dir }}/../../group_vars/all.yml"
+    - "{{ playbook_dir }}/../../host_vars/{{ inventory_hostname }}.yml"
+
+  vars:
+    git_user_name: "{{ github_user_name | default('qui3tly') }}"
+    git_user_email: "{{ github_user_email | default('qui3tly@quietly.online') }}"
+    
+    # Repos for Master only
+    master_repos:
+      - { name: "ansible", dest: "~/.ansible" }
+      - { name: "quietly.its.me", dest: "~", allow_init_nonempty: true }
+      - { name: "governance", dest: "~/.governance" }
+      - { name: "github-config", dest: "~/.github" }
+      - { name: "projects", dest: "~/projects" }
+    
+    # Repos for Lady (DR clone)
+    lady_repos:
+      - { name: "quietly.online", dest: "~", allow_init_nonempty: true }
+      - { name: "governance", dest: "~/.governance" }
+      - { name: "projects", dest: "~/projects" }
+    
+    # Repos for all servers
+    common_repos:
+      - { name: "governance", dest: "~/.governance" }
+
+  tasks:
+    #=== INSTALL GIT & GH CLI ===
+    - name: Install git
+      become: true
+      ansible.builtin.apt:
+        name: git
+        state: present
+        update_cache: true
+
+    - name: Check if gh is installed
+      ansible.builtin.command: which gh
+      register: gh_check
+      ignore_errors: true
+      changed_when: false
+
+    - name: Install GitHub CLI
+      become: true
+      when: gh_check.rc != 0
+      block:
+        - name: Add GitHub CLI GPG key
+          ansible.builtin.apt_key:
+            url: https://cli.github.com/packages/githubcli-archive-keyring.gpg
+            keyring: /usr/share/keyrings/githubcli-archive-keyring.gpg
+            state: present
+
+        - name: Add GitHub CLI repository
+          ansible.builtin.apt_repository:
+            repo: "deb [arch=amd64 signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main"
+            state: present
+
+        - name: Install gh
+          ansible.builtin.apt:
+            name: gh
+            state: present
+            update_cache: true
+
+    #=== GIT CONFIG ===
+    - name: Configure git user name
+      community.general.git_config:
+        name: user.name
+        value: "{{ git_user_name }}"
+        scope: global
+
+    - name: Configure git user email
+      community.general.git_config:
+        name: user.email
+        value: "{{ git_user_email }}"
+        scope: global
+
+    - name: Configure git credential helper for GitHub
+      community.general.git_config:
+        name: "credential.https://github.com.helper"
+        value: "!/usr/bin/gh auth git-credential"
+        scope: global
+
+    - name: Configure git credential helper for Gist
+      community.general.git_config:
+        name: "credential.https://gist.github.com.helper"
+        value: "!/usr/bin/gh auth git-credential"
+        scope: global
+
+    - name: Configure git default branch
+      community.general.git_config:
+        name: init.defaultBranch
+        value: main
+        scope: global
+
+    - name: Configure git pull strategy
+      community.general.git_config:
+        name: pull.rebase
+        value: "false"
+        scope: global
+
+    #=== GH AUTH (TOKEN FILE) ===
+    - name: Check GitHub token file
+      ansible.builtin.stat:
+        path: "{{ secrets_dir }}/github/token"
+      register: gh_token_file
+
+    - name: Authenticate GitHub CLI with token file
+      ansible.builtin.shell: "gh auth login --with-token < {{ secrets_dir }}/github/token"
+      when: gh_token_file.stat.exists
+      changed_when: false
+      failed_when: false
+
+    #=== VERIFY GH AUTH ===
+    - name: Check gh auth status
+      ansible.builtin.command: gh auth status
+      register: gh_auth
+      changed_when: false
+      ignore_errors: true
+
+    - name: Warn if not authenticated
+      ansible.builtin.debug:
+        msg: |
+          ⚠️  GitHub CLI not authenticated!
+          Run: gh auth login
+          Then re-run this playbook.
+      when: gh_auth.rc != 0
+
+    - name: Fail if not authenticated
+      ansible.builtin.fail:
+        msg: "GitHub CLI must be authenticated before cloning repos"
+      when: gh_auth.rc != 0
+
+    #=== CREATE DIRECTORIES ===
+    - name: Create .github directory
+      ansible.builtin.file:
+        path: "{{ ansible_env.HOME }}/.github"
+        state: directory
+        mode: '0755'
+
+    #=== CLONE/UPDATE REPOS - MASTER ===
+    - name: Ensure Master repos present
+      when: inventory_hostname == 'master'
+      ansible.builtin.include_tasks: "{{ playbook_dir }}/../shared/tasks/ensure-repo.yml"
+      loop: "{{ master_repos }}"
+      loop_control:
+        label: "{{ item.name }}"
+      vars:
+        repo_path: "{{ item.dest | replace('~', ansible_env.HOME) }}"
+
+    #=== CLONE/UPDATE REPOS - LADY ===
+    - name: Ensure Lady repos present
+      when: inventory_hostname == 'lady'
+      ansible.builtin.include_tasks: "{{ playbook_dir }}/../shared/tasks/ensure-repo.yml"
+      loop: "{{ lady_repos }}"
+      loop_control:
+        label: "{{ item.name }}"
+      vars:
+        repo_path: "{{ item.dest | replace('~', ansible_env.HOME) }}"
+
+    #=== SYMLINK COPILOT INSTRUCTIONS ===
+    - name: Check if github-config is cloned
+      ansible.builtin.stat:
+        path: "{{ ansible_env.HOME }}/.github/copilot-instructions.md"
+      register: copilot_src
+
+    - name: Create copilot-instructions symlink (if github-config exists)
+      ansible.builtin.file:
+        src: "{{ ansible_env.HOME }}/.github/copilot-instructions.md"
+        dest: "{{ ansible_env.HOME }}/.copilot-instructions.md"
+        state: link
+        force: true
+      when: copilot_src.stat.exists
+
+    #=== MAKE ANSIBLE SCRIPTS EXECUTABLE ===
+    - name: Make ansible scripts executable (Master only)
+      when: inventory_hostname == 'master'
+      ansible.builtin.file:
+        path: "{{ ansible_env.HOME }}/.ansible/scripts/{{ item }}"
+        mode: '0755'
+      loop:
+        - deploy-master.sh
+        - deploy-lady.sh
+        - health-check.sh
+        - list-playbooks.sh
+      failed_when: false
+
+    #=== SUMMARY ===
+    - name: Show clone results
+      ansible.builtin.debug:
+        msg: |
+          GitHub Setup Complete for {{ inventory_hostname }}
+          
+          Repos cloned/updated:
+          {% if inventory_hostname == 'master' %}
+          {% for item in master_repos %}
+          - {{ item.name }} → {{ item.dest }}
+          {% endfor %}
+          {% else %}
+          {% for item in lady_repos %}
+          - {{ item.name }} → {{ item.dest }}
+          {% endfor %}
+          {% endif %}
+          
+          Next: Verify repos with 'git -C <path> status'

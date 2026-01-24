@@ -1,0 +1,39 @@
+---
+# MASTER SEMAPHORE - Ansible UI
+# Usage: ansible-playbook -i inventory/production.ini playbooks/12-semaphore.yml
+
+- name: Deploy Semaphore on Master
+  hosts: master
+  become: true
+  become_user: "{{ admin_user }}"
+  vars_files:
+    - "{{ playbook_dir }}/../../group_vars/all.yml"
+    - "{{ playbook_dir }}/../../host_vars/master.yml"
+
+  tasks:
+    - name: Pull latest from GitHub
+      ansible.builtin.git:
+        repo: "https://github.com/quietly007/quietly.its.me.git"
+        dest: "{{ ansible_env.HOME }}"
+        version: main
+        update: yes
+        force: no
+
+    - name: Check compose file exists
+      ansible.builtin.stat:
+        path: "{{ compose_dir }}/semaphore/docker-compose.yaml"
+      register: semaphore_compose
+
+    - name: Fail if compose file missing
+      ansible.builtin.fail:
+        msg: "Compose file missing at {{ compose_dir }}/semaphore/docker-compose.yaml"
+      when: not semaphore_compose.stat.exists
+
+    - name: Start Semaphore
+      community.docker.docker_compose_v2:
+        project_src: "{{ compose_dir }}/semaphore"
+        state: present
+
+    - name: Show status
+      ansible.builtin.debug:
+        msg: "Semaphore deployed at https://semaphore.quietly.its.me"

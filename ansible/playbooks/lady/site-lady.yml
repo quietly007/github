@@ -1,0 +1,51 @@
+---
+# LADY SITE - Full Lady server deployment
+# Usage: ansible-playbook -i inventory/production.ini playbooks/lady/site-lady.yml
+#
+# Runs all Lady playbooks in order
+
+# Core infrastructure
+- name: Bootstrap
+  ansible.builtin.import_playbook: 00-bootstrap.yml
+
+- name: Hardening
+  ansible.builtin.import_playbook: 01-hardening.yml
+
+- name: Security audit (AIDE/Lynis)
+  ansible.builtin.import_playbook: ../shared/03-security-audit.yml
+
+- name: GitHub Setup
+  ansible.builtin.import_playbook: 08-github.yml
+
+- name: Traefik
+  ansible.builtin.import_playbook: 02-traefik.yml
+
+- name: CrowdSec
+  ansible.builtin.import_playbook: 03-crowdsec.yml
+
+- name: Portainer
+  ansible.builtin.import_playbook: 04-portainer.yml
+
+- name: Monitoring Agents
+  ansible.builtin.import_playbook: 05-monitoring-agents.yml
+
+- name: Tailscale
+  ansible.builtin.import_playbook: 06-tailscale.yml
+
+# Lady-specific services (ACTIVE)
+- name: Mailcow Email Server
+  ansible.builtin.import_playbook: 07-mailcow.yml
+
+# Lady-specific services (FUTURE - not currently deployed)
+# - name: Nextcloud
+#   ansible.builtin.import_playbook: 20-nextcloud.yml
+
+# - name: UniFi Controller
+#   ansible.builtin.import_playbook: 21-unifi.yml
+
+# - name: UISP
+#   ansible.builtin.import_playbook: 22-uisp.yml
+
+# Verification
+- name: Health Check
+  ansible.builtin.import_playbook: health-check.yml

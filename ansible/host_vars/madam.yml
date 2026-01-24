@@ -1,0 +1,42 @@
+# Madam server - WORKER node (DR Testing / Development)
+# Test server for disaster recovery and preproduction testing
+---
+hostname: madam
+domain: madam.qui3tly.cloud
+tailnet_hostname: "madam.qui3tly.cloud"  # MagicDNS - survives IP changes!
+public_ip: "TBD"  # Update when VPS is ordered
+tailnet_ip: "TBD"  # Assigned by Headscale after connection
+portainer_agent_bind_ip: "TBD"  # Same as tailnet_ip
+
+# NOT a master - worker only
+is_master: false
+run_headscale: false
+run_pihole: false              # Uses Master's Pi-hole
+run_monitoring_stack: false    # No Prometheus/Grafana/Loki (Master has them)
+run_monitoring_agents: true    # node-exporter, promtail, cadvisor → report to Master
+run_semaphore: false
+run_admin_services: false      # No headscale-admin, admin-panel, etc.
+
+# Madam-specific services (DR testing)
+run_mailcow: false             # Not needed for testing
+run_nextcloud: false
+run_unifi: false
+run_uisp: false
+
+# Tailscale config
+tailscale_advertise_routes: ""
+tailscale_exit_node: false
+
+# No WireGuard on worker (Tailscale only)
+wireguard_enabled: false
+
+# Docker configuration
+docker_dir: "/home/qui3tly/.docker"
+compose_dir: "/home/qui3tly/.docker-compose"
+admin_user: "qui3tly"
+
+# Timezone
+timezone: "Europe/Paris"
+
+# GitHub repository
+github_repo: "quietly.its.me"  # Shares master's repo for DR testing

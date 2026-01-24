@@ -1,0 +1,10 @@
+[Interface]
+PrivateKey = {{ wg_privatekey.content | b64decode | trim }}
+Address = {{ wireguard_address }}
+ListenPort = {{ wireguard_listen_port }}
+
+# EdgeRouter peer
+[Peer]
+PublicKey = {{ edgerouter_wg_pubkey | default('EDGEROUTER_PUBKEY_HERE') }}
+AllowedIPs = 10.100.0.2/32, 192.168.1.0/24
+PersistentKeepalive = 25

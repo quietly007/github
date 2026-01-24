@@ -1,0 +1,85 @@
+---
+# LADY FRESH INSTALL - Complete DR from bare metal
+#
+# SINGLE COMMAND DR:
+#   ansible-playbook -i inventory/initial.ini playbooks/lady/lady-dr.yml --ask-pass
+#
+# This runs the ENTIRE DR process:
+# - Phase 0: Initial access (creates qui3tly, removes admin)
+# - Phase 1: Bootstrap (Docker, packages)
+# - Phase 2: Hardening (UFW, fail2ban)
+# - Phase 3: Secrets (Tailscale authkey, CF token, etc)
+# - Phase 4: Tailscale (NATIVE - must connect before Docker services)
+# - Phase 5: GitHub (clone repos for docker-compose files)
+# - Phase 6: Core services (Traefik, CrowdSec, Portainer, Monitoring)
+#
+# Prerequisites:
+# - Fresh Debian 12 server at Contabo
+# - Master's Headscale running
+# - Secrets exist on Master (~/.secrets/)
+
+# ═══════════════════════════════════════════════════════════════════
+# PHASE 0: INITIAL ACCESS (creates qui3tly, removes admin)
+# ═══════════════════════════════════════════════════════════════════
+- name: "🔑 Phase 0: Initial Access (create qui3tly, remove admin)"
+  ansible.builtin.import_playbook: 00-initial-access.yml
+
+# ═══════════════════════════════════════════════════════════════════
+# PHASE 1: BOOTSTRAP
+# ═══════════════════════════════════════════════════════════════════
+- name: "📦 Phase 1: Bootstrap (Docker, dirs, packages)"
+  ansible.builtin.import_playbook: 00-bootstrap.yml
+
+# ═══════════════════════════════════════════════════════════════════
+# PHASE 2: HARDENING
+# ═══════════════════════════════════════════════════════════════════
+- name: "🔒 Phase 2: Hardening (UFW, fail2ban, sysctl)"
+  ansible.builtin.import_playbook: 01-hardening.yml
+
+# ═══════════════════════════════════════════════════════════════════
+# PHASE 3: SECRETS (before Tailscale needs authkey)
+# ═══════════════════════════════════════════════════════════════════
+- name: "🔑 Phase 3: Secrets (sync from Master)"
+  ansible.builtin.import_playbook: ../master/00-secrets.yml
+
+# ═══════════════════════════════════════════════════════════════════
+# PHASE 4: TAILSCALE (NATIVE SERVICE - before ANY Docker services)
+# Must be connected before any service tries to bind to Tailnet IP
+# ═══════════════════════════════════════════════════════════════════
+- name: "🌐 Phase 4: Tailscale VPN (connects to Master Headscale)"
+  ansible.builtin.import_playbook: 06-tailscale.yml
+
+# ═══════════════════════════════════════════════════════════════════
+# PHASE 5: GITHUB (for docker-compose files)
+# ═══════════════════════════════════════════════════════════════════
+- name: "🔧 Phase 5: GitHub CLI & Repos (for docker-compose files)"
+  ansible.builtin.import_playbook: 08-github.yml
+
+# ═══════════════════════════════════════════════════════════════════
+# PHASE 6: CORE SERVICES (Tailnet IP now available)
+# ═══════════════════════════════════════════════════════════════════
+- name: "🔀 Phase 6a: Traefik (Reverse Proxy)"
+  ansible.builtin.import_playbook: 02-traefik.yml
+
+- name: "🛡️ Phase 6b: CrowdSec (Security)"
+  ansible.builtin.import_playbook: 03-crowdsec.yml
+
+- name: "📊 Phase 6c: Portainer (Docker UI - binds to Tailnet IP)"
+  ansible.builtin.import_playbook: 04-portainer.yml
+
+- name: "📈 Phase 6d: Monitoring Agents (node-exporter, cadvisor, promtail)"
+  ansible.builtin.import_playbook: 05-monitoring-agents.yml
+
+# ═══════════════════════════════════════════════════════════════════
+# PHASE 6: SECURITY AUDIT TOOLS (install only - init/audit is explicit)
+# ═══════════════════════════════════════════════════════════════════
+- name: "🔒 Phase 6: Security Audit Tools (AIDE + Lynis install)"
+  ansible.builtin.import_playbook: 09-security-audit.yml
+
+# ═══════════════════════════════════════════════════════════════════
+# DR COMPLETE - Lady ready for production workloads
+# ═══════════════════════════════════════════════════════════════════
+# Post-DR (run manually with production.ini):
+#   - Mailcow: ansible-playbook -i inventory/production.ini playbooks/lady/07-mailcow.yml
+#   - AIDE init: ansible-playbook ... -e aide_initialize=true
+#   - Lynis audit: ansible-playbook ... -e lynis_audit=true

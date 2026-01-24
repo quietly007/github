@@ -1,0 +1,83 @@
+# Server gitignore - deployed by Ansible
+# Simple patterns - no full paths
+
+# === SECRETS - NEVER TRACK ===
+.secrets/
+**/secrets/
+*.pem
+*.key
+*token*
+*credential*
+acme.json
+.git-credentials
+
+# === RUNTIME DATA - IGNORE ===
+**/data/
+**/logs/
+**/cache/
+*.log
+*.log.*
+*.pid
+*.sock
+
+# === DATABASES - IGNORE ===
+*.db
+*.mmdb
+*.sqlite
+*.sqlite3
+
+# === SEPARATE REPOS ===
+.governance/
+.ansible/
+.githooks/
+
+# === PERSONAL/LOCAL ===
+.bash_history*
+.bash_logout
+.bashrc
+.profile
+.lesshst
+.sudo_as_admin_successful
+.cache/
+.config/
+.ssh/
+.gnupg/
+.gitconfig
+.wget-hsts
+.vscode/
+.vscode-server/
+.dotnet/
+
+# === DOWNLOADS/TEMP ===
+DOWNLOADS/
+projects/
+*.tar.gz
+*.bak
+*.bak.*
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# === COPILOT RUNTIME ===
+.copilot/backups/
+.copilot/TEMP/
+.copilot/patches/
+
+# === DOCKER RUNTIME (not configs) ===
+.docker/**/data/
+.docker/**/logs/
+.docker/**/db/
+.docker-compose/**/logs/
+.docker-compose/**/*.log
+
+# === PIHOLE RUNTIME ===
+.docker/pihole/etc-pihole/*.db
+.docker/pihole/etc-pihole/*.list
+.docker/pihole/etc-pihole/list.*
+.docker/pihole/etc-pihole/migration_backup/
+.docker/pihole/etc-pihole/versions
+
+# === CROWDSEC RUNTIME ===
+.docker/crowdsec/db/
+.docker/crowdsec/config/hub/
