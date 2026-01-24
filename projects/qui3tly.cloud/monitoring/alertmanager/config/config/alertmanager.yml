@@ -1,0 +1,70 @@
+# Alertmanager Configuration
+# Routes alerts to Ntfy (iOS + Android)
+
+global:
+  resolve_timeout: 5m
+
+# Routing configuration
+route:
+  group_by: ['alertname', 'cluster', 'service']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 12h
+  receiver: 'default'
+  
+  routes:
+    # Critical alerts - immediate notification (Priority 5)
+    - match:
+        severity: critical
+      receiver: 'critical-alerts'
+      continue: true
+    
+    # Warning alerts - batched (Priority 4)
+    - match:
+        severity: warning
+      receiver: 'warning-alerts'
+      group_wait: 30s
+      group_interval: 5m
+    
+    # Info alerts - batched heavily (Priority 3)
+    - match:
+        severity: info
+      receiver: 'info-alerts'
+      group_wait: 5m
+      group_interval: 30m
+
+# Inhibition rules - prevent alert spam
+inhibit_rules:
+  # If node is down, suppress all other alerts from that node
+  - source_match:
+      severity: 'critical'
+      alertname: 'InstanceDown'
+    target_match_re:
+      severity: 'warning|info'
+    equal: ['instance']
+
+# Receivers (notification channels)
+receivers:
+  # Default receiver - Ntfy
+  - name: 'default'
+    webhook_configs:
+      - url: 'https://ntfy.quietly.its.me/qui3tly-alerts?priority=3&tags=information_source'
+        send_resolved: true
+
+  # Critical alerts - Ntfy high priority
+  - name: 'critical-alerts'
+    webhook_configs:
+      - url: 'https://ntfy.quietly.its.me/qui3tly-critical?priority=5&tags=rotating_light,skull&title=🚨+CRITICAL+ALERT'
+        send_resolved: true
+
+  # Warning alerts - Ntfy normal priority
+  - name: 'warning-alerts'
+    webhook_configs:
+      - url: 'https://ntfy.quietly.its.me/qui3tly-warnings?priority=4&tags=warning&title=⚠️+Warning'
+        send_resolved: true
+
+  # Info alerts - Ntfy low priority
+  - name: 'info-alerts'
+    webhook_configs:
+      - url: 'https://ntfy.quietly.its.me/qui3tly-info?priority=3&tags=information_source&title=ℹ️+Info'
+        send_resolved: false

@@ -1,0 +1,11 @@
+---
+- resources:
+    label: Master
+    cpu: true
+    memory: true
+    disk: /
+    uptime: true
+
+- search:
+    provider: google
+    target: _blank
