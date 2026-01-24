@@ -1,0 +1,24 @@
+services:
+  homepage:
+    container_name: homepage
+    image: ghcr.io/gethomepage/homepage:latest
+    restart: unless-stopped
+    volumes:
+      - ./config:/app/config
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - HOMEPAGE_VAR_DOMAIN=quietly.its.me
+      - HOMEPAGE_ALLOWED_HOSTS=home.quietly.its.me
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.homepage.rule=Host(`home.quietly.its.me`)"
+      - "traefik.http.routers.homepage.entrypoints=https"
+      - "traefik.http.routers.homepage.tls.certresolver=cloudflare"
+      - "traefik.http.services.homepage.loadbalancer.server.port=3000"
+    networks:
+      - traefik
+
+networks:
+  traefik:
+    external: true

@@ -1,0 +1,30 @@
+---
+- Monitoring:
+    - Status Page:
+        href: https://status.quietly.its.me
+        description: Service uptime monitoring
+    - Metrics:
+        href: https://grafana.quietly.its.me
+        description: Performance dashboards
+    - Logs:
+        href: https://grafana.quietly.its.me/explore
+        description: Centralized logs
+
+- Servers:
+    - Master:
+        href: https://grafana.quietly.its.me/d/master-overview
+        description: Main server metrics
+    - Lady:
+        href: https://grafana.quietly.its.me/d/lady-overview
+        description: Worker server metrics
+
+- Management:
+    - Portainer:
+        href: https://portainer.quietly.its.me
+        description: Docker management
+    - Traefik:
+        href: https://traefik.quietly.its.me
+        description: Reverse proxy
+    - Notifications:
+        href: https://ntfy.quietly.its.me
+        description: Push notifications
