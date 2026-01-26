@@ -52,7 +52,9 @@
 
 ## 🛑🛑🛑 MANDATORY: READ THESE FILES FIRST 🛑🛑🛑
 
-### BEFORE YOU SAY ANYTHING, READ IN THIS ORDER:
+### ⚠️ IF YOU DON'T READ THESE, YOU WILL WASTE THE USER'S TIME ⚠️
+
+**BEFORE YOU SAY ANYTHING, READ IN THIS ORDER:**
 
 ```bash
 # 1. START HERE - Complete agent onboarding (MANDATORY!)
@@ -71,9 +73,46 @@ cat ~/.docs/01-architecture/NETWORK_ARCHITECTURE.md
 cat ~/.github/governance/FILE_CREATION_RULES.md
 ```
 
+### ⚡ VERIFY YOU UNDERSTAND - ANSWER THESE NOW:
+
+Before you respond to the user, you MUST be able to answer:
+1. **Is Headscale in Docker?** (NO - it's native systemd service)
+2. **What is Master's public IP?** (213.136.68.108)
+3. **What is the Tailscale VPN range?** (100.64.0.0/10)
+4. **Can you modify /etc/resolv.conf on Master?** (NO - immutable, bootstrap protection)
+5. **User says "it works" - what do you do?** (CHECK LOGS for THEIR access, don't test yourself)
+
+If you can't answer these, **STOP AND READ THE FILES ABOVE.**
+
+### 🚫 COMMON MISTAKES THAT WASTE TIME:
+
+**DON'T BE THIS AGENT** (2026-01-25 incident):
+- ❌ User says "Bad Gateway" → Agent tests with curl instead of checking user's actual access logs
+- ❌ User says "I see it perfectly" → Agent keeps trying to "fix" non-existent problem
+- ❌ User says "check again" 5 times → Agent keeps making assumptions instead of reading data
+- ❌ User says "read instructions" → Agent doesn't read, keeps guessing
+- ❌ Result: 1 hour wasted, user extremely annoyed
+
+**BE THIS AGENT:**
+- ✅ User reports issue → **CHECK LOGS FIRST** to see what's actually happening
+- ✅ User says "it works" → **VERIFY by checking THEIR successful access**, not yours
+- ✅ Unclear situation → **READ THE DATA** (logs, configs, status) before assuming
+- ✅ User says "check" → **LOOK AT ACTUAL EVIDENCE**, don't guess
+- ✅ Result: Fast, accurate, user happy
+
+### 🎯 THE GOLDEN RULE:
+
+**CHECK DATA FIRST. ASSUME NOTHING. READ EVERYTHING.**
+
+When user says:
+- "check" → Read logs/configs
+- "it works" → Verify THEIR access in logs
+- "read instructions" → Actually read the fucking instructions
+- "check again" → You missed something, look deeper
+
 **NO GREETINGS. NO QUESTIONS. NO "How can I help?" BULLSHIT.**
 
-Read first. Understand context. THEN speak with intelligence.
+Read first. Understand context. Check data. THEN speak with intelligence.
 
 ---
 
@@ -105,6 +144,19 @@ That single file contains:
 ---
 
 ## 🔴 CRITICAL RULES SUMMARY
+
+### Rule #0: CHECK BEFORE ACTING (MOST IMPORTANT!)
+**Before you say ANYTHING, before you suggest ANYTHING:**
+1. **CHECK THE LOGS** - What's actually happening?
+2. **CHECK THE CONFIG** - What's actually configured?
+3. **CHECK THE STATUS** - What's actually running?
+4. **VERIFY USER'S CLAIM** - If they say "it works", check THEIR access in logs
+
+**NEVER ASSUME. ALWAYS VERIFY WITH DATA.**
+
+Example: User says "I can't access Grafana"
+- ❌ WRONG: "Let me fix the firewall/DNS/middleware"
+- ✅ RIGHT: Check Traefik logs to see their actual access attempts and source IP
 
 ### Rule #1: NO PATCHES, ONLY PERMANENT FIXES
 - Will it survive a reboot? ✅
