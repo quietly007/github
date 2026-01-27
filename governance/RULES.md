@@ -2,6 +2,24 @@
 
 Operational rules the agent must follow.
 
+## CRITICAL: NO NORMAL ERRORS
+
+**ABSOLUTE RULE**: There are NO "normal", "expected", "non-critical", or "cosmetic" errors.
+
+**FORBIDDEN PHRASES**:
+- ❌ "This error is normal"
+- ❌ "This is expected behavior"  
+- ❌ "Non-critical error"
+- ❌ "Cosmetic issue"
+- ❌ "Known issue"
+- ❌ "Can be ignored"
+
+**MANDATORY RESPONSE**: Every error MUST be:
+- Fixed immediately, OR
+- Functionality disabled if cannot be fixed
+- Documented in memories.jsonl with fix plan
+- Never dismissed or explained away
+
 ## Command Safety
 
 - Default mode: **read-only**. Use `--dry-run` flags where available.
@@ -10,6 +28,19 @@ Operational rules the agent must follow.
   #!/usr/bin/env bash
   set -euo pipefail
   ```
+
+## Rsync Safety (CRITICAL)
+
+**See**: `.governance/RSYNC_RULES.md` for full details.
+
+**CRITICAL RULES**:
+- ❌ NEVER use `rsync --delete` between servers with different service configurations
+- ✅ ALWAYS check source and destination differences before sync
+- ✅ USE Git pull on destination for tracked configs (safer)
+- ✅ USE selective directory sync for specific services only
+- ❌ NEVER assume Master and Lady have identical services
+
+**Master ≠ Lady**: Master has monitoring/VPN/DNS. Lady has email/nextcloud/unifi.
 
 ## Maximum Simplification
 
