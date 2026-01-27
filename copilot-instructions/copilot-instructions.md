@@ -3,7 +3,7 @@
 > **FIRST THING**: Read `~/.copilot/START_HERE.md` - Complete agent onboarding  
 > **Authority**: `~/.github/governance/` - All governance rules  
 > **Last Updated**: 2026-01-27 (Audit verified)  
-> **Server**: quietly.its.me (Debian 12) - MASTER node  
+> **Server**: master (Debian 12) - MASTER node  
 > **Infrastructure Grade**: A+++ (10/10) World-Class Excellence
 
 ---
@@ -283,7 +283,7 @@ See: `~/.github/governance/FILE_CREATION_RULES.md`
 
 ```bash
 # Server identity
-hostname  # Should be: quietly.its.me
+hostname  # Should be: master
 
 # All containers
 docker ps --format "table {{.Names}}\t{{.Status}}"
