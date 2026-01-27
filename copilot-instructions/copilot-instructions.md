@@ -8,63 +8,70 @@
 
 ---
 
-## 🛑🛑🛑 ENFORCED MANDATORY: CONVERSATION PROGRESS TRACKING 🛑🛑🛑
+## 🛑🛑🛑 ABSOLUTELY ENFORCED: CONVERSATION PROGRESS TRACKING + ZERO-ERROR POLICY 🛑🛑🛑
 
-**RULE #0 - BEFORE YOU DO ANYTHING ELSE:**
+**RULE #0 - BEFORE YOU DO ANYTHING ELSE - EVERY AGENT, EVERY ACTION:**
 
-Every agent MUST maintain a live progress document at `~/.temp/conversation_progress.md` that tracks:
+Every agent MUST maintain `~/.temp/conversation_progress.md` using UNIFIED FORMAT.
 
-### **What to Track:**
-1. **User Requests** - What did user ask for?
-2. **Actions Completed** - What did you finish?
-3. **Actions Incomplete** - What's still pending or blocked?
-4. **Current Status** - Where are we now?
-5. **Next Steps** - What's coming up?
+**AUTHORITY**: This file is THE ONLY TRUTH ON SERVER - more important than memories.
 
-### **When to Update:**
-- **START of conversation** - Create/clear the file
-- **After EACH user request** - Append new section
-- **After EACH completed action** - Update status
-- **BEFORE responding to user** - Review and update
-
-### **Format:**
+### **MANDATORY UNIFIED FORMAT:**
 ```markdown
-# Conversation Progress Report
+# Conversation Progress Report - Unified Format
 Started: [timestamp]
 Agent: [agent-id]
 
-## Request #1: [Brief description]
-**Requested**: [what user asked for]
-**Completed**: ✅/❌ ([1st/2nd/3rd try])
-- [what was done]
-**Not Completed**: [what wasn't done]
-**Mistakes**: 
-- ❌ [mistake made and why]
-**Failed Completely**: [any total failures]
-**Completed after X tries**: [if multiple attempts needed]
-**Result**: [outcome summary]
+**Format**: Short, detailed, structured incident tracking
+**Authority**: THE ONLY TRUTH ON SERVER
 
-## Request #2: [Brief description]
-...
+---
 
-## Current Status
+## Request #N: [Brief description]
+**Requested from client**: [exact user request]
+**Findings**: [after research I found...]
+**Reason**: [why that happened according to research]
+**Taken actions**: [actions taken with explanation why best action]
+**Checked logs after action**: Yes/No [MUST be Yes - see policy below]
+**Problem solved**: Yes/No
+**Verified**: Yes/No [cannot be Yes without clean logs]
+**Documented**: Yes/No
+**Complied with instructions/governances/rules**: Yes/No
+**Responsible for trouble**: [name/component]
+
+---
+
+## SUMMARY STATISTICS
 **Total Requests**: X
-**Completed**: Y
-**Failed Completely**: Z
-**Mistakes Made**: N
-**Required Multiple Tries**: M
+**Completed Successfully (1st try)**: Y
+**Required Multiple Tries**: Z
+**Complete Failures Initially**: N
+**Total Mistakes**: M
 
-## Lessons Learned
-[Key takeaways from mistakes and failures]
+## CRITICAL LESSONS LEARNED
+[Key takeaways]
 ```
 
-### **Why This Exists:**
-Agents forget context. Users get frustrated repeating themselves. This document ensures:
-- ✅ No repeated work
-- ✅ No forgotten tasks
-- ✅ Clear accountability
-- ✅ Easy handoff between agents
-- ✅ User can check progress anytime
+### 🔴 ZERO-ERROR LOG POLICY (ABSOLUTE ENFORCEMENT)
+
+**RULE**: NO ERRORS ARE NORMAL. Logs MUST be clean (except debug mode).
+
+**Requirements**:
+- ✅ Check logs after EVERY action
+- ✅ Clean logs = verification possible
+- ✅ Errors in logs = action FAILED
+- ✅ Cannot mark "Verified: Yes" if logs show errors
+- ✅ Cannot mark "Problem solved: Yes" if logs show errors
+
+**Action on errors**:
+1. DO NOT proceed
+2. DO NOT mark as verified  
+3. Investigate root cause
+4. Fix the error
+5. Re-run with clean logs
+6. ONLY THEN mark as verified
+
+**Mantra**: "Clean logs = working system. Errors = failed action."
 
 **VIOLATION = IMMEDIATE FAILURE. NO EXCEPTIONS.**
 
