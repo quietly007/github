@@ -19,11 +19,13 @@ Every agent MUST maintain `~/.temp/conversation_progress.md` using UNIFIED FORMA
 ### **MANDATORY UNIFIED FORMAT:**
 ```markdown
 # Conversation Progress Report - Unified Format
-Started: [timestamp]
+Started: [YYYY-MM-DDTHH:MM:SSZ timestamp - MINUTE PRECISION REQUIRED]
 Agent: [agent-id]
 
 **Format**: Short, detailed, structured incident tracking
 **Authority**: THE ONLY TRUTH ON SERVER
+
+**TIMESTAMP REQUIREMENT**: ALL documented changes MUST include minute-level precision (YYYY-MM-DDTHH:MM:SSZ format). Date-only timestamps are UNACCEPTABLE.
 
 ---
 
