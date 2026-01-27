@@ -316,3 +316,28 @@ sudo ufw status numbered
 **Status**: PRODUCTION EXCELLENCE  
 **Grade**: A+++ (10/10)  
 **Mission**: Fly to the moon 🚀
+
+---
+
+## 🔄 MANDATORY WORKFLOW
+
+**EVERY agent MUST follow this workflow - NO EXCEPTIONS:**
+
+See: `AGENT_WORKFLOW_MANDATORY.md` and `AGENT_WORKFLOW_VISUAL.md`
+
+**Workflow Summary**:
+1. **Phase 1**: Initial Connection (read 11 files, verify understanding)
+2. **Phase 2**: Work Execution (write memory after EVERY step)
+3. **Phase 3**: Task Completion (update docs, commit git, sync memories)
+4. **Phase 4**: Handoff (verify, document for next agent)
+
+**Compliance Required**:
+- ✅ Read ALL mandatory files before starting
+- ✅ Write memory after EVERY step
+- ✅ Update documentation when reality changes
+- ✅ Ask permission for production changes
+- ✅ Leave complete handoff for next agent
+
+**Violations**: Logged, flagged, work reverted
+
+**This is not optional. This is LAW.**
