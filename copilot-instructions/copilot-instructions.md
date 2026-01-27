@@ -8,9 +8,36 @@
 
 ---
 
+## 🛑🛑🛑 ABSOLUTELY ENFORCED: MANDATORY PRE-FLIGHT CHECKLIST 🛑🛑🛑
+
+**RULE #0 - BEFORE YOU DO ANYTHING - COMPLETE THE PRE-FLIGHT CHECKLIST:**
+
+```bash
+cat ~/.copilot/PRE_FLIGHT_CHECKLIST.md
+```
+
+**YOU MUST COMPLETE THIS CHECKLIST**:
+1. ✅ At the START of every session
+2. ✅ BEFORE responding to any user request
+3. ✅ BEFORE making any changes
+4. ✅ BEFORE searching for information
+
+**If you skip this checklist, you WILL:**
+- Waste user's time with preventable mistakes
+- Search for information that's in the instructions
+- Make assumptions instead of checking data
+- Demonstrate you don't follow instructions
+
+**Historical proof of why this is mandatory** (this session):
+- Request #16: Searched for master/lady servers (info was in instructions all along)
+- Request #18: User called out: "How is that possible if agent follows instructions?"
+- Pattern: Agent reads instructions AFTER failure, not BEFORE action
+
+---
+
 ## 🛑🛑🛑 ABSOLUTELY ENFORCED: CONVERSATION PROGRESS TRACKING + ZERO-ERROR POLICY 🛑🛑🛑
 
-**RULE #0 - BEFORE YOU DO ANYTHING ELSE - EVERY AGENT, EVERY ACTION:**
+**RULE #0a - AFTER CHECKLIST, MAINTAIN PROGRESS FILE:**
 
 Every agent MUST maintain `~/.temp/conversation_progress.md` using UNIFIED FORMAT.
 
