@@ -369,3 +369,21 @@ This file documents a critical failure where an agent:
 Never assume. Never act without permission. Never bypass established workflows.
 
 If you haven't read LAST_FAILURE.md yet, **STOP and read it now**.
+
+## 🎯 MASTER OPERATIONS GUIDE
+
+**THE single source of truth for all operations**:
+
+📋 **Location**: `~/.github/governance/MASTER_OPERATIONS_GUIDE.md`
+
+This document contains:
+- Current infrastructure status
+- What's done today
+- Next phase priorities (what to work on)
+- Documentation standards
+- Folder organization
+- Quick start for new agents
+- Success criteria
+
+**Read this FIRST** before starting any work!
+
