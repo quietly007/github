@@ -35,13 +35,26 @@
         - cloud-final
       failed_when: false
 
-    - name: Purge cloud-init
+    - name: Purge cloud-init and exim4
       ansible.builtin.apt:
-        name: cloud-init
+        name:
+          - cloud-init
+          - exim4
+          - exim4-base
+          - exim4-config
+          - exim4-daemon-light
         state: absent
         purge: true
 
-    - name: Remove cloud-init directories
+    - name: Stop and mask exim4 service
+      ansible.builtin.systemd:
+        name: exim4
+        state: stopped
+        enabled: false
+        masked: true
+      failed_when: false
+
+    - name: Remove cloud-init and exim4 directories
       ansible.builtin.file:
         path: "{{ item }}"
         state: absent
@@ -50,6 +63,8 @@
         - /var/lib/cloud
         - /var/log/cloud-init.log
         - /var/log/cloud-init-output.log
+        - /var/log/exim4
+        - /etc/exim4
 
     - name: Check if admin user exists
       ansible.builtin.getent:

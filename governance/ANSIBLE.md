@@ -1,7 +1,8 @@
 # Ansible Automation
 
-> **Last Updated**: 2026-01-23
+> **Last Updated**: 2026-01-27
 > **UI**: https://semaphore.quietly.its.me
+> **Email Policy**: Mailcow on Lady is the ONLY MTA - NO exim4/postfix/sendmail on any server
 
 ---
 
