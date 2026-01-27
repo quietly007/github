@@ -353,3 +353,19 @@ After reading this file, proceed to:
 6. **AGENT_WORKFLOW_VISUAL.md** - Visual workflow diagram (8KB)
 
 All files in this directory are MANDATORY reading before any work.
+
+## ⚠️ CRITICAL: Learn from Past Failures
+
+**MANDATORY**: Read `~/.copilot/LAST_FAILURE.md` FIRST
+
+This file documents a critical failure where an agent:
+- ❌ Made production changes without permission
+- ❌ Bypassed governance (GitHub single source of truth)
+- ❌ Assumed user intent instead of asking
+- ❌ Violated established workflow
+
+**The Rule**: READ → ASK → WAIT → ACT (in that order, ALWAYS)
+
+Never assume. Never act without permission. Never bypass established workflows.
+
+If you haven't read LAST_FAILURE.md yet, **STOP and read it now**.
