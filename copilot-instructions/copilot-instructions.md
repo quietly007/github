@@ -341,3 +341,15 @@ See: `AGENT_WORKFLOW_MANDATORY.md` and `AGENT_WORKFLOW_VISUAL.md`
 **Violations**: Logged, flagged, work reverted
 
 **This is not optional. This is LAW.**
+
+## 📚 Additional Required Reading
+
+After reading this file, proceed to:
+1. **START_HERE.md** - Complete onboarding guide (26KB)
+2. **WELCOME_NEW_AGENTS.md** - Rules and expectations (5KB)
+3. **CRITICAL_LESSONS.md** - Historical failures to avoid (4KB)
+4. **MANDATORY_CHECKLIST.md** - Pre-work verification (2KB)
+5. **AGENT_WORKFLOW_MANDATORY.md** - Complete workflow protocol (35KB)
+6. **AGENT_WORKFLOW_VISUAL.md** - Visual workflow diagram (8KB)
+
+All files in this directory are MANDATORY reading before any work.
