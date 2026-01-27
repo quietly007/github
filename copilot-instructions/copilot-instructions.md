@@ -34,21 +34,28 @@ Started: [timestamp]
 Agent: [agent-id]
 
 ## Request #1: [Brief description]
-User Asked: [what user wanted]
-Actions Completed:
-- ✅ [what was done]
-- ✅ [what was done]
-Actions Incomplete:
-- ❌ [what wasn't done and why]
-Status: [Complete/In Progress/Blocked]
+**Requested**: [what user asked for]
+**Completed**: ✅/❌ ([1st/2nd/3rd try])
+- [what was done]
+**Not Completed**: [what wasn't done]
+**Mistakes**: 
+- ❌ [mistake made and why]
+**Failed Completely**: [any total failures]
+**Completed after X tries**: [if multiple attempts needed]
+**Result**: [outcome summary]
 
 ## Request #2: [Brief description]
 ...
 
 ## Current Status
-Total Requests: X
-Completed: Y
-Pending: Z
+**Total Requests**: X
+**Completed**: Y
+**Failed Completely**: Z
+**Mistakes Made**: N
+**Required Multiple Tries**: M
+
+## Lessons Learned
+[Key takeaways from mistakes and failures]
 ```
 
 ### **Why This Exists:**
