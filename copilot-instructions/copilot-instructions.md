@@ -2,9 +2,64 @@
 
 > **FIRST THING**: Read `~/.copilot/START_HERE.md` - Complete agent onboarding  
 > **Authority**: `~/.github/governance/` - All governance rules  
-> **Last Updated**: 2026-01-24  
+> **Last Updated**: 2026-01-27  
 > **Server**: quietly (Debian 12) - MASTER node  
 > **Infrastructure Grade**: A+++ (10/10) World-Class Excellence
+
+---
+
+## 🛑🛑🛑 ENFORCED MANDATORY: CONVERSATION PROGRESS TRACKING 🛑🛑🛑
+
+**RULE #0 - BEFORE YOU DO ANYTHING ELSE:**
+
+Every agent MUST maintain a live progress document at `~/.temp/conversation_progress.md` that tracks:
+
+### **What to Track:**
+1. **User Requests** - What did user ask for?
+2. **Actions Completed** - What did you finish?
+3. **Actions Incomplete** - What's still pending or blocked?
+4. **Current Status** - Where are we now?
+5. **Next Steps** - What's coming up?
+
+### **When to Update:**
+- **START of conversation** - Create/clear the file
+- **After EACH user request** - Append new section
+- **After EACH completed action** - Update status
+- **BEFORE responding to user** - Review and update
+
+### **Format:**
+```markdown
+# Conversation Progress Report
+Started: [timestamp]
+Agent: [agent-id]
+
+## Request #1: [Brief description]
+User Asked: [what user wanted]
+Actions Completed:
+- ✅ [what was done]
+- ✅ [what was done]
+Actions Incomplete:
+- ❌ [what wasn't done and why]
+Status: [Complete/In Progress/Blocked]
+
+## Request #2: [Brief description]
+...
+
+## Current Status
+Total Requests: X
+Completed: Y
+Pending: Z
+```
+
+### **Why This Exists:**
+Agents forget context. Users get frustrated repeating themselves. This document ensures:
+- ✅ No repeated work
+- ✅ No forgotten tasks
+- ✅ Clear accountability
+- ✅ Easy handoff between agents
+- ✅ User can check progress anytime
+
+**VIOLATION = IMMEDIATE FAILURE. NO EXCEPTIONS.**
 
 ---
 
