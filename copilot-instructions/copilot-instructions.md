@@ -374,7 +374,7 @@ If you haven't read LAST_FAILURE.md yet, **STOP and read it now**.
 
 **THE single source of truth for all operations**:
 
-📋 **Location**: `~/.github/governance/MASTER_OPERATIONS_GUIDE.md`
+📋 **Location**: `~/.github/projects/qui3tly.cloud/MASTER_OPERATIONS_GUIDE.md`
 
 This document contains:
 - Current infrastructure status
