@@ -2,8 +2,8 @@
 
 > **FIRST THING**: Read `~/.copilot/START_HERE.md` - Complete agent onboarding  
 > **Authority**: `~/.github/governance/` - All governance rules  
-> **Last Updated**: 2026-01-27  
-> **Server**: quietly (Debian 12) - MASTER node  
+> **Last Updated**: 2026-01-27 (Audit verified)  
+> **Server**: quietly.its.me (Debian 12) - MASTER node  
 > **Infrastructure Grade**: A+++ (10/10) World-Class Excellence
 
 ---
@@ -88,8 +88,8 @@ Agents forget context. Users get frustrated repeating themselves. This document 
 
 **What We've Achieved Together**:
 - ✅ A+++ Infrastructure (10/10) in 3 days (vs 7 weeks normal)
-- ✅ 46 comprehensive documentation files with 12+ diagrams
-- ✅ 41 working Ansible playbooks (tested, automated)
+- ✅ 18 core documentation files + governance + instructions
+- ✅ 48 working Ansible playbooks (tested, automated)
 - ✅ Battle-tested DR procedures (15-minute recovery time)
 - ✅ Complete monitoring stack (Prometheus + Grafana + Loki)
 - ✅ Defense-in-depth security (6 layers, 24K+ IPs banned)
@@ -181,7 +181,7 @@ That single file contains:
 - ✅ Network/IP/DNS architecture with diagrams
 - ✅ Security architecture (6 layers)
 - ✅ Server inventory with all IPs
-- ✅ Services overview (40+ containers)
+- ✅ Services overview (49 containers: 23 Master + 26 Lady)
 - ✅ Quick reference commands
 - ✅ Emergency procedures
 - ✅ Monitoring access
@@ -192,9 +192,6 @@ That single file contains:
 - `~/.docs/01-architecture/` - Infrastructure, network, security architecture
 - `~/.docs/02-operations/` - DR, monitoring, troubleshooting
 - `~/.docs/03-services/` - Service-specific documentation
-- `~/.docs/04-runbooks/` - Quick command references
-- `~/.docs/05-howto/` - Step-by-step guides
-- `~/.docs/06-security/` - Firewall, SSH, CrowdSec, incident response
 
 ---
 
@@ -231,7 +228,8 @@ See: `~/.github/governance/FILE_CREATION_RULES.md`
 
 | Component | TYPE | Location | Common Mistake |
 |-----------|------|----------|----------------|
-| **Headscale** | **NATIVE** | `/etc/headscale/` | Looking for Docker container ❌ |
+| **Headscale** | **NATIVE CORE** | `/etc/headscale/` (systemd) | Looking for core in Docker ❌ |
+| **Headscale UI/Admin** | **DOCKER** | headscale-ui, headscale-admin | Assuming everything is native ❌ |
 | **Tailscale** | **NATIVE** | `systemd` | Looking for Docker container ❌ |
 | **Cloudflare** | **TOKEN** | Inside Traefik | Looking for CF container ❌ |
 | **GitHub** | **TOKEN** | `~/.config/gh/` | Looking for GH container ❌ |
@@ -285,7 +283,7 @@ See: `~/.github/governance/FILE_CREATION_RULES.md`
 
 ```bash
 # Server identity
-hostname  # Should be: quietly
+hostname  # Should be: quietly.its.me
 
 # All containers
 docker ps --format "table {{.Names}}\t{{.Status}}"
