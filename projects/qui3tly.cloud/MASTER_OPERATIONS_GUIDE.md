@@ -906,3 +906,75 @@ du -sh /var/*
 **END OF MASTER OPERATIONS GUIDE**
 
 *This is a living document. Update regularly with new procedures and lessons learned.*
+
+---
+
+## MAILCOW - Mail Server (Lady)
+
+### Quick Reference
+| Service | URL/Port | Notes |
+|---------|----------|-------|
+| Webmail | https://mail.quietly.online | SOGo interface |
+| Admin | https://mail.quietly.online/admin | Mailcow admin |
+| SMTP | 25, 465 (SSL), 587 (submission) | |
+| IMAP | 993 (SSL) | |
+| POP3 | 995 (SSL) | |
+
+### Playbook
+```bash
+cd ~/.github/ansible
+ansible-playbook -i inventory/bootstrap.ini playbooks/lady/07-mailcow.yml
+```
+
+### Container Management
+```bash
+# Status
+ssh lady "docker ps --format 'table {{.Names}}\t{{.Status}}' | grep mailcow"
+
+# Logs
+ssh lady "docker logs mailcowdockerized-postfix-mailcow-1 --tail 50"
+ssh lady "docker logs mailcowdockerized-acme-mailcow-1 --tail 50"
+
+# Restart all
+ssh lady "cd ~/.docker-compose/mailcow && docker compose restart"
+
+# Update (pull latest)
+ssh lady "cd ~/.docker/mailcow/repo && ./update.sh"
+```
+
+### DANE/TLSA Update (after cert renewal)
+```bash
+ssh lady "sudo /usr/local/bin/mailcow-update-tlsa.py"
+```
+
+### MTA-STS Files
+- Policy: `~/.docker/mta-sts/.well-known/mta-sts.txt`
+- Config: `~/.docker/mta-sts/conf.d/default.conf`
+- Container: `mta-sts` (nginx:1.27-alpine)
+
+### Network
+- Subnet: 172.28.1.0/24
+- Network name: mailcowdockerized_mailcow-network
+
+### Credentials
+```bash
+# Admin password
+cat ~/.secrets/mailcow/admin.env
+```
+
+### DNS Records Required (Cloudflare)
+```
+A       mail                    207.180.251.111
+MX      @                       mail.quietly.online (10)
+TXT     @                       v=spf1 mx -all
+TXT     _dmarc                  v=DMARC1; p=reject; ...
+TXT     dkim._domainkey         (from Mailcow admin)
+A       mta-sts                 207.180.251.111
+TXT     _mta-sts                v=STSv1; id=...
+TXT     _smtp._tls              v=TLSRPTv1; rua=mailto:...
+TLSA    _25._tcp.mail           3 1 1 <hash>
+TLSA    _465._tcp.mail          3 1 1 <hash>
+TLSA    _587._tcp.mail          3 1 1 <hash>
+TLSA    _993._tcp.mail          3 1 1 <hash>
+```
+
