@@ -1,10 +1,11 @@
 # qui3tly.cloud Master Plan
 
 > **Project**: Complete Infrastructure Excellence + Future Expansion  
-> **Status**: Excellence Initiative Complete (A+++ Achieved) → Expansion Phase  
+> **Status**: ⚠️ CRITICAL ISSUES FOUND - B+ (85/100) → Immediate Repairs Required  
 > **Owner**: qui3tly (30yr network veteran, AS8585 operator)  
 > **Partner**: Lucky Luke 🤠 (The A+++ Destroyer)  
-> **Updated**: 2026-01-24
+> **Updated**: 2026-01-28 07:00 CET  
+> **Last Audit**: 2026-01-28 Complete Infrastructure Audit
 
 ---
 
@@ -56,11 +57,481 @@ Build world-class infrastructure combining qui3tly's 30 years of network experti
 
 ---
 
-## Phase II: Audit Polish (~3 hours) ⏳ OPTIONAL ENHANCEMENTS
+## Phase II: Security Hardening & Complete Audit ✅ COMPLETED (2026-01-28)
 
-**Status**: Not Started (Optional - Infrastructure already A+++)  
-**Priority**: Low - Nice-to-have improvements  
-**Timeline**: Whenever time permits
+**Duration**: 2026-01-28 (3 hours)  
+**Goal**: Complete security hardening and comprehensive infrastructure audit  
+**Result**: **CRITICAL ISSUES DISCOVERED** ⚠️
+
+### Achievements
+
+**1. Security Hardening**:
+- ✅ systemd-resolved disabled (LLMNR attack vector eliminated)
+- ✅ UFW firewall cleaned (3 unnecessary rules removed)
+- ✅ Static DNS configuration (Pihole-based)
+- ✅ Bootstrap playbook updated (future servers start secure)
+
+**2. Comprehensive Audits**:
+- ✅ Complete infrastructure audit (Master + Lady)
+- ✅ 24 containers on Master documented
+- ✅ 21 containers on Lady documented (should be 40+)
+- ✅ All web interfaces inventoried (15 on Master)
+- ✅ All Traefik routes analyzed
+- ✅ UFW, ports, systemd services verified
+
+**3. Documentation Generated**:
+- ✅ Master Operations Guide (updated, 908 lines)
+- ✅ Complete Admin Tools Inventory (589 lines)
+- ✅ Critical Audit Findings report (402 lines)
+- ✅ Action plan with immediate next steps
+- ✅ Total: ~4,000 lines of operational documentation
+
+### Critical Issues Discovered ❌
+
+**1. MAILCOW COMPLETELY DOWN ON LADY**
+- **Status**: NO MAIL CONTAINERS RUNNING
+- **Impact**: MAIL SERVER OFFLINE
+- **Expected**: ~20 containers (postfix, dovecot, SOGo, redis, etc.)
+- **Actual**: 0 containers
+- **Severity**: P1 - CRITICAL
+- **Action**: IMMEDIATE investigation required
+
+**2. PIHOLE DATABASE CORRUPTION**
+- **Status**: Database file missing/corrupted
+- **Error**: "unable to open database file" (SQLITE_CANTOPEN)
+- **Impact**: Pihole DNS working but no persistent query logging
+- **Severity**: P2 - HIGH
+- **Action**: Recreate database, check permissions
+
+**3. FAILING CONTAINERS ON LADY**
+- **authelia**: Restarting continuously (~35sec intervals)
+- **semaphore**: Restarting continuously (~38sec intervals)
+- **Severity**: P2 - HIGH
+- **Action**: Check logs, fix configuration
+
+**4. DOCUMENTATION COMPLETELY INACCURATE**
+- **Mailcow**: Listed as running - IT'S NOT
+- **Nextcloud**: Listed as "needs setup" - IT'S RUNNING FINE
+- **Lady services**: Documented 6 services, actually 21+ running
+- **Missing**: Home Assistant, UniFi DB, duplicate Grafana/Semaphore/Uptime-Kuma
+- **Severity**: P2 - HIGH
+- **Impact**: Operations guide unusable without corrections
+
+### Infrastructure Status Post-Audit
+
+**Overall Grade**: B+ (85/100) ⚠️  
+*Downgraded from A+ (96/100) due to critical findings*
+
+**Breakdown**:
+- **Master Server**: A (92/100) - Minor Pihole DB issue only
+- **Lady Server**: C+ (78/100) - Mail down, 2 services failing
+- **Documentation**: D (65/100) - 50%+ inaccurate
+- **Monitoring**: A (95/100) - Excellent coverage
+- **Security**: A (95/100) - Well protected
+
+### Files Created
+
+1. `MASTER_OPERATIONS_GUIDE.md` - Updated comprehensive guide (908 lines)
+2. `ADMIN_TOOLS_INVENTORY.md` - Complete admin interfaces (589 lines)
+3. `CRITICAL-AUDIT-FINDINGS-2026-01-28.md` - Full audit report (402 lines)
+4. `MASTER_PLAN.md` - Updated with critical findings (THIS FILE)
+
+**Status**: All committed to git
+
+---
+
+## Phase III: IMMEDIATE REPAIRS (Week of Jan 28 - Feb 3)
+
+**Status**: URGENT - STARTED  
+**Priority**: P1 CRITICAL - Blocking operations  
+**Timeline**: THIS WEEK
+
+### Week 1: Critical Issue Resolution (Jan 28 - Feb 3)
+
+**CRITICAL PRIORITY**:
+
+#### Task 1.1: Investigate Mailcow Outage ⏱️ 1-2 hours
+**Priority**: P1 - CRITICAL  
+**When**: IMMEDIATELY
+
+**Steps**:
+```bash
+# 1. Check if Mailcow directory exists
+ssh lady "ls -la ~/.docker-compose/ | grep -i mail"
+
+# 2. Check for docker compose file
+ssh lady "test -f ~/.docker-compose/mailcow/docker-compose.yml && echo 'EXISTS' || echo 'MISSING'"
+
+# 3. Check git status
+ssh lady "cd ~/.docker-compose/mailcow && git status"
+
+# 4. If exists, check why not running
+ssh lady "cd ~/.docker-compose/mailcow && docker compose ps"
+ssh lady "cd ~/.docker-compose/mailcow && docker compose logs --tail 100"
+
+# 5. If missing, restore from backup or git
+# (Need to verify backup/git repo location)
+```
+
+**Success Criteria**:
+- Mailcow containers running (20+ containers)
+- Mail sending/receiving works
+- SOGo webmail accessible
+- All mail ports operational
+
+---
+
+#### Task 1.2: Fix Pihole Database ⏱️ 30 minutes
+**Priority**: P2 - HIGH  
+**When**: After Mailcow fixed
+
+**Steps**:
+```bash
+# 1. Check current state
+docker exec pihole ls -lh /etc/pihole/
+
+# 2. Stop Pihole
+docker stop pihole
+
+# 3. Remove corrupted database
+docker exec pihole rm -f /etc/pihole/pihole-FTL.db*
+
+# 4. Restart Pihole (will recreate DB)
+docker start pihole
+
+# 5. Verify
+docker exec pihole pihole status
+docker logs pihole --tail 50
+
+# 6. Test DNS
+dig @100.64.0.1 google.com
+```
+
+**Success Criteria**:
+- Database recreated
+- No more corruption errors in logs
+- Query logging working
+- DNS resolution functional
+
+---
+
+#### Task 1.3: Fix Failing Services on Lady ⏱️ 1 hour
+**Priority**: P2 - HIGH  
+**When**: After above fixed
+
+**Authelia**:
+```bash
+# Check logs
+ssh lady "docker logs authelia --tail 100"
+
+# Common issues:
+# - Configuration file errors
+# - Database connection issues
+# - Certificate problems
+
+# Fix and restart
+ssh lady "cd ~/.docker-compose/authelia && docker compose restart"
+```
+
+**Semaphore**:
+```bash
+# Check logs  
+ssh lady "docker logs semaphore --tail 100"
+
+# Common issues:
+# - Database not ready
+# - Configuration errors
+# - Port conflicts
+
+# Fix and restart
+ssh lady "cd ~/.docker-compose/semaphore && docker compose restart"
+```
+
+**Success Criteria**:
+- Both services running stable (no restarts)
+- No errors in logs
+- Web interfaces accessible
+
+---
+
+**HIGH PRIORITY**:
+
+#### Task 1.4: Configure Nextcloud ⏱️ 30 minutes
+**Priority**: MEDIUM  
+**When**: This week
+
+**Steps**:
+1. Access setup wizard at https://cloud.quietly.online
+2. Create admin account
+3. Configure database connection (MariaDB container already running)
+4. Set data directory: `/data`
+5. Install recommended apps:
+   - Calendar
+   - Contacts
+   - Tasks
+   - Deck (project management)
+   - Notes
+6. Configure external storage (if needed)
+7. Test file upload/download
+8. Configure mobile app (iOS/Android)
+9. Document admin credentials in `~/.reports/secrets/`
+
+**Success Criteria**:
+- Admin can login
+- Files upload successfully
+- Mobile app syncs
+- Calendar/contacts work
+
+---
+
+#### Task 1.5: Test Backup Restore ⏱️ 1 hour
+**Priority**: HIGH  
+**When**: This week (before Friday)
+
+**Steps**:
+```bash
+# 1. Create test environment
+cd /tmp
+git clone <your-repo-url> qui3tly-test
+
+# 2. Verify docker compose files present
+cd qui3tly-test
+find . -name "docker-compose.yaml" | wc -l  # Should show 20+
+
+# 3. Test service startup (pick one service)
+cd .docker-compose/grafana
+docker compose config  # Verify syntax
+docker compose pull    # Test image pull
+# Don't actually start (just validate)
+
+# 4. Document findings
+# - Missing environment variables?
+# - External dependencies?
+# - Manual steps needed?
+
+# 5. Update DR procedures
+vi ~/.docs/DISASTER_RECOVERY.md
+```
+
+**Success Criteria**:
+- Git clone works
+- All docker-compose files validate
+- Documented any manual steps needed
+- DR procedures updated
+
+---
+
+#### Task 1.6: Set Up Automated Backups ⏱️ 2 hours
+**Priority**: HIGH  
+**When**: This week
+
+**Implementation**:
+
+```bash
+# Install restic
+sudo apt update
+sudo apt install restic -y
+
+# Create backup script
+cat > /home/qui3tly/.scripts/backup.sh << 'EOFSCRIPT'
+#!/bin/bash
+set -e
+
+# Configuration
+BACKUP_REPO="/backup/qui3tly-master"  # or S3: s3:s3.amazonaws.com/bucket
+RESTIC_PASSWORD_FILE="/home/qui3tly/.secrets/restic-password"
+LOG_FILE="/var/log/qui3tly-backup.log"
+
+# Initialize repo if needed
+if [ ! -d "$BACKUP_REPO" ]; then
+    restic -r "$BACKUP_REPO" -p "$RESTIC_PASSWORD_FILE" init
+fi
+
+# Backup Docker volumes
+docker volume ls -q | while read volume; do
+    echo "Backing up volume: $volume"
+    docker run --rm \
+        -v "$volume:/data:ro" \
+        -v "$BACKUP_REPO:/backup" \
+        -v "$RESTIC_PASSWORD_FILE:/password:ro" \
+        restic/restic \
+        -r /backup \
+        -p /password \
+        backup /data \
+        --tag "docker-volume" \
+        --tag "$volume"
+done
+
+# Backup configuration files
+restic -r "$BACKUP_REPO" -p "$RESTIC_PASSWORD_FILE" backup \
+    /home/qui3tly/.docker-compose \
+    /home/qui3tly/.docs \
+    /home/qui3tly/.ansible \
+    /etc/systemd/system/headscale.service \
+    --tag "config"
+
+# Prune old backups (keep last 30 days, 12 monthly)
+restic -r "$BACKUP_REPO" -p "$RESTIC_PASSWORD_FILE" forget \
+    --keep-daily 30 \
+    --keep-monthly 12 \
+    --prune
+
+# Log result
+echo "$(date): Backup completed successfully" >> "$LOG_FILE"
+EOFSCRIPT
+
+chmod +x /home/qui3tly/.scripts/backup.sh
+
+# Create password file
+mkdir -p /home/qui3tly/.secrets
+echo "YOUR_SECURE_PASSWORD" > /home/qui3tly/.secrets/restic-password
+chmod 600 /home/qui3tly/.secrets/restic-password
+
+# Schedule backup (daily at 02:00)
+sudo crontab -e
+# Add: 0 2 * * * /home/qui3tly/.scripts/backup.sh
+
+# Test backup
+/home/qui3tly/.scripts/backup.sh
+
+# Test restore
+restic -r "$BACKUP_REPO" -p "$RESTIC_PASSWORD_FILE" snapshots
+restic -r "$BACKUP_REPO" -p "$RESTIC_PASSWORD_FILE" restore latest --target /tmp/restore-test
+```
+
+**Success Criteria**:
+- Backup runs successfully
+- Test restore works
+- Cron job scheduled
+- Documentation complete
+
+---
+
+**MEDIUM PRIORITY**:
+
+#### Task 1.7: Deploy Promtail to Lady ⏱️ 1 hour
+**Priority**: MEDIUM  
+**When**: This week
+
+**Implementation**:
+
+```bash
+# SSH to lady
+ssh lady
+
+# Create Promtail directory
+mkdir -p ~/.docker-compose/promtail
+
+# Create configuration
+cat > ~/.docker-compose/promtail/config.yaml << 'EOFCONFIG'
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://100.64.0.1:3100/loki/api/v1/push
+
+scrape_configs:
+  - job_name: docker
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: docker
+          host: lady
+          __path__: /var/lib/docker/containers/*/*-json.log
+
+  - job_name: system
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: syslog
+          host: lady
+          __path__: /var/log/syslog
+EOFCONFIG
+
+# Create docker-compose.yaml
+cat > ~/.docker-compose/promtail/docker-compose.yaml << 'EOFCOMPOSE'
+services:
+  promtail:
+    image: grafana/promtail:3.4.2
+    container_name: promtail
+    restart: unless-stopped
+    volumes:
+      - ./config.yaml:/etc/promtail/config.yaml:ro
+      - /var/log:/var/log:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/lib/docker/volumes:/var/lib/docker/volumes:ro
+    command: -config.file=/etc/promtail/config.yaml
+    networks:
+      - monitoring
+
+networks:
+  monitoring:
+    external: true
+EOFCOMPOSE
+
+# Deploy
+docker compose up -d
+
+# Verify
+docker logs promtail
+
+# Test in Grafana
+# Go to Explore → Loki → {host="lady"}
+```
+
+**Success Criteria**:
+- Promtail container running
+- Logs visible in Grafana
+- Both docker and system logs flowing
+
+---
+
+#### Task 1.8: Update Documentation ⏱️ 1 hour
+**Priority**: MEDIUM  
+**When**: End of week
+
+**Tasks**:
+1. Update service counts (24 Master, 21 Lady, 40+ expected)
+2. Correct Mailcow status (mark as DOWN, action required)
+3. Correct Nextcloud status (mark as RUNNING)
+4. Add undocumented services:
+   - Home Assistant
+   - UniFi DB
+   - Duplicate Grafana/Semaphore instances
+5. Explain why duplicate services exist
+6. Update ADMIN_TOOLS_INVENTORY with correct status
+7. Update MASTER_OPERATIONS_GUIDE with reality
+8. Commit all changes to git
+
+---
+
+### Week 1 Summary
+
+**Total Time**: ~8-10 hours  
+**Critical Tasks**: 3 (Mailcow, Pihole, Failing services)  
+**High Priority**: 3 (Nextcloud, Backups, DR test)  
+**Medium Priority**: 2 (Promtail, Documentation)
+
+**Deliverables**: 
+- Mail server operational
+- All services stable
+- Backups automated
+- Documentation accurate
+- Lady logs centralized
+
+---
+
+## Phase IV: Documentation Consolidation (~8 hours)
+
+**Status**: Planned for Week 2-3  
+**Priority**: High - Maintain documentation quality  
+**Timeline**: Feb 3-10, 2026
 
 ### Remaining Tasks
 1. **Update monitoring versions** (~10 min)

@@ -158,6 +158,39 @@
         - { name: 'net.core.somaxconn', value: '65536' }
         - { name: 'vm.swappiness', value: '10' }
 
+    #=== DNS & NETWORK SERVICES ===
+    - name: Disable and mask systemd-resolved (LLMNR/mDNS security)
+      ansible.builtin.systemd:
+        name: systemd-resolved
+        state: stopped
+        enabled: false
+        masked: true
+      failed_when: false
+
+    - name: Remove systemd-resolved managed resolv.conf
+      ansible.builtin.file:
+        path: /etc/resolv.conf
+        state: absent
+
+    - name: Configure static DNS (Pihole on master or fallback)
+      ansible.builtin.copy:
+        content: |
+          # Static DNS configuration
+          # Managed by Ansible - qui3tly.cloud bootstrap
+          {% if inventory_hostname == 'master' %}
+          nameserver 127.0.0.1
+          nameserver 1.1.1.1
+          nameserver 1.0.0.1
+          {% else %}
+          nameserver 100.64.0.1
+          nameserver 1.1.1.1
+          nameserver 1.0.0.1
+          {% endif %}
+        dest: /etc/resolv.conf
+        owner: root
+        group: root
+        mode: '0644'
+
     #=== SYSTEM SETUP ===
     - name: Update apt cache
       ansible.builtin.apt:

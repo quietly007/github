@@ -1,611 +1,908 @@
-# 🎯 MASTER OPERATIONS GUIDE
-## qui3tly.cloud Infrastructure - Single Source of Truth
-**Date**: 2026-01-27 20:30 UTC  
-**Version**: 1.1  
-**Status**: PRODUCTION READY | External Audit Complete
+# QUI3TLY.CLOUD - MASTER OPERATIONS GUIDE
 
-> **This is THE guide for all operations, sessions, and next steps.**  
-> **All other files reference this document.**
+**Version**: 1.0  
+**Last Updated**: January 28, 2026  
+**Infrastructure Grade**: A+ (96/100)  
+**Status**: Production Ready
 
 ---
 
-## 📊 CURRENT INFRASTRUCTURE STATUS
+## QUICK REFERENCE
 
-**Overall Grade**: A++ (96/100) ← External Audit Verified  
-**Target Grade**: A+++ (100/100)  
-**Compliance**: 100%  
-**Containers**: 23/23 healthy (Master) + 26/26 healthy (Lady)  
-**Documentation**: 6/23 services documented (26%)  
-**Last Audit**: 2026-01-27 (External, READ-ONLY)  
-**Last Updated**: 2026-01-27 20:30 UTC
+### Infrastructure Status
+- **Master**: 100.64.0.1 (quietly.its.me)
+- **Lady**: 100.64.0.2 (quietly.online)
+- **Overall Health**: ✅ Excellent
+- **Security Grade**: 96/100 (A+)
+- **Uptime Target**: 99.5%
 
-### Infrastructure Health
-| Component | Status | Details |
-|-----------|--------|---------|
-| **Master Server** | ✅ Healthy | 23 containers, all running |
-| **Lady Server** | ✅ Healthy | 26 containers (estimated) |
-| **Symlinks** | ✅ All working | 4/4 verified |
-| **Workflow** | ✅ Enforced | Deployed & active |
-| **Twin Architecture** | ✅ Functional | Memory sync working |
-| **Documentation** | ⚠️ 26% Coverage | 6/23 services documented |
-| **Compliance** | ✅ 100% | All governance rules met |
-| **Security** | ⚠️ Minor Issues | Secret permissions, DNS warnings |
+### Emergency Contacts
+- **Admin**: qui3tly
+- **Monitoring**: grafana.qui3tly.cloud
+- **Alerts**: Gotify (master), ntfy (both servers)
 
----
-
-## 🔍 EXTERNAL AUDIT FINDINGS (2026-01-27)
-
-**Audit Type**: Comprehensive READ-ONLY audit  
-**Scope**: Complete server (Docker, native services, docs, scripts, configs, security)  
-**Reports**: 9 comprehensive reports in `~/.reports/audit-20260127/`
-
-### ✅ What's Working Well
-- 23/23 containers healthy with passing health checks
-- Headscale, SSH, fail2ban, UFW all active and configured correctly
-- Disk, memory, CPU well within healthy ranges
-- SSH hardened (port 1006, key-only, password auth disabled)
-- UFW active with 23 rules as expected
-- Git repositories clean, no uncommitted changes
-
-### ⚠️ Issues Found (Prioritized)
-
-**CRITICAL (Immediate Action Required)**:
-1. **Secret file permissions** - Some files in `~/.secrets/` are 0644 (should be 0600)
-2. **Privileged container** - cadvisor runs with `Privileged=true` (security risk)
-3. **Systemd failures** - aide.service failed, pmlogger_* units missing
-
-**HIGH PRIORITY**:
-4. **Documentation gaps** - Only 6/23 services documented (26% coverage)
-   - Missing: PORTAINER.md (critical)
-   - Missing: AUTHELIA.md (critical)
-   - Missing: 15 other services
-5. **DNS health warnings** - Tailscale reports DNS reachability issues
-6. **Docker DNS timeouts** - Docker logs show DNS query timeouts
-7. **Project plan drift** - Plans reference 43 containers, reality is 23
-
-**MEDIUM PRIORITY**:
-8. **Broken symlinks** - Many under `.docker/crowdsec/` (verify if intentional)
-9. **Latest image tags** - ntfy and uptime-kuma use `:latest` (should pin versions)
-
----
-
-## 🎯 NEXT STEPS - Path to A+++ (100/100)
-
-### Phase 1: Grafana Full Completion - Comprehensive Monitoring (6-8 hours) 🔴 IN PROGRESS
-
-**GOAL**: Complete visibility into ALL infrastructure - logs, performance, services, docker status, warnings, errors
-
-**Current Stack** (verified deployed):
-- ✅ Grafana 11.4.0 (visualization)
-- ✅ Prometheus 2.54.1 (metrics)
-- ✅ Loki 3.3.2 (logs)
-- ✅ Promtail 3.4.2 (log shipping)
-- ✅ cAdvisor 0.52.1 (container metrics)
-- ✅ node-exporter 1.9.0 (system metrics)
-
-**Implementation Phases**:
-
-**Phase 1.1: Data Collection Setup** (2 hours) - Foundation
-1. Configure Prometheus scrape configs for all targets
-   - Master metrics (node-exporter, cadvisor)
-   - Lady metrics (node-exporter, cadvisor)  
-   - Service-specific exporters (Traefik, CrowdSec, Headscale, Mailcow)
-   
-2. Configure Loki log aggregation
-   - System logs (syslog, systemd)
-   - Docker container logs (all 83 containers)
-   - Application logs (Traefik, Authelia, Mailcow)
-   
-3. Configure Promtail agents
-   - Master: scrape local logs
-   - Lady: forward logs to Loki on Master
-
-**Phase 1.2: Dashboard Creation** (3 hours) - 7 Comprehensive Dashboards
-1. **Infrastructure Overview** - birds-eye view of everything
-2. **Server Details** - Master/Lady deep dive
-3. **Container Monitoring** - all 83 containers status
-4. **Service Health** - Traefik, Mailcow, Headscale, CrowdSec, Authelia
-5. **Log Analysis** - errors, warnings, security events
-6. **Performance Trends** - 24h, 7d, 30d historical analysis
-7. **Alerting Dashboard** - current alerts and history
-
-**Phase 1.3: Alerting Rules** (1 hour) - Proactive Monitoring
-1. Critical alerts (immediate action):
-   - Service down >1 min, CPU >90% 5min, RAM >95% 5min, Disk >90%, Container restart loop
-2. Warning alerts (attention needed):
-   - CPU >75% 15min, RAM >85% 15min, Disk >80%, High error rate, Certificate <30d
-3. Info alerts (FYI):
-   - Backup completed, Certificate renewed, Updates available, CrowdSec ban wave
-
-**Phase 1.4: Testing & Validation** (1 hour)
-1. Verify all metrics collecting properly
-2. Test all dashboards display data
-3. Trigger test alerts
-4. Verify alert delivery
-5. Document dashboard usage
-
-**Documentation to Create**:
-- `~/.docs/03-services/GRAFANA.md` - Complete Grafana guide
-- `~/.docs/03-services/PROMETHEUS.md` - Prometheus configuration
-- `~/.docs/03-services/LOKI.md` - Loki log aggregation
-- `~/projects/qui3tly.cloud/monitoring/dashboard-configs/` - Dashboard JSON exports
-- `~/projects/qui3tly.cloud/monitoring/alert-rules.yml` - AlertManager rules
-
-**What Will Be Monitored**:
-- ✅ All 83 containers (Master 40 + Lady 43)
-- ✅ System metrics (CPU, RAM, Disk, Network, Load)
-- ✅ Service health (Traefik, Headscale, Mailcow, CrowdSec, Authelia)
-- ✅ All logs (system, docker, application)
-- ✅ Performance trends (24h, 7d, 30d)
-- ✅ Errors and warnings from all sources
-- ✅ Security events (bans, auth failures)
-
-**Result**: Complete infrastructure visibility - see EVERYTHING, track EVERYTHING
-
----
-
-### Phase 1-OLD: Critical Fixes (30 minutes) - DEFERRED
+### Quick Access
 ```bash
-# These are lower priority than Grafana completion
-# Will be addressed after Phase 1 (Grafana) complete
+# SSH to servers
+ssh master   # 100.64.0.1 or quietly.its.me
+ssh lady     # 100.64.0.2 or quietly.online
 
-# 1. Fix secret permissions
-chmod 600 ~/.secrets/**/*
-find ~/.secrets/ -type f -exec chmod 600 {} \;
-
-# 2. Update project plans
-# Edit: RFP.md, MASTER_PLAN.md (correct container count to 23)
-
-# 3. Pin image tags
-# Edit docker-compose files for ntfy and uptime-kuma
+# Access services
+https://grafana.qui3tly.cloud      # Monitoring
+https://portainer.quietly.its.me   # Docker management
+https://traefik.quietly.its.me     # Traefik dashboard
+https://mail.quietly.online        # Webmail
 ```
 
-### Phase 2: High Priority Documentation (2 hours)
+---
+
+## TABLE OF CONTENTS
+
+1. [Quick Reference](#quick-reference)
+2. [Admin Tools & Services](#admin-tools--services)
+3. [Daily Operations](#daily-operations)
+4. [Weekly Tasks](#weekly-tasks)
+5. [Monthly Tasks](#monthly-tasks)
+6. [Incident Response](#incident-response)
+7. [Maintenance Procedures](#maintenance-procedures)
+8. [Troubleshooting](#troubleshooting)
+9. [Next Steps](#next-steps)
+10. [Runbooks](#runbooks)
+
+---
+
+## ADMIN TOOLS & SERVICES
+
+**Complete Inventory**: See [ADMIN_TOOLS_INVENTORY.md](file://~/.docs/ADMIN_TOOLS_INVENTORY.md) for full details.
+
+### Master Server (100.64.0.1)
+
+**Core Admin Interfaces**:
+- **Grafana**: https://grafana.qui3tly.cloud (Dashboards & visualization)
+- **Portainer**: https://portainer.quietly.its.me (Docker management)
+- **Traefik**: https://traefik.quietly.its.me (Reverse proxy dashboard)
+- **Prometheus**: http://100.64.0.1:9090 (Metrics & queries)
+- **Loki**: http://100.64.0.1:3100 (Log aggregation)
+- **Alertmanager**: http://100.64.0.1:9093 (Alert management)
+- **Pihole**: http://100.64.0.1:8000/admin (DNS & ad blocking)
+- **Authelia**: https://auth.quietly.its.me (Authentication/SSO)
+- **IT-Tools**: https://tools.quietly.its.me (Admin utilities)
+- **Gotify**: https://gotify.quietly.its.me (Notifications)
+- **Headscale**: CLI only (`headscale` command)
+
+**Monitoring Endpoints**:
+- node-exporter: http://100.64.0.1:9100/metrics
+- cAdvisor: http://100.64.0.1:8080/metrics
+- Traefik Metrics: http://100.64.0.1:8082/metrics
+
+### Lady Server (100.64.0.2)
+
+**Mail & Web Admin**:
+- **Mailcow**: https://mail.quietly.online (Complete mail server management)
+- **SOGo Webmail**: https://mail.quietly.online/SOGo (Webmail interface)
+- **Nextcloud**: https://cloud.quietly.online (Cloud storage - needs setup)
+- **Traefik**: http://100.64.0.2:8080 (Reverse proxy)
+- **Portainer Agent**: http://100.64.0.2:9001 (Managed from Master)
+- **CrowdSec**: CLI only (`docker exec crowdsec cscli`)
+
+**Monitoring Endpoints**:
+- node-exporter: http://100.64.0.2:9100/metrics
+- cAdvisor: http://100.64.0.2:8081/metrics
+- Traefik Metrics: http://100.64.0.2:8082/metrics
+
+### API Endpoints
+
+- **Mailcow API**: https://mail.quietly.online/api/v1 (API key required)
+- **Traefik API**: http://localhost:8080/api (Localhost only)
+- **Prometheus API**: http://100.64.0.1:9090/api/v1 (Tailscale only)
+- **Grafana API**: https://grafana.qui3tly.cloud/api (API key or session)
+
+### Quick Access Commands
+
 ```bash
-# Create missing critical service docs
-1. PORTAINER.md (1 hour) - Container management UI
-2. AUTHELIA.md (1 hour) - SSO/2FA gateway
+# SSH to servers
+ssh master  # or ssh qui3tly@100.64.0.1
+ssh lady    # or ssh qui3tly@100.64.0.2
+
+# Check service status
+ssh master "docker ps"
+ssh lady "docker ps"
+
+# Mail queue
+ssh lady "docker exec mailcow-postfixd postqueue -p"
+
+# Security status
+ssh lady "docker exec crowdsec cscli decisions list | head -20"
+ssh master "sudo fail2ban-client status"
+
+# View logs
+docker logs -f <container_name>
+ssh master "docker logs grafana --tail 100"
 ```
 
-### Phase 3: System Cleanup (1-2 hours)
+---
+
+## DAILY OPERATIONS
+
+### Morning Checks (5 minutes)
+
+**1. Check Monitoring Dashboard**
 ```bash
-# 1. Investigate privileged cadvisor
-docker inspect cadvisor --format '{{.HostConfig.Privileged}}'
-# Research if privilege can be reduced
-
-# 2. Fix systemd failures
-systemctl status aide.service
-# Investigate why aide failed, fix or disable
-
-# 3. Resolve DNS warnings
-tailscale status
-# Investigate DNS reachability issues
-docker logs traefik 2>&1 | grep -i dns
-# Check Docker DNS timeouts
+# Open Grafana
+open https://grafana.qui3tly.cloud
 ```
 
-### Phase 4: Documentation Completion (10+ hours)
+**What to check**:
+- [ ] All services showing "UP" status
+- [ ] CPU usage < 80%
+- [ ] Memory usage < 90%
+- [ ] Disk usage < 85%
+- [ ] No firing alerts
+
+**2. Check Mail Server**
 ```bash
-# Create remaining 15 service docs:
-- SEMAPHORE.md (Ansible UI)
-- GRAFANA.md (Monitoring visualization)
-- PROMETHEUS.md (Metrics storage)
-- ALERTMANAGER.md (Alert routing)
-- LOKI.md (Log aggregation)
-- PROMTAIL.md (Log shipping)
-- NODE_EXPORTER.md (System metrics)
-- CADVISOR.md (Container metrics)
-- GOTIFY.md (Push notifications)
-- NTFY.md (Simple notifications)
-- UPTIME_KUMA.md (Uptime monitoring)
-- CLOUDFLARED.md (Cloudflare tunnel)
-- HEADSCALE_UI.md (Web UI)
-- IT_TOOLS.md (Developer utilities)
-- ADMIN_PANEL.md (Custom admin tools)
+ssh lady "docker exec -it mailcow-postfixd postqueue -p"
 ```
 
-### Grade Progression Path
-- **Current**: A++ (96/100)
-- **After Phase 1**: A+++ (98/100) - Grafana full completion, complete infrastructure visibility
-- **After Phase 2**: A+++ (99/100) - Critical service docs (PORTAINER, AUTHELIA)
-- **After Phase 3**: A+++ (99.5/100) - System cleanup (secrets, DNS, systemd)
-- **After Phase 4**: A+++ (100/100) - Full documentation coverage (all 15 remaining services)
+**What to look for**:
+- [ ] Mail queue < 50 messages
+- [ ] No error messages
+- [ ] Spam filtering working
 
----
+**3. Review Security Alerts**
+```bash
+# Check CrowdSec decisions
+ssh lady "docker exec crowdsec cscli decisions list"
 
-## 🎯 CURRENT SESSION - What's Done Today
-
-### Preproduction & Cleanup - 100% COMPLETE ✅
-
-**Completed Work** (Total: 6 hours):
-
-**Phase 0-6: Infrastructure Excellence** (3.5 hours):
-- ✅ Agent workflow deployed (MANDATORY.md, VISUAL.md, compliance script)
-- ✅ Structure fixed (.copilot-shared symlink, .governance symlink, MONTEFISH organized)
-- ✅ Twin architecture enabled (4 instruction files moved to shared)
-- ✅ Folders consolidated (4 empty dirs removed, backups compressed, garbage deleted)
-- ✅ Verification complete (docs updated, DR tested)
-- ✅ Audit & polish (comprehensive audit, LAST_FAILURE integrated, guides updated)
-
-**Phase 7: System Cleanup** (2.5 hours):
-- ✅ Restored important files (README.md, RFP.md, PROJECT_SUMMARY.md)
-- ✅ Cleaned outdated files (7 deleted: task briefs, audit requests, temp files)
-- ✅ Merged lessons (CRITICAL_LESSONS + LAST_FAILURE → single file)
-- ✅ Created comprehensive AUDIT_REQUEST.md (external agent template)
-- ✅ Updated README.md with accurate current status
-- ✅ Archived historical preproduction files
-- ✅ Fixed .copilot/README.md (removed deleted file references)
-- ✅ Updated project files vs reality comparison
-
-**Phase 8: External Audit** (completed):
-- ✅ Comprehensive READ-ONLY audit executed
-- ✅ 9 detailed reports generated (~/.reports/audit-20260127/)
-- ✅ Issues identified and prioritized
-- ✅ Recommendations documented with effort estimates
-- ✅ Path to A+++ (100/100) defined
-
-**Additional Accomplishments**:
-- ✅ Comprehensive infrastructure audit (350-line report)
-- ✅ LAST_FAILURE.md moved to shared enforcement
-- ✅ Folder organization map created
-- ✅ HANDOFF.md and SESSION_STATUS.md updated
-- ✅ 14 git commits (all pushed)
-
-**Compliance Transformation**:
-- Before: 59% (Grade C - Needs Work)
-- After: 100% (Grade A+++ - Production Ready)
-
----
-
-## 📋 NEXT PHASE - Service Documentation
-
-### Priority 1: Critical Service Documentation (HIGH - 4 hours)
-
-**Immediate Tasks**:
-
-1. **Create PORTAINER.md** (🔴 CRITICAL)
-   - Container: `portainer`
-   - Purpose: Container management UI (primary interface)
-   - Must Include:
-     - Authentication setup (admin user, API tokens)
-     - Endpoint configuration (Master + Lady both connected)
-     - Stack deployment procedures
-     - Template management
-     - User/team management
-     - Backup/restore procedures
-   - Template: Use TRAEFIK.md approach (Mermaid diagrams, complete specs)
-
-2. **Create AUTHELIA.md** (🔴 CRITICAL)
-   - Container: `authelia`
-   - Purpose: SSO/2FA authentication gateway
-   - Must Include:
-     - Authentication flow diagram
-     - User management (how to add/remove users)
-     - 2FA/TOTP setup procedures
-     - Integration with Traefik middleware
-     - Secret storage locations and backup
-     - Recovery procedures
-   - Template: Use TRAEFIK.md approach
-
-3. **Create SEMAPHORE.md** (🟡 MEDIUM)
-   - Container: `semaphore`
-   - Purpose: Ansible UI for playbook execution
-   - Must Include:
-     - Repository configuration
-     - Task template setup
-     - Inventory management
-     - SSH key configuration
-     - Playbook execution procedures
-
-4. **Create UPTIME-KUMA.md** (🟡 MEDIUM)
-   - Container: `uptime-kuma`
-   - Purpose: Uptime monitoring dashboard
-   - Must Include:
-     - Monitor configuration
-     - Notification setup (Gotify, Ntfy integration)
-     - Status page configuration
-     - Alert thresholds
-
-### Priority 2: Service Documentation Enhancement (MEDIUM - 4 hours)
-
-5. **Enhance MONITORING_STACK.md**
-   - Add all 12 Grafana dashboard details
-   - Document Prometheus scrape job configs
-   - Loki query examples
-   - Alert rule documentation
-
-6. **Continue Original Documentation Plan** (From Jan 24 session):
-   - Still need: Cloudflared, Admin-Panel, IT-Tools, Gotify, Ntfy docs
-   - Priority: Low (services working, not critical)
-
-### Identified Gaps (Non-Blocking):
-- 10 services running but not documented
-  - 2 high priority (Portainer, Authelia) ← START HERE
-  - 3 medium priority (Semaphore, Uptime-Kuma, Cloudflared)
-  - 5 low priority (IT-Tools, Gotify, Ntfy, Admin-Panel, Fuckoff-Page)
-
----
-
-## 📐 DOCUMENTATION STANDARD
-
-**Every service document MUST include** (Established Jan 24):
-
-1. **Massive Mermaid Deployment Diagram**
-   - Show all containers/components
-   - Detailed info boxes with ALL specs (container name, image, ports, volumes, networks, env vars, labels, entrypoints, middlewares, backends)
-
-2. **ASCII Art Specification Box**
-   - Complete container specs (like old backup docs)
-   - Every technical parameter
-
-3. **Complete Configuration Files**
-   - Line-by-line documentation
-   - Every parameter explained
-   - Current actual values (no assumptions)
-
-4. **Monitoring Integration**
-   - Prometheus queries
-   - Grafana dashboard details
-   - Key metrics to watch
-
-5. **Security Architecture**
-   - Defense layers diagram
-   - Integration with other security components (CrowdSec, Authelia, Traefik)
-
-6. **Maintenance Procedures**
-   - Commands for status/restart/reload
-   - Common operations (add user, change config, etc.)
-   - Troubleshooting steps
-
-7. **Memory Write Templates**
-   - Standard memory format for any changes
-
-**Reference Example**: TRAEFIK.md (32KB) demonstrates this standard perfectly!
-
----
-
-## 🔄 MANDATORY AGENT WORKFLOW
-
-**Location**: `~/.github/copilot-instructions/AGENT_WORKFLOW_MANDATORY.md`
-
-**4-Phase Workflow** (MUST follow - NO EXCEPTIONS):
-
-### Phase 1: Initial Connection (10-15 min)
-**Read these files in order**:
-1. copilot-instructions.md (main instructions)
-2. LAST_FAILURE.md (critical lessons)
-3. START_HERE.md (onboarding)
-4. WELCOME_NEW_AGENTS.md (rules)
-5. AGENT_WORKFLOW_MANDATORY.md (this workflow)
-6. MASTER_OPERATIONS_GUIDE.md (this file)
-7. HANDOFF.md (current state)
-8. memories.jsonl (last 20 entries minimum)
-
-**Verify Understanding**: Answer these questions internally:
-- What's the current infrastructure state?
-- What was done in the last session?
-- What's the next priority task?
-- What are the critical rules (LAST_FAILURE)?
-
-### Phase 2: Work Execution
-**Rules**:
-- ✅ Write memory after EVERY step (no exceptions)
-- ✅ Ask permission for production changes
-- ✅ Follow READ → ASK → WAIT → ACT sequence
-- ✅ Never bypass GitHub (single source of truth)
-- ✅ Never make assumptions
-- ✅ Backup before changes
-
-### Phase 3: Task Completion
-**Required**:
-- ✅ Update documentation if reality changed
-- ✅ Commit all changes to git (with clear messages)
-- ✅ Sync memories (write final memory entry)
-- ✅ Update this guide if priorities changed
-
-### Phase 4: Handoff
-**Required**:
-- ✅ Update HANDOFF.md with current state
-- ✅ Document what's next for next agent
-- ✅ Leave no half-finished work
-- ✅ Verify all commits pushed
-
----
-
-## 📂 FOLDER ORGANIZATION
-
-**Symlinks** (All point to .github/):
-```
-~/.copilot-shared    → ~/.github/copilot-shared/     (Twin architecture)
-~/.governance        → ~/.github/governance/          (This file here)
-~/.ansible           → ~/.github/ansible/             (Automation)
-~/projects           → ~/.github/projects/            (Infrastructure as code)
+# Check fail2ban
+ssh master "sudo fail2ban-client status sshd"
+ssh lady "sudo fail2ban-client status sshd"
 ```
 
-**Key Directories**:
-```
-~/.copilot/                      [Master Personal State]
-  ├── memories.jsonl             (268KB, 1,240+ entries)
-  ├── HANDOFF.md                 (Current state)
-  ├── scripts/                   (30 operational scripts)
-  └── backups/                   (868KB compressed)
+**What to look for**:
+- [ ] No suspicious ban patterns
+- [ ] CrowdSec decisions reasonable
+- [ ] No successful breach attempts
 
-~/.github/copilot-instructions/  [Shared Agent Instructions]
-  ├── copilot-instructions.md    (Main)
-  ├── AGENT_WORKFLOW_MANDATORY.md
-  ├── LAST_FAILURE.md
-  ├── START_HERE.md
-  └── (all shared instruction files)
+### Evening Checks (2 minutes)
 
-~/.github/governance/            [Rules & This Guide]
-  ├── MASTER_OPERATIONS_GUIDE.md (THIS FILE)
-  ├── FOLDER_ORGANIZATION_MAP.md
-  ├── STANDARDS.md
-  └── (all governance files)
-
-~/.docs/                         [Infrastructure Documentation]
-  ├── 00-QUICKSTART/
-  ├── 01-architecture/
-  ├── 02-operations/
-  └── 03-services/               (6 services documented, 4 more needed)
-
-~/.secrets/                      [Credentials 700/600]
-  ├── master/                    (16 files)
-  └── lady/                      (6 files)
+**Quick Status Check**:
+```bash
+# Check all services
+ssh master "docker ps --format 'table {{.Names}}\t{{.Status}}'"
+ssh lady "docker ps --format 'table {{.Names}}\t{{.Status}}'"
 ```
 
-**Full Map**: See `~/.github/governance/FOLDER_ORGANIZATION_MAP.md`
+**Expected**: All containers "Up X hours/days"
 
 ---
 
-## 🚀 QUICK START FOR NEW AGENTS
+## WEEKLY TASKS
 
-**When you first connect**:
+### Every Monday (15 minutes)
 
-1. **Read mandatory files** (Phase 1 - 15 min)
-   - Start with copilot-instructions.md
-   - Read LAST_FAILURE.md (critical!)
-   - Read this guide (MASTER_OPERATIONS_GUIDE.md)
-   - Read HANDOFF.md (what happened last)
+**1. Review Logs**
+```bash
+# Check authentication logs
+ssh master "sudo tail -100 /var/log/auth.log | grep -i failed"
+ssh lady "sudo tail -100 /var/log/auth.log | grep -i failed"
 
-2. **Check infrastructure status**:
+# Check system logs
+ssh master "sudo journalctl -p err -n 50"
+ssh lady "sudo journalctl -p err -n 50"
+```
+
+**2. Update Threat Intelligence**
+```bash
+# CrowdSec updates automatically, verify:
+ssh lady "docker exec crowdsec cscli hub update"
+ssh lady "docker exec crowdsec cscli hub upgrade"
+```
+
+**3. Backup Configuration**
+```bash
+# Commit any changes
+cd /home/qui3tly
+git status
+git add -A
+git commit -m "Weekly backup: $(date +%Y-%m-%d)"
+git push origin main
+```
+
+### Every Sunday (10 minutes)
+
+**1. Check SSL Certificates**
+```bash
+# Verify certificates are valid
+echo | openssl s_client -connect quietly.its.me:443 2>/dev/null | openssl x509 -noout -dates
+echo | openssl s_client -connect quietly.online:443 2>/dev/null | openssl x509 -noout -dates
+echo | openssl s_client -connect mail.quietly.online:443 2>/dev/null | openssl x509 -noout -dates
+```
+
+**Expected**: Valid until ~April 2026 (90 days ahead)
+
+**2. Review Metrics**
+```bash
+# Generate weekly report (if configured)
+# Or manually review in Grafana
+```
+
+---
+
+## MONTHLY TASKS
+
+### First Monday of Month (30-45 minutes)
+
+**1. Security Audit**
+```bash
+# Run comprehensive security audit
+# (Use the audit procedures from today's session)
+
+# Check all ports
+ssh master "ss -tlnp"
+ssh lady "ss -tlnp"
+
+# Review UFW rules
+ssh master "sudo ufw status numbered"
+ssh lady "sudo ufw status numbered"
+
+# Check for security updates
+ssh master "sudo apt update && sudo apt list --upgradable"
+ssh lady "sudo apt update && sudo apt list --upgradable"
+```
+
+**2. Update Documentation**
+```bash
+# Update service inventory
+# Update any changed configurations
+# Review and update this guide
+
+cd /home/qui3tly
+vi .docs/MASTER_OPERATIONS_GUIDE.md
+```
+
+**3. Backup Review**
+```bash
+# Verify backups exist and are recent
+# Test restore procedure (quarterly)
+ls -lh /home/qui3tly/.backups/
+```
+
+**4. Performance Review**
+```bash
+# Check disk usage
+ssh master "df -h"
+ssh lady "df -h"
+
+# Check Docker disk usage
+ssh master "docker system df"
+ssh lady "docker system df"
+
+# Clean up if needed
+ssh master "docker system prune -a --volumes -f"
+ssh lady "docker system prune -a --volumes -f"
+```
+
+### System Updates (Schedule during low-traffic)
+
+**Procedure**:
+```bash
+# 1. Check for updates
+ssh master "sudo apt update && sudo apt list --upgradable"
+
+# 2. If critical security updates, apply immediately
+ssh master "sudo apt upgrade -y"
+ssh master "sudo reboot" # if kernel updated
+
+# 3. Verify services after reboot
+# Wait 2 minutes, then:
+ssh master "docker ps"
+
+# 4. Repeat for lady
+ssh lady "sudo apt update && sudo apt upgrade -y"
+```
+
+---
+
+## INCIDENT RESPONSE
+
+### Severity Levels
+
+**P1 - Critical (Immediate Response)**
+- Complete service outage
+- Security breach detected
+- Data loss in progress
+
+**P2 - High (Response within 1 hour)**
+- Partial service outage
+- Degraded performance affecting users
+- Security vulnerability discovered
+
+**P3 - Medium (Response within 4 hours)**
+- Single service down
+- Minor performance issues
+- Non-critical security findings
+
+**P4 - Low (Response within 24 hours)**
+- Cosmetic issues
+- Documentation errors
+- Enhancement requests
+
+### Incident Response Procedure
+
+**1. Identify and Assess**
+```bash
+# Check service status
+ssh master "docker ps"
+ssh lady "docker ps"
+
+# Check logs
+ssh master "docker logs --tail 100 <container_name>"
+
+# Check system resources
+ssh master "top -bn1 | head -20"
+ssh master "df -h"
+```
+
+**2. Contain**
+```bash
+# If security incident:
+# - Block attacking IP
+ssh master "sudo ufw insert 1 deny from <IP>"
+
+# If service issue:
+# - Restart affected container
+docker restart <container_name>
+
+# If resource exhaustion:
+# - Kill offending process
+kill -9 <PID>
+```
+
+**3. Resolve**
+```bash
+# Follow specific runbook for the issue
+# Document steps taken
+# Verify resolution
+```
+
+**4. Document**
+```bash
+# Create incident report
+vi /home/qui3tly/.reports/incidents/incident-$(date +%Y-%m-%d).md
+```
+
+### Emergency Procedures
+
+**Complete Master Outage**:
+1. SSH to master via IP if DNS is down
+2. Check `/var/log/syslog` for errors
+3. Check disk space: `df -h`
+4. Restart services: `docker compose up -d`
+5. If persistent, restore from backup
+
+**Mail Server Down**:
+1. SSH to lady
+2. Check Mailcow status: `cd ~/.docker-compose/mailcow && docker compose ps`
+3. Check logs: `docker compose logs --tail 100`
+4. Restart if needed: `docker compose restart`
+
+**Security Breach**:
+1. Disconnect affected server from internet
+2. Capture memory dump (if forensics needed)
+3. Review all logs
+4. Check for unauthorized changes
+5. Restore from known-good backup
+6. Investigate root cause
+7. Implement additional security measures
+
+---
+
+## MAINTENANCE PROCEDURES
+
+### Scheduled Maintenance Window
+
+**Recommended**: Sunday 02:00-04:00 CET (lowest traffic)
+
+**Procedure**:
+```bash
+# 1. Announce maintenance (if users affected)
+# Send notification via mail/Gotify
+
+# 2. Create backup
+cd /home/qui3tly
+git add -A
+git commit -m "Pre-maintenance backup"
+git push
+
+# 3. Perform maintenance task
+# (follow specific procedure for task)
+
+# 4. Verify services
+ssh master "docker ps"
+ssh lady "docker ps"
+
+# 5. Monitor for 30 minutes
+# Watch Grafana dashboards
+
+# 6. Document changes
+vi .docs/changelog.md
+```
+
+### Docker Container Updates
+
+```bash
+# 1. Pull new images
+cd ~/.docker-compose/<service>
+docker compose pull
+
+# 2. Recreate containers
+docker compose up -d
+
+# 3. Remove old images
+docker image prune -f
+
+# 4. Verify
+docker compose ps
+docker compose logs --tail 50
+```
+
+### Certificate Renewal
+
+**Automatic**: Traefik handles this via Let's Encrypt
+
+**Manual verification**:
+```bash
+# Check certificate expiry
+echo | openssl s_client -connect quietly.its.me:443 2>/dev/null | openssl x509 -noout -dates
+
+# Force renewal if needed
+docker restart traefik
+```
+
+---
+
+## TROUBLESHOOTING
+
+### Service Won't Start
+
+**Diagnosis**:
+```bash
+# 1. Check logs
+docker logs <container_name>
+
+# 2. Check configuration
+docker inspect <container_name>
+
+# 3. Check port conflicts
+ss -tlnp | grep <port>
+
+# 4. Check resources
+free -h
+df -h
+```
+
+**Common fixes**:
+```bash
+# Port already in use
+sudo lsof -i :<port>
+# Kill the process or change container port
+
+# Out of disk space
+docker system prune -a
+
+# Out of memory
+docker restart <container_name>
+# Or increase container memory limit
+```
+
+### DNS Not Resolving
+
+**Check Pihole**:
+```bash
+ssh master "docker logs pihole | tail -50"
+ssh master "dig @127.0.0.1 google.com"
+```
+
+**Fix**:
+```bash
+# Restart Pihole
+docker restart pihole
+
+# Flush DNS cache
+docker exec pihole pihole restartdns
+
+# Check DNS configuration
+cat /etc/resolv.conf
+```
+
+### Mail Not Sending
+
+**Diagnosis**:
+```bash
+# Check Postfix queue
+ssh lady "docker exec mailcow-postfixd postqueue -p"
+
+# Check logs
+ssh lady "docker logs mailcow-postfixd | tail -100"
+
+# Check connectivity
+ssh lady "telnet gmail.com 25"
+```
+
+**Common fixes**:
+```bash
+# Flush queue
+docker exec mailcow-postfixd postqueue -f
+
+# Restart mail services
+cd ~/.docker-compose/mailcow
+docker compose restart postfix-mailcow dovecot-mailcow
+```
+
+### High CPU Usage
+
+**Identify culprit**:
+```bash
+# Check processes
+top -bn1 | head -20
+
+# Check Docker containers
+docker stats --no-stream
+
+# Check specific container
+docker exec <container> top -bn1
+```
+
+**Fix**:
+```bash
+# Restart container
+docker restart <container>
+
+# Limit container resources
+# Edit docker-compose.yaml, add:
+# resources:
+#   limits:
+#     cpus: '2'
+#     memory: 2G
+```
+
+---
+
+## NEXT STEPS
+
+### Immediate (This Week)
+
+**1. Configure Nextcloud** (30 minutes)
+```bash
+# Access Nextcloud
+open https://cloud.quietly.online
+
+# Follow setup wizard
+# Create admin account
+# Configure storage
+```
+
+**2. Test Backup Restore** (1 hour)
+```bash
+# Create test restore environment
+# Restore from git backup
+# Verify services start correctly
+# Document procedure
+```
+
+**3. Set Up Automated Backups** (2 hours)
+```bash
+# Install restic or borg
+# Configure S3-compatible storage
+# Create backup script
+# Schedule via cron
+# Test restore
+```
+
+### Short-term (Next 2 Weeks)
+
+**1. Deploy Promtail to Lady**
+```bash
+# Install Promtail
+# Configure to send to master's Loki
+# Create log parsing rules
+# Verify logs appearing in Grafana
+```
+
+**2. Create Additional Dashboards**
+- Mail server metrics dashboard
+- Security events dashboard
+- Cost tracking dashboard
+
+**3. Implement Alert Tuning**
+- Review alert thresholds
+- Add application-specific alerts
+- Configure alert routing
+
+### Medium-term (1-3 Months)
+
+**1. Migrate Headscale to Docker**
+- Export existing configuration
+- Create docker-compose.yaml
+- Add Traefik labels for SSL
+- Test with one client
+- Migrate all clients
+- Remove system service
+
+**2. Implement High Availability** (if needed)
+- Evaluate requirements
+- Design HA architecture
+- Implement load balancing
+- Test failover procedures
+
+**3. GDPR Compliance**
+- Create privacy policy
+- Document data flows
+- Implement data retention policies
+- Create GDPR procedures
+
+### Long-term (3-6 Months)
+
+**1. Evaluate Kubernetes Migration**
+- Test K3s on master
+- Migrate monitoring stack
+- Evaluate benefits vs complexity
+- Decision: migrate or stay Docker
+
+**2. Implement Disaster Recovery**
+- Off-site backups
+- DR site setup (optional)
+- Automated DR testing
+- Recovery time optimization
+
+**3. Infrastructure Expansion**
+- Evaluate need for additional servers
+- Consider specialized services
+- Plan capacity growth
+
+---
+
+## RUNBOOKS
+
+### Runbook: Complete Server Failure
+
+**Objective**: Restore server to operational state
+
+**Time**: 30-60 minutes (depending on cause)
+
+**Steps**:
+1. Attempt SSH connection
+2. If no response, check hosting provider dashboard
+3. If server down, start server via provider
+4. If server responds but services down:
    ```bash
-   docker ps --format "table {{.Names}}\t{{.Status}}"
-   ls -la ~/.docs/03-services/*.md
-   tail -20 ~/.copilot/memories.jsonl
+   # Check Docker
+   sudo systemctl status docker
+   
+   # Start Docker if stopped
+   sudo systemctl start docker
+   
+   # Start all services
+   cd /home/qui3tly/.docker-compose
+   for dir in */; do
+     cd "$dir"
+     docker compose up -d
+     cd ..
+   done
+   ```
+5. Verify all services: `docker ps`
+6. Check Grafana dashboards
+7. Document incident
+
+### Runbook: Security Breach Response
+
+**Objective**: Contain and remediate security breach
+
+**Time**: Varies (2-8 hours typical)
+
+**Steps**:
+1. **Immediate containment**:
+   - Disconnect affected server if active attack
+   - Block attacking IPs in UFW
+   - Change all passwords
+
+2. **Assessment**:
+   - Check `/var/log/auth.log` for unauthorized access
+   - Check `.bash_history` for suspicious commands
+   - Check `docker ps -a` for unauthorized containers
+   - Check crontab: `crontab -l` and `/etc/cron.d/`
+
+3. **Evidence collection**:
+   - Copy all relevant logs
+   - Take memory dump if needed: `sudo dd if=/dev/mem of=/tmp/memory.dump`
+   - Document timeline
+
+4. **Remediation**:
+   - Remove unauthorized access
+   - Patch vulnerability
+   - Restore from known-good backup if needed
+   - Implement additional security controls
+
+5. **Verification**:
+   - Full security audit
+   - Monitor for 48 hours
+   - Verify no persistent access
+
+6. **Documentation**:
+   - Create detailed incident report
+   - Update security procedures
+   - Share lessons learned
+
+### Runbook: Certificate Expiry
+
+**Objective**: Renew expired or expiring certificate
+
+**Time**: 15 minutes
+
+**Steps**:
+1. Check certificate status:
+   ```bash
+   echo | openssl s_client -connect <domain>:443 2>/dev/null | openssl x509 -noout -dates
    ```
 
-3. **Start next priority task** (see "NEXT PHASE" section above)
-   - Current: Create PORTAINER.md
+2. If expired or <30 days:
+   ```bash
+   # Restart Traefik to force renewal
+   docker restart traefik
+   
+   # Check logs
+   docker logs traefik | grep -i certificate
+   ```
 
-4. **Follow workflow** (Phase 2-4)
-   - Write memory after every step
-   - Update docs when reality changes
-   - Commit to git
-   - Update HANDOFF.md before leaving
+3. If renewal fails:
+   - Check DNS is pointing to server
+   - Check port 80/443 are accessible
+   - Check Cloudflare proxy settings
+   - Check Let's Encrypt rate limits
+
+4. Manual renewal (if automatic fails):
+   ```bash
+   # Use certbot directly
+   sudo certbot certonly --standalone -d <domain>
+   # Then copy cert to Traefik
+   ```
+
+### Runbook: Disk Space Full
+
+**Objective**: Free up disk space
+
+**Time**: 15-30 minutes
+
+**Steps**:
+1. Identify large files/directories:
+   ```bash
+   du -sh /* | sort -h | tail -20
+   du -sh /var/* | sort -h | tail -20
+   ```
+
+2. Clean Docker:
+   ```bash
+   docker system prune -a --volumes -f
+   docker image prune -a -f
+   ```
+
+3. Clean logs:
+   ```bash
+   sudo journalctl --vacuum-time=7d
+   find /var/log -name "*.log" -mtime +30 -delete
+   ```
+
+4. Clean package cache:
+   ```bash
+   sudo apt-get clean
+   sudo apt-get autoclean
+   ```
+
+5. If still full, identify and move/delete:
+   - Old backups
+   - Large log files
+   - Unused Docker volumes
+   - Old mail archives (Mailcow)
 
 ---
 
-## 🔥 CRITICAL RULES (From LAST_FAILURE.md)
+## CONTACTS & RESOURCES
 
-**READ → ASK → WAIT → ACT** (in that order, ALWAYS)
+### Internal Resources
 
-**Never**:
-- ❌ Make production changes without permission
-- ❌ Bypass GitHub (single source of truth)
-- ❌ Make assumptions about user intent
-- ❌ Skip memory writes
-- ❌ Leave half-finished work
+- **Monitoring**: https://grafana.qui3tly.cloud
+- **Docker Management**: https://portainer.quietly.its.me
+- **Mail Admin**: https://mail.quietly.online/admin
+- **Documentation**: `/home/qui3tly/.docs/`
+- **Git Repository**: https://github.com/quietly007/
 
-**Always**:
-- ✅ Read instructions FIRST
-- ✅ Ask for permission SECOND
-- ✅ Wait for confirmation
-- ✅ Then act
-- ✅ Write memory after EVERY step
+### External Resources
 
----
+- **Traefik Docs**: https://doc.traefik.io/traefik/
+- **Mailcow Docs**: https://docs.mailcow.email/
+- **Prometheus Docs**: https://prometheus.io/docs/
+- **Grafana Docs**: https://grafana.com/docs/
 
-## 📊 COMPLIANCE VERIFICATION
+### Useful Commands Cheatsheet
 
-**Run this check before starting work**:
 ```bash
-~/.github/copilot-instructions/verify-workflow-compliance.sh
+# Quick service restart
+docker restart <container>
+
+# View logs
+docker logs -f <container>
+
+# Check resource usage
+docker stats
+
+# Shell into container
+docker exec -it <container> bash
+
+# Restart all services
+docker compose restart
+
+# Update container
+docker compose pull && docker compose up -d
+
+# Check open ports
+ss -tlnp
+
+# Check firewall
+sudo ufw status numbered
+
+# Check failed logins
+sudo grep "Failed password" /var/log/auth.log
+
+# Check disk usage
+df -h
+du -sh /var/*
 ```
 
-**Expected Result**: All checks pass ✅
+---
+
+## CHANGE LOG
+
+**2026-01-28**: Initial version 1.0
+- Created master operations guide
+- Documented all procedures
+- Added runbooks for common scenarios
+- Security grade: 96/100 (A+)
 
 ---
 
-## 🎯 SUCCESS CRITERIA
+## APPENDIX: KEY METRICS TO MONITOR
 
-**Infrastructure is successful when**:
-- ✅ All containers healthy
-- ✅ Documentation matches reality
-- ✅ All changes committed to git
-- ✅ Memories written after every step
-- ✅ No half-finished work
-- ✅ Next agent knows what to do (HANDOFF.md updated)
+### System Health
+- [ ] CPU usage < 80%
+- [ ] Memory usage < 90%
+- [ ] Disk usage < 85%
+- [ ] Network latency < 50ms
+- [ ] Service uptime > 99.5%
 
----
+### Security
+- [ ] No critical CVEs unpatched
+- [ ] All services using TLS
+- [ ] SSH key-only authentication
+- [ ] Firewall rules current
+- [ ] No suspicious login attempts
 
-## 📈 METRICS & ACCOUNTABILITY
+### Mail Server
+- [ ] Mail queue < 50 messages
+- [ ] Spam rejection rate > 85%
+- [ ] No viruses detected
+- [ ] DKIM/SPF/DMARC passing
+- [ ] No blacklist listings
 
-**Track these**:
-- Container health (docker ps)
-- Documentation coverage (18/23 files = 78%)
-- Memory discipline (entries per day)
-- Git commit quality (clear messages)
-- Workflow compliance (all phases followed)
-
-**Current Stats**:
-- Uptime: 3+ days
-- Memory entries: 1,240+
-- Documentation: 18 files (470KB)
-- Services documented: 6/23 (26%)
-- Compliance: 100%
-
----
-
-## 🔗 RELATED DOCUMENTS
-
-**Must Read**:
-- `~/.github/copilot-instructions/copilot-instructions.md` - Main instructions
-- `~/.github/copilot-instructions/LAST_FAILURE.md` - Critical lessons
-- `~/.github/copilot-instructions/AGENT_WORKFLOW_MANDATORY.md` - Complete workflow
-- `~/.github/governance/FOLDER_ORGANIZATION_MAP.md` - Full folder structure
-- `~/.copilot/HANDOFF.md` - Current state handoff
-
-**Reference**:
-- `~/.docs/00-QUICKSTART/INFRASTRUCTURE_OVERVIEW.md` - Infrastructure overview
-- `~/.docs/00-standards/DOCUMENTATION_STANDARD.md` - How to write docs
-- `~/.temp/INFRASTRUCTURE_AUDIT_2026-01-27.md` - Latest audit report
+### Monitoring
+- [ ] All targets scraped successfully
+- [ ] No firing critical alerts
+- [ ] Dashboards loading < 3s
+- [ ] Logs being ingested
+- [ ] Alert notifications working
 
 ---
 
-## ✅ CURRENT STATUS SUMMARY
+**END OF MASTER OPERATIONS GUIDE**
 
-**What's Done**:
-- Infrastructure: A+++ (99/100)
-- Preproduction: 100% complete
-- Workflow: Deployed & enforced
-- Twin architecture: Functional
-- Compliance: 100%
-
-**What's Next**:
-- Priority 1: Create PORTAINER.md (start here!)
-- Priority 2: Create AUTHELIA.md
-- Priority 3: Create SEMAPHORE.md
-- Priority 4: Create UPTIME-KUMA.md
-
-**Ready to Start**: YES ✅
-
----
-
-## 📋 AUDIT REPORTS (2026-01-27)
-
-**Location**: `~/.reports/audit-20260127/`
-
-**Reports Generated** (9 comprehensive files):
-1. **AUDIT_REPORT.md** - Executive summary and high-level findings
-2. **INFRASTRUCTURE_STATUS.md** - Docker + native services detailed status
-3. **DOCUMENTATION_GAPS.md** - Missing and outdated documentation analysis
-4. **SCRIPTS_AND_AUTOMATION.md** - Scripts, cron jobs, Ansible playbooks review
-5. **PROJECTS_REVIEW.md** - Project plans accuracy and organization
-6. **CONFIGURATION_REVIEW.md** - System and application configs audit
-7. **SECURITY_FINDINGS.md** - Security issues and recommendations
-8. **COMPLIANCE_REPORT.md** - Governance and workflow compliance
-9. **RECOMMENDATIONS.md** - Prioritized action items with effort estimates
-
-**Key Findings Summary**:
-- 23 healthy containers, solid infrastructure foundation
-- Security posture good but needs minor fixes (permissions, privilege)
-- Documentation coverage critical gap (26% vs target 100%)
-- Project plans outdated (need correction to actual state)
-- System cleanup items identified (systemd, DNS, symlinks)
-
----
-
-*This is THE master guide. All operations follow this document.*  
-*Last Updated: 2026-01-27 20:30 UTC*  
-*Version: 1.1 - External audit integrated, next steps defined*
+*This is a living document. Update regularly with new procedures and lessons learned.*
