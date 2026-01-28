@@ -71,8 +71,84 @@
 
 ## 🎯 NEXT STEPS - Path to A+++ (100/100)
 
-### Phase 1: Critical Fixes (30 minutes)
+### Phase 1: Grafana Full Completion - Comprehensive Monitoring (6-8 hours) 🔴 IN PROGRESS
+
+**GOAL**: Complete visibility into ALL infrastructure - logs, performance, services, docker status, warnings, errors
+
+**Current Stack** (verified deployed):
+- ✅ Grafana 11.4.0 (visualization)
+- ✅ Prometheus 2.54.1 (metrics)
+- ✅ Loki 3.3.2 (logs)
+- ✅ Promtail 3.4.2 (log shipping)
+- ✅ cAdvisor 0.52.1 (container metrics)
+- ✅ node-exporter 1.9.0 (system metrics)
+
+**Implementation Phases**:
+
+**Phase 1.1: Data Collection Setup** (2 hours) - Foundation
+1. Configure Prometheus scrape configs for all targets
+   - Master metrics (node-exporter, cadvisor)
+   - Lady metrics (node-exporter, cadvisor)  
+   - Service-specific exporters (Traefik, CrowdSec, Headscale, Mailcow)
+   
+2. Configure Loki log aggregation
+   - System logs (syslog, systemd)
+   - Docker container logs (all 83 containers)
+   - Application logs (Traefik, Authelia, Mailcow)
+   
+3. Configure Promtail agents
+   - Master: scrape local logs
+   - Lady: forward logs to Loki on Master
+
+**Phase 1.2: Dashboard Creation** (3 hours) - 7 Comprehensive Dashboards
+1. **Infrastructure Overview** - birds-eye view of everything
+2. **Server Details** - Master/Lady deep dive
+3. **Container Monitoring** - all 83 containers status
+4. **Service Health** - Traefik, Mailcow, Headscale, CrowdSec, Authelia
+5. **Log Analysis** - errors, warnings, security events
+6. **Performance Trends** - 24h, 7d, 30d historical analysis
+7. **Alerting Dashboard** - current alerts and history
+
+**Phase 1.3: Alerting Rules** (1 hour) - Proactive Monitoring
+1. Critical alerts (immediate action):
+   - Service down >1 min, CPU >90% 5min, RAM >95% 5min, Disk >90%, Container restart loop
+2. Warning alerts (attention needed):
+   - CPU >75% 15min, RAM >85% 15min, Disk >80%, High error rate, Certificate <30d
+3. Info alerts (FYI):
+   - Backup completed, Certificate renewed, Updates available, CrowdSec ban wave
+
+**Phase 1.4: Testing & Validation** (1 hour)
+1. Verify all metrics collecting properly
+2. Test all dashboards display data
+3. Trigger test alerts
+4. Verify alert delivery
+5. Document dashboard usage
+
+**Documentation to Create**:
+- `~/.docs/03-services/GRAFANA.md` - Complete Grafana guide
+- `~/.docs/03-services/PROMETHEUS.md` - Prometheus configuration
+- `~/.docs/03-services/LOKI.md` - Loki log aggregation
+- `~/projects/qui3tly.cloud/monitoring/dashboard-configs/` - Dashboard JSON exports
+- `~/projects/qui3tly.cloud/monitoring/alert-rules.yml` - AlertManager rules
+
+**What Will Be Monitored**:
+- ✅ All 83 containers (Master 40 + Lady 43)
+- ✅ System metrics (CPU, RAM, Disk, Network, Load)
+- ✅ Service health (Traefik, Headscale, Mailcow, CrowdSec, Authelia)
+- ✅ All logs (system, docker, application)
+- ✅ Performance trends (24h, 7d, 30d)
+- ✅ Errors and warnings from all sources
+- ✅ Security events (bans, auth failures)
+
+**Result**: Complete infrastructure visibility - see EVERYTHING, track EVERYTHING
+
+---
+
+### Phase 1-OLD: Critical Fixes (30 minutes) - DEFERRED
 ```bash
+# These are lower priority than Grafana completion
+# Will be addressed after Phase 1 (Grafana) complete
+
 # 1. Fix secret permissions
 chmod 600 ~/.secrets/**/*
 find ~/.secrets/ -type f -exec chmod 600 {} \;
@@ -130,10 +206,10 @@ docker logs traefik 2>&1 | grep -i dns
 
 ### Grade Progression Path
 - **Current**: A++ (96/100)
-- **After Phase 1**: A++ (96/100) - Security improved
-- **After Phase 2**: A+++ (98/100) - Critical docs complete
-- **After Phase 3**: A+++ (99/100) - System cleanup
-- **After Phase 4**: A+++ (100/100) - Full documentation coverage
+- **After Phase 1**: A+++ (98/100) - Grafana full completion, complete infrastructure visibility
+- **After Phase 2**: A+++ (99/100) - Critical service docs (PORTAINER, AUTHELIA)
+- **After Phase 3**: A+++ (99.5/100) - System cleanup (secrets, DNS, systemd)
+- **After Phase 4**: A+++ (100/100) - Full documentation coverage (all 15 remaining services)
 
 ---
 

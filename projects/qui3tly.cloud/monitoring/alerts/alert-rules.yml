@@ -1,0 +1,104 @@
+# AlertManager Rules for qui3tly.cloud
+# Proactive monitoring alerts: Critical, Warning, Info
+
+groups:
+  # Critical Alerts - Immediate Action Required
+  - name: critical_alerts
+    interval: 30s
+    rules:
+      - alert: ServiceDown
+        expr: up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Service {{ $labels.job }} on {{ $labels.server }} is DOWN"
+          description: "{{ $labels.job }} has been down for more than 1 minute."
+
+      - alert: HighCPU
+        expr: (100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)) > 90
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High CPU usage on {{ $labels.instance }}"
+          description: "CPU usage is above 90% (current: {{ $value }}%)"
+
+      - alert: HighMemory
+        expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100 > 95
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High memory usage on {{ $labels.instance }}"
+          description: "Memory usage is above 95% (current: {{ $value }}%)"
+
+      - alert: DiskFull
+        expr: (node_filesystem_avail_bytes{fstype!~"tmpfs|fuse.*"} / node_filesystem_size_bytes * 100) < 10
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Disk almost full on {{ $labels.instance }}"
+          description: "Disk {{ $labels.mountpoint }} has less than 10% free (current: {{ $value }}%)"
+
+      - alert: ContainerRestartLoop
+        expr: rate(container_start_time_seconds[10m]) > 3
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Container {{ $labels.name }} restarting frequently"
+          description: "Container has restarted more than 3 times in 10 minutes."
+
+  # Warning Alerts - Attention Needed
+  - name: warning_alerts
+    interval: 1m
+    rules:
+      - alert: HighCPUWarning
+        expr: (100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)) > 75
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Elevated CPU usage on {{ $labels.instance }}"
+          description: "CPU usage is above 75% for 15 minutes (current: {{ $value }}%)"
+
+      - alert: HighMemoryWarning
+        expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100 > 85
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Elevated memory usage on {{ $labels.instance }}"
+          description: "Memory usage is above 85% for 15 minutes (current: {{ $value }}%)"
+
+      - alert: DiskSpaceWarning
+        expr: (node_filesystem_avail_bytes{fstype!~"tmpfs|fuse.*"} / node_filesystem_size_bytes * 100) < 20
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low disk space on {{ $labels.instance }}"
+          description: "Disk {{ $labels.mountpoint }} has less than 20% free (current: {{ $value }}%)"
+
+      - alert: HighErrorRate
+        expr: rate(traefik_service_requests_total{code=~"5.."}[5m]) > 100
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High error rate in Traefik"
+          description: "Service {{ $labels.service }} has more than 100 5xx errors per minute."
+
+  # Info Alerts - Informational
+  - name: info_alerts
+    interval: 5m
+    rules:
+      - alert: CrowdSecBanWave
+        expr: rate(crowdsec_decisions_total[1h]) > 100
+        labels:
+          severity: info
+        annotations:
+          summary: "CrowdSec ban wave detected"
+          description: "More than 100 IPs banned in the last hour (current rate: {{ $value }}/hour)"

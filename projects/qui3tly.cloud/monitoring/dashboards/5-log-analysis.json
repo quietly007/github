@@ -1,0 +1,238 @@
+{
+  "title": "5. Log Analysis",
+  "tags": [
+    "qui3tly-cloud",
+    "logs",
+    "errors"
+  ],
+  "timezone": "browser",
+  "schemaVersion": 38,
+  "refresh": "1m",
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Error Count by Server",
+      "type": "bargauge",
+      "targets": [
+        {
+          "expr": "sum(count_over_time({level=\"error\"}[5m])) by (server)",
+          "legendFormat": "{{server}}",
+          "datasource": "Loki"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": {
+            "steps": [
+              {
+                "value": 0,
+                "color": "green"
+              },
+              {
+                "value": 10,
+                "color": "yellow"
+              },
+              {
+                "value": 50,
+                "color": "red"
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "gradient"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      }
+    },
+    {
+      "id": 2,
+      "title": "Warning Count by Server",
+      "type": "bargauge",
+      "targets": [
+        {
+          "expr": "sum(count_over_time({level=\"warning\"}[5m])) by (server)",
+          "legendFormat": "{{server}}",
+          "datasource": "Loki"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": {
+            "steps": [
+              {
+                "value": 0,
+                "color": "green"
+              },
+              {
+                "value": 20,
+                "color": "yellow"
+              },
+              {
+                "value": 100,
+                "color": "orange"
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "orientation": "horizontal",
+        "displayMode": "gradient"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      }
+    },
+    {
+      "id": 3,
+      "title": "Error Rate Over Time",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "sum(rate({level=\"error\"}[5m])) by (server)",
+          "legendFormat": "{{server}}",
+          "datasource": "Loki"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps"
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 8
+      }
+    },
+    {
+      "id": 4,
+      "title": "Recent Errors (Last 100)",
+      "type": "logs",
+      "targets": [
+        {
+          "expr": "{level=\"error\"}",
+          "datasource": "Loki"
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "wrapLogMessage": true,
+        "sortOrder": "Descending",
+        "dedupStrategy": "none"
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 24,
+        "x": 0,
+        "y": 16
+      }
+    },
+    {
+      "id": 5,
+      "title": "Traefik Access Logs - Status Distribution",
+      "type": "piechart",
+      "targets": [
+        {
+          "expr": "sum(count_over_time({job=\"traefik-access\"}[1h])) by (status)",
+          "legendFormat": "{{status}}",
+          "datasource": "Loki"
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right"
+        }
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 28
+      }
+    },
+    {
+      "id": 6,
+      "title": "Authentication Failures",
+      "type": "logs",
+      "targets": [
+        {
+          "expr": "{job=\"auth\"} |= \"Failed\" or {job=\"authelia\"} |= \"authentication failed\"",
+          "datasource": "Loki"
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "wrapLogMessage": true
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 28
+      }
+    },
+    {
+      "id": 7,
+      "title": "Security Events (CrowdSec, fail2ban)",
+      "type": "logs",
+      "targets": [
+        {
+          "expr": "{job=~\"syslog\"} |= \"crowdsec\" or \"fail2ban\"",
+          "datasource": "Loki"
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "wrapLogMessage": true
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 38
+      }
+    },
+    {
+      "id": 8,
+      "title": "Log Volume by Source",
+      "type": "timeseries",
+      "targets": [
+        {
+          "expr": "sum(rate({job!=\"\"}[5m])) by (job)",
+          "legendFormat": "{{job}}",
+          "datasource": "Loki"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "logs/s"
+        }
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 48
+      }
+    }
+  ]
+}
