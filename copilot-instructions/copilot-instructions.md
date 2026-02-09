@@ -35,6 +35,105 @@ cat ~/.copilot/PRE_FLIGHT_CHECKLIST.md
 
 ---
 
+## 🛑🛑🛑 ABSOLUTELY ENFORCED: GOVERNANCE COMPLIANCE 🛑🛑🛑
+
+**RULE #0b - BEFORE ANY ACTION, CHECK GOVERNANCE FILES:**
+
+**Authority**: `~/.github/governance/` - ALL rules enforced
+
+### **MANDATORY GOVERNANCE CHECKS:**
+
+| Action Type | MUST Check FIRST | File Location |
+|-------------|------------------|---------------|
+| **Creating ANY file** | FILE_CREATION_RULES.md | `~/.github/governance/FILE_CREATION_RULES.md` |
+| **Docker operation** | DOCKER_LAYOUT.md | `~/.github/governance/DOCKER_LAYOUT.md` |
+| **GitHub operation** | GITHUB_STRUCTURE_DEFINITIVE.md | `~/.github/governance/GITHUB_STRUCTURE_DEFINITIVE.md` |
+| **File organization** | FOLDER_ORGANIZATION_MAP.md | `~/.github/governance/FOLDER_ORGANIZATION_MAP.md` |
+
+### **FILE CREATION ENFORCEMENT (CRITICAL):**
+
+**From FILE_CREATION_RULES.md** (NON-NEGOTIABLE):
+
+1. **NEVER create files directly in `~/` (home root)** - FORBIDDEN
+2. **ALWAYS create in `~/.temp/` first** - User reviews then decides final location
+3. **ALWAYS search for existing files** - Check before creating duplicates
+4. **ALWAYS inform user** - Tell them where file was created and why
+
+**Example Workflow** (MANDATORY):
+```bash
+# Step 1: User asks for new architecture doc
+# Step 2: Agent checks governance
+cat ~/.github/governance/FILE_CREATION_RULES.md  # Rule: Create in .temp first
+
+# Step 3: Agent searches for existing files
+find ~/.docs -name "*ARCHITECTURE*"  # Check for duplicates
+
+# Step 4: Agent creates in .temp (NOT final location)
+cat > ~/.temp/NEW_ARCHITECTURE_DOC.md << 'EOF'
+[content]
+EOF
+
+# Step 5: Agent informs user
+"I've created NEW_ARCHITECTURE_DOC.md in ~/.temp/ per FILE_CREATION_RULES.md.
+After review, where should it go?
+- ~/.docs/01-architecture/
+- ~/.docs/02-operations/
+- Other location?"
+```
+
+**Violation Example** (What I did wrong today):
+```bash
+# ❌ WRONG - Created directly in final location without checking
+create_file ~/.docs/01-architecture/DOCKER_ORGANIZATION_MANDATORY.md
+
+# ❌ WRONG - Didn't check if DOCKER_ORGANIZATION.md already existed
+# ❌ WRONG - Didn't create in ~/.temp/ first
+# ❌ WRONG - Didn't ask user for final location
+```
+
+**Correct Approach**:
+```bash
+# ✅ Step 1: Check governance
+read FILE_CREATION_RULES.md  # Says: Create in .temp first
+
+# ✅ Step 2: Search for existing
+find ~/.docs -name "*DOCKER_ORGANIZATION*"  # Found: DOCKER_ORGANIZATION.md exists!
+
+# ✅ Step 3: Ask user
+"DOCKER_ORGANIZATION.md already exists in .docs/01-architecture/
+Do you want me to:
+1. Update existing file
+2. Create new mandatory version alongside it
+3. Replace existing with mandatory version?"
+
+# ✅ Step 4: Create in .temp after user decides
+create_file ~/.temp/DOCKER_ORGANIZATION_MANDATORY.md
+
+# ✅ Step 5: User reviews and decides final location
+```
+
+### **ENFORCEMENT:**
+
+**Before creating ANY file:**
+- [ ] Read `~/.github/governance/FILE_CREATION_RULES.md`
+- [ ] Search for existing similar files (`find`, `grep_search`, `file_search`)
+- [ ] Create in `~/.temp/` (NOT final location)
+- [ ] Inform user and ask for final location
+
+**Before ANY Docker operation:**
+- [ ] Read `~/.github/governance/DOCKER_LAYOUT.md`
+- [ ] Verify current structure matches mandatory layout
+- [ ] Check `~/.docs/01-architecture/DOCKER_ORGANIZATION_MANDATORY.md` if exists
+
+**Before ANY GitHub operation:**
+- [ ] Read `~/.github/governance/GITHUB_STRUCTURE_DEFINITIVE.md`
+- [ ] Verify repository structure (two-repo model)
+- [ ] Check `~/.docs/01-architecture/GITHUB_ORGANIZATION_MANDATORY.md` if exists
+
+**VIOLATION = IMMEDIATE FAILURE. NO EXCEPTIONS.**
+
+---
+
 ## 🛑🛑🛑 ABSOLUTELY ENFORCED: CONVERSATION PROGRESS TRACKING + ZERO-ERROR POLICY 🛑🛑🛑
 
 **RULE #0a - AFTER CHECKLIST, MAINTAIN PROGRESS FILE:**
