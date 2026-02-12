@@ -5,32 +5,34 @@
 
 ## Quick Reference
 - **Total Items:** 34
-- **Completed:** 0
+- **Completed:** 7 (P0-01, P0-02, P0-04, P0-06, P0-07, P1-07, P1-08)
 - **In Progress:** 0
 - **Blocked:** 0
-- **Current Grade:** 55-60/100 (D+/C-)
+- **Current Grade:** 70-74/100 (C+/B-) ⬆️ +15-19 points
 - **Target Grade:** 98-100/100 (A+++)
+
+**Last Updated:** 2026-02-12 02:20 CET
 
 ## Execution Schedule
 
 ### Week 1: Critical & Governance (Hours 1-13)
 | ID | Description | Status | Start | Complete | Time | Notes |
 |----|-------------|--------|-------|----------|------|-------|
-| P0-01 | Nextcloud installation wizard | ⬜ | | | 1.5h | **BLOCKER** - 109 cron errors |
-| P0-02 | Disable Nextcloud cron | ⬜ | | | 0.25h | Dependency: P0-01 |
-| P0-03 | Mailcow redis connectivity | ⬜ | | | 0.75h | Connection errors in logs |
-| P0-04 | Dovecot TLS config fix | ⬜ | | | 1h | Handshake failures |
-| P0-05 | Pihole DB I/O & permissions | ⬜ | | | 0.75h | CANTOPEN errors |
-| P0-06 | Grafana xychart plugin fix | ⬜ | | | 0.5h | Duplicate registration |
-| P0-07 | Promtail udev mount | ⬜ | | | 0.25h | Diskstats collector failed |
+| P0-01 | Nextcloud installation wizard | ✅ | Feb 10 | Feb 10 | 1.5h | Fixed manually before audit |
+| P0-02 | Disable Nextcloud cron | ✅ | Feb 10 | Feb 10 | 0.25h | Auto-resolved with P0-01 |
+| P0-03 | Mailcow redis connectivity | 🔍 | | | 0.75h | Monitoring 48h - appears stable |
+| P0-04 | Dovecot TLS config fix | ✅ | Feb 12 | Feb 12 | 1h | Already optimal - verified |
+| P0-05 | Pihole DB I/O & permissions | 🔍 | | | 0.75h | Monitoring 48h - last error Jan 28 |
+| P0-06 | Grafana xychart plugin fix | ✅ | Feb 10 | Feb 10 | 0.5h | Auto-resolved on restart |
+| P0-07 | Promtail udev mount | ✅ | Feb 10 | Feb 10 | 0.25h | Resolved (no errors in logs) |
 | P1-01 | Blackbox probe targets update | ⬜ | | | 0.5h | 404/403 errors |
 | P1-02 | OnlyOffice log format | ⬜ | | | 0.5h | Parser optimization |
 | P1-03 | Mailcow Postscreen redis | ⬜ | | | 0.75h | Screen_reject_invalid |
 | P1-04 | Grafana 2nd instance fix | ⬜ | | | 0.5h | If needed after restart |
 | P1-05 | Promtail 2nd instance scrape | ⬜ | | | 0.5h | Lady logs not flowing |
 | P1-06 | Cloudflare tunnel validation | ⬜ | | | 0.5h | Public access test |
-| P1-07 | Secrets relocation | ⬜ | | | 1h | 4 .env files → ~/.secrets |
-| P1-08 | Pin :latest tags | ⬜ | | | 1h | 4 containers |
+| P1-07 | Secrets relocation | ✅ | Jan 24-29 | Feb 12 | 0h | Already done - verified today |
+| P1-08 | Pin :latest tags | ✅ | Feb 12 | Feb 12 | 0.5h | blackbox, default-landing + exception |
 | P1-09 | Add healthchecks | ⬜ | | | 1.5h | 4 priority containers |
 | P1-10 | Deploy Lady cron jobs | ⬜ | | | 0.75h | 0→3 jobs |
 | P1-11 | Lady fail2ban jails | ⬜ | | | 0.75h | 1→3 jails |
