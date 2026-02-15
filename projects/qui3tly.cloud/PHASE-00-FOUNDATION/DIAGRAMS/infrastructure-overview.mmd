@@ -1,0 +1,133 @@
+graph TB
+    subgraph Users["👥 Users & Clients"]
+        WebUsers[Web Browsers]
+        MailClients[Email Clients]
+        VPNClients[VPN Clients]
+        MacClient[Mac Mini Client]
+    end
+
+    subgraph Master["🖥️ MASTER SERVER<br/>qui3tly - 213.136.68.108<br/>6vCPU, 16GB RAM, 400GB SSD<br/>25 Containers"]
+        subgraph EdgeServices["Edge Services"]
+            Traefik[Traefik v3.0<br/>Reverse Proxy<br/>TLS Termination]
+            Authelia[Authelia<br/>SSO + 2FA]
+        end
+
+        subgraph Monitoring["Monitoring Stack"]
+            Prometheus[Prometheus<br/>52 targets<br/>15GB TSDB]
+            Grafana[Grafana<br/>12 dashboards]
+            Loki[Loki<br/>8GB logs]
+            Promtail[Promtail<br/>Log shipper]
+            Alertmanager[Alertmanager<br/>Alert routing]
+        end
+
+        subgraph Security["Security Stack"]
+            CrowdSec[CrowdSec<br/>42,345 rules<br/>1,247 bans]
+            Fail2ban[Fail2ban<br/>SSH protection]
+            Bouncer[Traefik Bouncer<br/>Auto-ban]
+        end
+
+        subgraph Network["Network Services"]
+            HeadscaleNative["Headscale v0.27.1<br/>⚠️ NATIVE systemd<br/>NOT Docker<br/>65.9MB RAM"]
+            PiHole[Pi-hole<br/>DNS filter]
+            Cloudflared[cloudflared<br/>DoH]
+        end
+
+        subgraph Management["Management Tools"]
+            Portainer[Portainer<br/>Docker UI]
+            Semaphore[Semaphore<br/>Ansible UI]
+            UptimeKuma[Uptime Kuma<br/>Status page]
+            Gotify[Gotify<br/>Notifications]
+            ITTools[IT Tools<br/>Dev utilities]
+        end
+
+        subgraph Data["Data Services"]
+            Redis[Redis<br/>Cache]
+            MariaDB[MariaDB<br/>Database]
+            Postgres[PostgreSQL<br/>Database]
+        end
+    end
+
+    subgraph Lady["🖥️ LADY SERVER<br/>Lady - 207.180.251.111<br/>6vCPU, 16GB RAM, 400GB SSD<br/>39 Containers"]
+        subgraph MailStack["Mailcow Stack (18 containers)"]
+            MailNginx[nginx<br/>Web frontend]
+            Dovecot[Dovecot<br/>IMAP/POP3]
+            Postfix[Postfix<br/>SMTP MTA]
+            Rspamd[Rspamd<br/>Spam filter]
+            SOGo[SOGo<br/>Webmail]
+            MailRedis[Redis]
+            MailMySQL[MySQL]
+            ClamAV[ClamAV<br/>Antivirus]
+            Solr[Solr<br/>Search]
+            MailOther["+ 9 more:<br/>Unbound, ACME,<br/>Watchdog, etc."]
+        end
+
+        subgraph Business["Business Applications"]
+            Nextcloud[Nextcloud 28<br/>128GB data]
+            OnlyOffice[OnlyOffice<br/>Office suite]
+            Odoo[Odoo 17<br/>ERP/CRM]
+            UniFi[UniFi Controller<br/>Network mgmt]
+            Frigate[Frigate NVR<br/>Video surveillance]
+            HomeAssistant[Home Assistant<br/>Automation]
+            UISP[UISP<br/>ISP mgmt]
+        end
+
+        subgraph LadyMonitoring["Monitoring Agents"]
+            NodeExp2[node-exporter]
+            Cadvisor2[cadvisor]
+            Promtail2[promtail]
+            PortainerAgent[portainer-agent]
+        end
+    end
+
+    subgraph Automation["🤖 Automation Layer<br/>Master Server"]
+        Cron["4 Cron Jobs:<br/>• daily_report (6am)<br/>• weekly_security (2am Sun)<br/>• monthly_report (3am 1st)<br/>• docker_backup (3am)"]
+        Scripts["29 Scripts:<br/>~/.copilot/scripts/<br/>• Backups (9)<br/>• Monitoring (7)<br/>• Maintenance (8)<br/>• Security (5)"]
+    end
+
+    subgraph Backup["💾 Backup Storage"]
+        LocalBackup["/backup/<br/>45GB total<br/>30-60 day retention"]
+        GitBackup["GitHub Private Repo<br/>Configs + Scripts"]
+    end
+
+    WebUsers -->|HTTPS| Traefik
+    MailClients -->|SMTP/IMAP| MailStack
+    VPNClients -.->|Tailscale| HeadscaleNative
+    MacClient -.->|Tailscale| HeadscaleNative
+
+    Traefik --> Authelia
+    Authelia --> Monitoring
+    Authelia --> Management
+    
+    Traefik -.->|VPN| Lady
+
+    MailStack --> MailMySQL
+    MailStack --> MailRedis
+    Business --> Nextcloud
+    Nextcloud --> OnlyOffice
+
+    Prometheus -->|Scrape| Master
+    Prometheus -->|Scrape VPN| Lady
+    Grafana --> Prometheus
+    Loki --> Promtail
+    Loki --> Promtail2
+    Alertmanager --> Gotify
+
+    CrowdSec --> Bouncer
+    Bouncer --> Traefik
+
+    Cron --> Scripts
+    Scripts -->|Backup| LocalBackup
+    Scripts -->|Push| GitBackup
+    Scripts -->|Monitor| Prometheus
+
+    classDef server fill:#326ce5,stroke:#fff,stroke-width:3px,color:#fff
+    classDef monitor fill:#ff6b35,stroke:#fff,stroke-width:2px,color:#fff
+    classDef security fill:#d62828,stroke:#fff,stroke-width:2px,color:#fff
+    classDef business fill:#00d4aa,stroke:#fff,stroke-width:2px,color:#000
+    classDef automation fill:#f77f00,stroke:#fff,stroke-width:2px,color:#fff
+
+    class Master,Lady server
+    class Monitoring,Grafana,Prometheus monitor
+    class Security,CrowdSec,Fail2ban security
+    class Business,Nextcloud,Odoo business
+    class Automation,Cron,Scripts automation

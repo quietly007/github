@@ -1,0 +1,5 @@
+]633;E;{   echo "# cron execution logs"\x3b   grep -iE "daily_report|weekly_security|docker_backup" /var/log/syslog 2>/dev/null | tail -200 || true\x3b   echo\x3b echo "# ~/.logs"\x3b ls -la ~/.logs/ 2>/dev/null || true\x3b   echo\x3b echo "# ~/.copilot/logs"\x3b ls -la ~/.copilot/logs/ 2>/dev/null || true\x3b } > /home/qui3tly/projects/qui3tly.cloud/PHASE-00-FOUNDATION/AGENT3/EVIDENCE/cron_execution_logs.txt 2>&1;cb80ee7f-9768-4bcb-9d38-2f473ba6c305]633;C# cron execution logs
+
+# ~/.logs
+
+# ~/.copilot/logs

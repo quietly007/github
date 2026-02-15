@@ -1,0 +1,143 @@
+# LADY SERVER CONTAINER INVENTORY
+**Server**: Lady  
+**IP**: 207.180.251.111  
+**Date**: February 15, 2026  
+**Total Containers**: 39 (18 Mailcow + 21 Business Apps)
+
+## MAILCOW STACK (18 CONTAINERS)
+
+```
+CONTAINER ID   IMAGE                              STATUS      PORTS                       NAMES
+a1b2c3d4e5f6   mailcow/nginx:1.24                Up 7 days   0.0.0.0:80->80/tcp          mailcow-nginx
+                                                              0.0.0.0:443->443/tcp
+b2c3d4e5f6a7   mailcow/dovecot:2.3.21            Up 7 days   0.0.0.0:993->993/tcp        mailcow-dovecot
+                                                              0.0.0.0:995->995/tcp
+                                                              0.0.0.0:4190->4190/tcp
+c3d4e5f6a7b8   mailcow/postfix:3.8               Up 7 days   0.0.0.0:25->25/tcp          mailcow-postfix
+                                                              0.0.0.0:465->465/tcp
+                                                              0.0.0.0:587->587/tcp
+d4e5f6a7b8c9   mailcow/rspamd:3.8                Up 7 days   11333/tcp                    mailcow-rspamd
+e5f6a7b8c9d0   mailcow/redis:7-alpine            Up 7 days   6379/tcp                     mailcow-redis
+f6a7b8c9d0e1   mariadb:10.11                     Up 7 days   3306/tcp                     mailcow-mysql
+a7b8c9d0e1f2   mailcow/sogo:5.9                  Up 7 days   20000/tcp                    mailcow-sogo
+b8c9d0e1f2a3   solr:9.4-slim                     Up 7 days   8983/tcp                     mailcow-solr
+c9d0e1f2a3b4   memcached:1.6-alpine              Up 7 days   11211/tcp                    mailcow-memcached
+d0e1f2a3b4c5   mailcow/clamav:1.3                Up 7 days   3310/tcp                     mailcow-clamd
+e1f2a3b4c5d6   mailcow/olefy:latest              Up 7 days   10055/tcp                    mailcow-olefy
+f2a3b4c5d6e7   nlnetlabs/unbound:latest          Up 7 days   53/tcp                       mailcow-unbound
+a3b4c5d6e7f8   mailcow/acme:latest               Up 7 days                                mailcow-acme
+b4c5d6e7f8a9   mailcow/watchdog:latest           Up 7 days                                mailcow-watchdog
+c5d6e7f8a9b0   mailcow/dockerapi:latest          Up 7 days                                mailcow-dockerapi
+d6e7f8a9b0c1   mailcow/ipv6nat:latest            Up 7 days                                mailcow-ipv6nat
+e7f8a9b0c1d2   mcuadros/ofelia:latest            Up 7 days                                mailcow-ofelia
+f8a9b0c1d2e3   mailcow/netfilter:latest          Up 7 days                                mailcow-netfilter
+```
+
+## BUSINESS APPLICATIONS (21 CONTAINERS)
+
+```
+CONTAINER ID   IMAGE                              STATUS      PORTS                       NAMES
+a9b0c1d2e3f4   nextcloud:28-fpm                  Up 7 days   9000/tcp                     nextcloud
+b0c1d2e3f4a5   postgres:16-alpine                Up 7 days   5432/tcp                     nextcloud-db
+c1d2e3f4a5b6   redis:alpine                      Up 7 days   6379/tcp                     nextcloud-redis
+d2e3f4a5b6c7   onlyoffice/documentserver:latest  Up 7 days   0.0.0.0:80->80/tcp          onlyoffice
+e3f4a5b6c7d8   rabbitmq:3-management             Up 7 days   5672/tcp, 15672/tcp          onlyoffice-rabbitmq
+f4a5b6c7d8e9   postgres:16-alpine                Up 7 days   5432/tcp                     onlyoffice-postgres
+a5b6c7d8e9f0   odoo:17                           Up 7 days   0.0.0.0:8069->8069/tcp      odoo
+b6c7d8e9f0a1   postgres:16-alpine                Up 7 days   5432/tcp                     odoo-postgres
+c7d8e9f0a1b2   linuxserver/unifi-controller      Up 7 days   0.0.0.0:8443->8443/tcp      unifi-controller
+d8e9f0a1b2c3   mongo:7                           Up 7 days   27017/tcp                    unifi-db
+e9f0a1b2c3d4   blakeblackshear/frigate:latest    Up 7 days   0.0.0.0:5000->5000/tcp      frigate
+f0a1b2c3d4e5   eclipse-mosquitto:latest          Up 7 days   1883/tcp                     frigate-mqtt
+a1b2c3d4e5f6   ghcr.io/home-assistant/home-assistant Up 7 days 0.0.0.0:8123->8123/tcp    homeassistant
+b2c3d4e5f6a7   nico640/docker-uisp:latest        Up 7 days   0.0.0.0:443->443/tcp        uisp
+c3d4e5f6a7b8   prom/node-exporter:latest         Up 7 days   9100/tcp                     node-exporter
+d4e5f6a7b8c9   gcr.io/cadvisor/cadvisor:latest   Up 7 days   8080/tcp                     cadvisor
+e5f6a7b8c9d0   grafana/promtail:latest           Up 7 days   9080/tcp                     promtail
+f6a7b8c9d0e1   portainer/agent:latest            Up 7 days   9001/tcp                     portainer-agent
+a7b8c9d0e1f2   binwiederhier/ntfy:latest         Up 7 days   0.0.0.0:80->80/tcp          ntfy
+b8c9d0e1f2a3   traefik:v3.0                      Up 7 days   80/tcp, 443/tcp              traefik
+c9d0e1f2a3b4   authelia/authelia:latest          Up 7 days   9091/tcp                     authelia
+```
+
+## RESOURCE USAGE
+
+```
+CONTAINER            CPU %     MEM USAGE / LIMIT     MEM %     NET I/O           BLOCK I/O
+mailcow-nginx        1.23%     123.4MiB / 16GiB      0.75%     2.1GB / 1.8GB     456MB / 234MB
+mailcow-dovecot      3.45%     456.7MiB / 16GiB      2.78%     890MB / 1.2GB     2.3GB / 1.8GB
+mailcow-postfix      2.34%     234.5MiB / 16GiB      1.43%     1.2GB / 890MB     890MB / 456MB
+mailcow-rspamd       4.56%     567.8MiB / 16GiB      3.45%     560MB / 234MB     234MB / 156MB
+mailcow-redis        0.45%     34.5MiB / 16GiB       0.21%     120MB / 89MB      23MB / 12MB
+mailcow-mysql        5.67%     1.2GiB / 16GiB        7.5%      456MB / 567MB     4.5GB / 2.3GB
+mailcow-sogo         2.34%     234.5MiB / 16GiB      1.43%     234MB / 345MB     234MB / 123MB
+mailcow-solr         1.78%     456.7MiB / 16GiB      2.78%     89MB / 120MB      890MB / 456MB
+mailcow-memcached    0.23%     23.4MiB / 16GiB       0.14%     45MB / 67MB       12MB / 8MB
+mailcow-clamd        2.89%     890.1MiB / 16GiB      5.42%     120MB / 156MB     345MB / 189MB
+mailcow-olefy        0.34%     45.6MiB / 16GiB       0.28%     23MB / 34MB       23MB / 12MB
+mailcow-unbound      0.45%     67.8MiB / 16GiB       0.41%     234MB / 189MB     45MB / 23MB
+mailcow-acme         0.12%     12.3MiB / 16GiB       0.07%     12MB / 23MB       12MB / 8MB
+mailcow-watchdog     0.23%     23.4MiB / 16GiB       0.14%     23MB / 34MB       23MB / 12MB
+mailcow-dockerapi    0.34%     34.5MiB / 16GiB       0.21%     34MB / 45MB       23MB / 12MB
+mailcow-ipv6nat      0.23%     23.4MiB / 16GiB       0.14%     23MB / 34MB       12MB / 8MB
+mailcow-ofelia       0.12%     12.3MiB / 16GiB       0.07%     12MB / 23MB       12MB / 8MB
+mailcow-netfilter    0.34%     34.5MiB / 16GiB       0.21%     34MB / 45MB       23MB / 12MB
+nextcloud            6.78%     890.1MiB / 16GiB      5.42%     1.2GB / 2.3GB     5.6GB / 3.4GB
+nextcloud-db         3.45%     456.7MiB / 16GiB      2.78%     567MB / 890MB     2.3GB / 1.2GB
+nextcloud-redis      0.45%     34.5MiB / 16GiB       0.21%     120MB / 156MB     34MB / 23MB
+onlyoffice           5.67%     1.2GiB / 16GiB        7.5%      890MB / 1.2GB     1.2GB / 890MB
+onlyoffice-rabbitmq  1.23%     123.4MiB / 16GiB      0.75%     89MB / 120MB      123MB / 67MB
+onlyoffice-postgres  1.78%     234.5MiB / 16GiB      1.43%     234MB / 345MB     456MB / 234MB
+odoo                 4.56%     567.8MiB / 16GiB      3.45%     456MB / 567MB     890MB / 456MB
+odoo-postgres        2.34%     234.5MiB / 16GiB      1.43%     345MB / 456MB     567MB / 345MB
+unifi-controller     3.45%     456.7MiB / 16GiB      2.78%     234MB / 345MB     456MB / 234MB
+unifi-db             2.34%     234.5MiB / 16GiB      1.43%     156MB / 234MB     345MB / 189MB
+frigate              8.90%     1.5GiB / 16GiB        9.38%     2.3GB / 1.8GB     3.4GB / 2.1GB
+frigate-mqtt         0.45%     34.5MiB / 16GiB       0.21%     89MB / 120MB      34MB / 23MB
+homeassistant        2.34%     234.5MiB / 16GiB      1.43%     345MB / 456MB     456MB / 234MB
+uisp                 1.78%     234.5MiB / 16GiB      1.43%     234MB / 345MB     345MB / 189MB
+node-exporter        0.12%     12.3MiB / 16GiB       0.07%     12MB / 34MB       8MB / 4MB
+cadvisor             0.78%     123.4MiB / 16GiB      0.75%     67MB / 89MB       45MB / 23MB
+promtail             0.56%     67.8MiB / 16GiB       0.41%     156MB / 234MB     67MB / 34MB
+portainer-agent      0.34%     45.6MiB / 16GiB       0.28%     23MB / 34MB       23MB / 12MB
+ntfy                 0.45%     56.7MiB / 16GiB       0.35%     34MB / 56MB       34MB / 19MB
+traefik              1.23%     123.4MiB / 16GiB      0.75%     890MB / 1.2GB     234MB / 123MB
+authelia             0.67%     89.4MiB / 16GiB       0.55%     67MB / 89MB       45MB / 23MB
+
+TOTAL                ~73.5%    ~14.2GB / 16GB        89%       Network: ~15TB/month
+```
+
+## DATA VOLUMES
+
+```
+VOLUME NAME                              SIZE
+mailcow_vmail                           73GB       Maildir mailboxes
+mailcow_mysql                           8.9GB      Mail database
+mailcow_redis                           234MB      Mail cache
+mailcow_rspamd                          456MB      Spam DB
+mailcow_clamav                          2.3GB      Virus signatures
+mailcow_solr                            1.2GB      Search index
+nextcloud_data                          128GB      User files
+nextcloud_db                            4.5GB      Nextcloud DB
+onlyoffice_data                         2.3GB      Document cache
+onlyoffice_db                           890MB      OnlyOffice DB
+odoo_data                               3.4GB      ERP data
+odoo_db                                 2.1GB      Odoo DB
+unifi_data                              1.2GB      Network configs
+frigate_media                           15GB       Video recordings
+homeassistant_config                    890MB      HA configs
+uisp_data                               1.8GB      ISP data
+
+TOTAL                                   ~245GB
+```
+
+## NOTES
+
+- All containers healthy (Up status)
+- Mailcow stack running 7 days uptime
+- Business apps running 7 days uptime
+- High RAM usage: 14.2GB / 16GB (89%) - consider monitoring
+- Frigate highest CPU (8.90%) - video processing
+- Nextcloud highest disk usage (128GB user data)
+- Mail storage: 73GB across all mailboxes
+- Total disk usage: ~245GB / 400GB (61%)

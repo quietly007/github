@@ -1,0 +1,244 @@
+## uisp_ps
+## uisp_ports
+## uisp_ucrm_tail
+{"message":"Done UCRM version.","channel":"web.sh","datetime":"2026-02-15T22:31:09+01:00","severity":"INFO","level":200}
+{"message":"Running console command: OldSound\\RabbitMqBundle\\Command\\SetupFabricCommand","context":{},"level":200,"level_name":"INFO","channel":"app","datetime":"2026-02-15T21:31:09+00:00","extra":{},"severity":"INFO"}
+Setting up the Rabbit MQ fabric
+{"message":"Generating static suspension page.","channel":"web.sh","datetime":"2026-02-15T22:31:10+01:00","severity":"INFO","level":200}
+{"message":"Running console command: AppBundle\\Command\\Suspension\\SetupStaticSuspensionPageCommand","context":{},"level":200,"level_name":"INFO","channel":"app","datetime":"2026-02-15T21:31:10+00:00","extra":{},"severity":"INFO"}
+{"message":"Done generating static suspension page.","channel":"web.sh","datetime":"2026-02-15T22:31:11+01:00","severity":"INFO","level":200}
+{"message":"Re/generating plugin symlinks and config files.","channel":"web.sh","datetime":"2026-02-15T22:31:11+01:00","severity":"INFO","level":200}
+{"message":"Running console command: AppBundle\\Command\\Plugin\\PluginSymbolicLinkCommand","context":{},"level":200,"level_name":"INFO","channel":"app","datetime":"2026-02-15T21:31:11+00:00","extra":{},"severity":"INFO"}
+{"message":"Running console command: AppBundle\\Command\\Plugin\\PluginUcrmConfigCommand","context":{},"level":200,"level_name":"INFO","channel":"app","datetime":"2026-02-15T21:31:12+00:00","extra":{},"severity":"INFO"}
+{"message":"Running console command: AppBundle\\Command\\Plugin\\PluginUpdateDatabaseInformationCommand","context":{},"level":200,"level_name":"INFO","channel":"app","datetime":"2026-02-15T21:31:12+00:00","extra":{},"severity":"INFO"}
+{"message":"Done re/generating plugin symlinks and config files.","channel":"web.sh","datetime":"2026-02-15T22:31:12+01:00","severity":"INFO","level":200}
+{"message":"Resetting in-progress states.","channel":"web.sh","datetime":"2026-02-15T22:31:12+01:00","severity":"INFO","level":200}
+{"message":"Running console command: AppBundle\\Command\\Migration\\UpdatePriceMinusTaxCommand","context":{},"level":200,"level_name":"INFO","channel":"app","datetime":"2026-02-15T21:31:12+00:00","extra":{},"severity":"INFO"}
+{"message":"Done resetting in-progress states.","channel":"web.sh","datetime":"2026-02-15T22:31:12+01:00","severity":"INFO","level":200}
+{"message":"Synchronizing with UNMS.","channel":"web.sh","datetime":"2026-02-15T22:31:12+01:00","severity":"INFO","level":200}
+{"message":"Waiting for UNMS (127.0.0.1:8081).","channel":"unms_ready.sh","datetime":"2026-02-15T22:31:13+01:00","severity":"INFO","level":200}
+{"message":"Waiting for UNMS (127.0.0.1:8081).","channel":"unms_ready.sh","datetime":"2026-02-15T22:31:16+01:00","severity":"INFO","level":200}
+{"message":"Waiting for UNMS (127.0.0.1:8081).","channel":"unms_ready.sh","datetime":"2026-02-15T22:31:19+01:00","severity":"INFO","level":200}
+{"message":"Waiting for UNMS (127.0.0.1:8081).","channel":"unms_ready.sh","datetime":"2026-02-15T22:31:23+01:00","severity":"INFO","level":200}
+{"message":"Waiting for UNMS (127.0.0.1:8081).","channel":"unms_ready.sh","datetime":"2026-02-15T22:31:26+01:00","severity":"INFO","level":200}
+{"message":"Waiting for UNMS (127.0.0.1:8081).","channel":"unms_ready.sh","datetime":"2026-02-15T22:31:29+01:00","severity":"INFO","level":200}
+{"message":"Waiting for UNMS (127.0.0.1:8081).","channel":"unms_ready.sh","datetime":"2026-02-15T22:31:33+01:00","severity":"INFO","level":200}
+{"message":"Waiting for UNMS (127.0.0.1:8081).","channel":"unms_ready.sh","datetime":"2026-02-15T22:31:36+01:00","severity":"INFO","level":200}
+{"message":"Waiting for UNMS (127.0.0.1:8081).","channel":"unms_ready.sh","datetime":"2026-02-15T22:31:39+01:00","severity":"INFO","level":200}
+{"message":"Waiting for UNMS (127.0.0.1:8081).","channel":"unms_ready.sh","datetime":"2026-02-15T22:31:43+01:00","severity":"INFO","level":200}
+{"message":"Waiting for UNMS (127.0.0.1:8081).","channel":"unms_ready.sh","datetime":"2026-02-15T22:31:46+01:00","severity":"INFO","level":200}
+{"message":"Waiting for UNMS (127.0.0.1:8081).","channel":"unms_ready.sh","datetime":"2026-02-15T22:31:49+01:00","severity":"INFO","level":200}
+{"message":"Waiting for UNMS (127.0.0.1:8081).","channel":"unms_ready.sh","datetime":"2026-02-15T22:31:53+01:00","severity":"INFO","level":200}
+{"message":"Waiting for UNMS (127.0.0.1:8081).","channel":"unms_ready.sh","datetime":"2026-02-15T22:31:56+01:00","severity":"INFO","level":200}
+{"message":"Waiting for UNMS (127.0.0.1:8081).","channel":"unms_ready.sh","datetime":"2026-02-15T22:31:59+01:00","severity":"INFO","level":200}
+{"message":"Waiting for UNMS (127.0.0.1:8081).","channel":"unms_ready.sh","datetime":"2026-02-15T22:32:03+01:00","severity":"INFO","level":200}
+{"message":"Waiting for UNMS (127.0.0.1:8081).","channel":"unms_ready.sh","datetime":"2026-02-15T22:32:06+01:00","severity":"INFO","level":200}
+{"message":"Waiting for UNMS (127.0.0.1:8081).","channel":"unms_ready.sh","datetime":"2026-02-15T22:32:10+01:00","severity":"INFO","level":200}
+{"message":"Waiting for UNMS (127.0.0.1:8081).","channel":"unms_ready.sh","datetime":"2026-02-15T22:32:13+01:00","severity":"INFO","level":200}
+{"message":"Waiting for UNMS (127.0.0.1:8081).","channel":"unms_ready.sh","datetime":"2026-02-15T22:32:16+01:00","severity":"INFO","level":200}
+{"message":"UNMS did not start in time, restarting container.","channel":"web.sh","datetime":"2026-02-15T22:32:16+01:00","severity":"WARNING","level":300}
+make: *** [Makefile:22: server_with_migrate] Error 1
+/usr/src/ucrm/scripts/init_log.sh
+/usr/src/ucrm/scripts/dirs.sh
+{"message":"Creating directories.","channel":"dirs.sh","datetime":"2026-02-15T22:32:17+01:00","severity":"INFO","level":200}
+{"message":"Done creating directories.","channel":"dirs.sh","datetime":"2026-02-15T22:32:18+01:00","severity":"INFO","level":200}
+{"message":"Creating symbolic links.","channel":"dirs.sh","datetime":"2026-02-15T22:32:18+01:00","severity":"INFO","level":200}
+{"message":"Creating symbolic link for /usr/src/ucrm/app/data.","channel":"dirs.sh","datetime":"2026-02-15T22:32:18+01:00","severity":"INFO","level":200}
+{"message":"Creating symbolic link for /usr/src/ucrm/app/EmailQueue.","channel":"dirs.sh","datetime":"2026-02-15T22:32:18+01:00","severity":"INFO","level":200}
+{"message":"Creating symbolic link for /usr/src/ucrm/app/logs.","channel":"dirs.sh","datetime":"2026-02-15T22:32:18+01:00","severity":"INFO","level":200}
+{"message":"Creating symbolic link for /usr/src/ucrm/web/uploads.","channel":"dirs.sh","datetime":"2026-02-15T22:32:18+01:00","severity":"INFO","level":200}
+{"message":"Creating symbolic links for /data/updates.","channel":"dirs.sh","datetime":"2026-02-15T22:32:18+01:00","severity":"INFO","level":200}
+{"message":"Publishing current /usr/src/ucrm/app/config/version.yml.","channel":"dirs.sh","datetime":"2026-02-15T22:32:18+01:00","severity":"INFO","level":200}
+{"message":"Done creating symbolic links.","channel":"dirs.sh","datetime":"2026-02-15T22:32:18+01:00","severity":"INFO","level":200}
+/usr/src/ucrm/scripts/parameters.sh
+{"message":"Replacing configuration parameters.","channel":"parameters.sh","datetime":"2026-02-15T22:32:18+01:00","severity":"INFO","level":200}
+{"message":"Done replacing configuration parameters.","channel":"parameters.sh","datetime":"2026-02-15T22:32:24+01:00","severity":"INFO","level":200}
+/usr/src/ucrm/scripts/cron_jobs_disable.sh
+crontab /tmp/crontabs/server
+su-exec unms /usr/src/ucrm/scripts/database_ready.sh
+{"message":"Waiting for database.","channel":"database_ready.sh","datetime":"2026-02-15T22:32:24+01:00","severity":"INFO","level":200}
+/usr/src/ucrm/scripts/database_ready.sh: line 7: /tmp/UCRM_init.log: Permission denied
+{"message":"Database ready.","channel":"database_ready.sh","datetime":"2026-02-15T22:32:24+01:00","severity":"INFO","level":200}
+su-exec unms /usr/src/ucrm/scripts/database_create_extensions.sh
+{"message":"Creating database extensions.","channel":"database_create_extensions.sh","datetime":"2026-02-15T22:32:24+01:00","severity":"INFO","level":200}
+{"message":"Extension \"citext\" exists.","channel":"database_create_extensions.sh","datetime":"2026-02-15T22:32:24+01:00","severity":"INFO","level":200}
+{"message":"Extension \"unaccent\" exists.","channel":"database_create_extensions.sh","datetime":"2026-02-15T22:32:24+01:00","severity":"INFO","level":200}
+{"message":"Extension \"uuid-ossp\" exists.","channel":"database_create_extensions.sh","datetime":"2026-02-15T22:32:25+01:00","severity":"INFO","level":200}
+{"message":"Finished creating database extensions.","channel":"database_create_extensions.sh","datetime":"2026-02-15T22:32:25+01:00","severity":"INFO","level":200}
+/usr/src/ucrm/scripts/backup_control_do.sh
+su-exec unms /usr/src/ucrm/scripts/verify_database_migrations_integrity.sh
+{"message":"Verifying database migrations integrity.","channel":"verify_database_migrations_integrity.sh","datetime":"2026-02-15T22:32:25+01:00","severity":"INFO","level":200}
+{"message":"Database migrations integrity verified.","channel":"verify_database_migrations_integrity.sh","datetime":"2026-02-15T22:32:25+01:00","severity":"INFO","level":200}
+su-exec unms /usr/src/ucrm/scripts/migrate.sh
+{"message":"Start replace shared views.","channel":"migrate.sh","datetime":"2026-02-15T22:32:25+01:00","severity":"INFO","level":200}
+{"message":"Done replace shared views.","channel":"migrate.sh","datetime":"2026-02-15T22:32:25+01:00","severity":"INFO","level":200}
+{"message":"Start database migration.","channel":"migrate.sh","datetime":"2026-02-15T22:32:25+01:00","severity":"INFO","level":200}
+{"message":"Done database migration.","channel":"migrate.sh","datetime":"2026-02-15T22:32:26+01:00","severity":"INFO","level":200}
+{"message":"Start shared views migration.","channel":"migrate.sh","datetime":"2026-02-15T22:32:26+01:00","severity":"INFO","level":200}
+{"message":"Done shared views migration.","channel":"migrate.sh","datetime":"2026-02-15T22:32:26+01:00","severity":"INFO","level":200}
+{"message":"Start notification templates migration.","channel":"migrate.sh","datetime":"2026-02-15T22:32:26+01:00","severity":"INFO","level":200}
+{"message":"Done notification templates migration.","channel":"migrate.sh","datetime":"2026-02-15T22:32:27+01:00","severity":"INFO","level":200}
+{"message":"Bumping UNMS version from ENV variable to database.","channel":"migrate.sh","datetime":"2026-02-15T22:32:27+01:00","severity":"INFO","level":200}
+{"message":"Done bumping UNMS version from ENV variable to database.","channel":"migrate.sh","datetime":"2026-02-15T22:32:27+01:00","severity":"INFO","level":200}
+su-exec unms /usr/src/ucrm/scripts/database_migrations_ready.sh
+{"message":"Waiting for migrations.","channel":"database_migrations_ready.sh","datetime":"2026-02-15T22:32:27+01:00","severity":"INFO","level":200}
+/usr/src/ucrm/scripts/database_migrations_ready.sh: line 7: /tmp/UCRM_init.log: Permission denied
+{"message":"Migrations ready.","channel":"database_migrations_ready.sh","datetime":"2026-02-15T22:32:27+01:00","severity":"INFO","level":200}
+/usr/src/ucrm/scripts/web.sh
+{"message":"Preparing server configuration.","channel":"web.sh","datetime":"2026-02-15T22:32:27+01:00","severity":"INFO","level":200}
+cp: cannot stat '/etc/nginx/available-servers/ucrm.conf': No such file or directory
+{"message":"Done preparing server configuration.","channel":"web.sh","datetime":"2026-02-15T22:32:27+01:00","severity":"INFO","level":200}
+{"message":"Updating environment variables.","channel":"web.sh","datetime":"2026-02-15T22:32:27+01:00","severity":"INFO","level":200}
+{"message":"Running console command: AppBundle\\Command\\BumpUasCommand","context":{},"level":200,"level_name":"INFO","channel":"app","datetime":"2026-02-15T21:32:28+00:00","extra":{},"severity":"INFO"}
+{"message":"Done updating environment variables.","channel":"web.sh","datetime":"2026-02-15T22:32:28+01:00","severity":"INFO","level":200}
+{"message":"Updating UCRM version.","channel":"web.sh","datetime":"2026-02-15T22:32:28+01:00","severity":"INFO","level":200}
+{"message":"Running console command: AppBundle\\Command\\BumpVersionCommand","context":{},"level":200,"level_name":"INFO","channel":"app","datetime":"2026-02-15T21:32:28+00:00","extra":{},"severity":"INFO"}
+{"message":"DB version not updated.","context":{},"level":200,"level_name":"INFO","channel":"app","datetime":"2026-02-15T21:32:28+00:00","extra":{},"severity":"INFO"}
+{"message":"Done UCRM version.","channel":"web.sh","datetime":"2026-02-15T22:32:28+01:00","severity":"INFO","level":200}
+{"message":"Running console command: OldSound\\RabbitMqBundle\\Command\\SetupFabricCommand","context":{},"level":200,"level_name":"INFO","channel":"app","datetime":"2026-02-15T21:32:28+00:00","extra":{},"severity":"INFO"}
+Setting up the Rabbit MQ fabric
+{"message":"Generating static suspension page.","channel":"web.sh","datetime":"2026-02-15T22:32:29+01:00","severity":"INFO","level":200}
+{"message":"Running console command: AppBundle\\Command\\Suspension\\SetupStaticSuspensionPageCommand","context":{},"level":200,"level_name":"INFO","channel":"app","datetime":"2026-02-15T21:32:29+00:00","extra":{},"severity":"INFO"}
+{"message":"Done generating static suspension page.","channel":"web.sh","datetime":"2026-02-15T22:32:30+01:00","severity":"INFO","level":200}
+{"message":"Re/generating plugin symlinks and config files.","channel":"web.sh","datetime":"2026-02-15T22:32:30+01:00","severity":"INFO","level":200}
+{"message":"Running console command: AppBundle\\Command\\Plugin\\PluginSymbolicLinkCommand","context":{},"level":200,"level_name":"INFO","channel":"app","datetime":"2026-02-15T21:32:30+00:00","extra":{},"severity":"INFO"}
+{"message":"Running console command: AppBundle\\Command\\Plugin\\PluginUcrmConfigCommand","context":{},"level":200,"level_name":"INFO","channel":"app","datetime":"2026-02-15T21:32:30+00:00","extra":{},"severity":"INFO"}
+{"message":"Running console command: AppBundle\\Command\\Plugin\\PluginUpdateDatabaseInformationCommand","context":{},"level":200,"level_name":"INFO","channel":"app","datetime":"2026-02-15T21:32:31+00:00","extra":{},"severity":"INFO"}
+{"message":"Done re/generating plugin symlinks and config files.","channel":"web.sh","datetime":"2026-02-15T22:32:31+01:00","severity":"INFO","level":200}
+{"message":"Resetting in-progress states.","channel":"web.sh","datetime":"2026-02-15T22:32:31+01:00","severity":"INFO","level":200}
+{"message":"Running console command: AppBundle\\Command\\Migration\\UpdatePriceMinusTaxCommand","context":{},"level":200,"level_name":"INFO","channel":"app","datetime":"2026-02-15T21:32:31+00:00","extra":{},"severity":"INFO"}
+{"message":"Done resetting in-progress states.","channel":"web.sh","datetime":"2026-02-15T22:32:31+01:00","severity":"INFO","level":200}
+{"message":"Synchronizing with UNMS.","channel":"web.sh","datetime":"2026-02-15T22:32:31+01:00","severity":"INFO","level":200}
+{"message":"Waiting for UNMS (127.0.0.1:8081).","channel":"unms_ready.sh","datetime":"2026-02-15T22:32:31+01:00","severity":"INFO","level":200}
+{"message":"Waiting for UNMS (127.0.0.1:8081).","channel":"unms_ready.sh","datetime":"2026-02-15T22:32:35+01:00","severity":"INFO","level":200}
+{"message":"Waiting for UNMS (127.0.0.1:8081).","channel":"unms_ready.sh","datetime":"2026-02-15T22:32:38+01:00","severity":"INFO","level":200}
+{"message":"Waiting for UNMS (127.0.0.1:8081).","channel":"unms_ready.sh","datetime":"2026-02-15T22:32:41+01:00","severity":"INFO","level":200}
+{"message":"Waiting for UNMS (127.0.0.1:8081).","channel":"unms_ready.sh","datetime":"2026-02-15T22:32:45+01:00","severity":"INFO","level":200}
+{"message":"Waiting for UNMS (127.0.0.1:8081).","channel":"unms_ready.sh","datetime":"2026-02-15T22:32:48+01:00","severity":"INFO","level":200}
+{"message":"Waiting for UNMS (127.0.0.1:8081).","channel":"unms_ready.sh","datetime":"2026-02-15T22:32:51+01:00","severity":"INFO","level":200}
+{"message":"Waiting for UNMS (127.0.0.1:8081).","channel":"unms_ready.sh","datetime":"2026-02-15T22:32:55+01:00","severity":"INFO","level":200}
+{"message":"Waiting for UNMS (127.0.0.1:8081).","channel":"unms_ready.sh","datetime":"2026-02-15T22:32:58+01:00","severity":"INFO","level":200}
+{"message":"Waiting for UNMS (127.0.0.1:8081).","channel":"unms_ready.sh","datetime":"2026-02-15T22:33:01+01:00","severity":"INFO","level":200}
+{"message":"Waiting for UNMS (127.0.0.1:8081).","channel":"unms_ready.sh","datetime":"2026-02-15T22:33:05+01:00","severity":"INFO","level":200}
+{"message":"Waiting for UNMS (127.0.0.1:8081).","channel":"unms_ready.sh","datetime":"2026-02-15T22:33:08+01:00","severity":"INFO","level":200}
+## uisp_api_tail
+{"level":30,"time":"2026-02-15T21:24:39.646Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.13ms","cpu":"0.37%","memory":"322MB","uptime":"2744s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:24:44.648Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.13ms","cpu":"1.44%","memory":"323MB","uptime":"2749s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:24:49.651Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.14ms","cpu":"0.64%","memory":"322MB","uptime":"2754s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:24:54.653Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.11ms","cpu":"0.50%","memory":"322MB","uptime":"2759s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:24:59.653Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.20ms","cpu":"0.73%","memory":"322MB","uptime":"2764s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:25:04.656Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.16ms","cpu":"0.20%","memory":"322MB","uptime":"2769s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:25:08.841Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"os","totalmem":"48187MB","freemem":"39054MB","loadavg":"0.44, 0.67, 0.77","uptime":"487376s"}
+{"level":30,"time":"2026-02-15T21:25:09.659Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.16ms","cpu":"0.39%","memory":"322MB","uptime":"2774s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:25:14.661Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.18ms","cpu":"0.40%","memory":"322MB","uptime":"2779s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:25:19.662Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.18ms","cpu":"0.28%","memory":"322MB","uptime":"2784s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:25:24.664Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.20ms","cpu":"0.45%","memory":"322MB","uptime":"2789s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:25:29.664Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.16ms","cpu":"0.44%","memory":"322MB","uptime":"2794s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:25:34.666Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.15ms","cpu":"0.37%","memory":"322MB","uptime":"2799s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:25:38.842Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"os","totalmem":"48187MB","freemem":"39202MB","loadavg":"0.33, 0.62, 0.74","uptime":"487406s"}
+{"level":30,"time":"2026-02-15T21:25:39.667Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.17ms","cpu":"0.34%","memory":"322MB","uptime":"2804s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:25:44.668Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.14ms","cpu":"1.11%","memory":"322MB","uptime":"2809s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:25:49.671Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.12ms","cpu":"0.68%","memory":"323MB","uptime":"2814s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:25:54.674Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.14ms","cpu":"0.37%","memory":"323MB","uptime":"2819s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:25:59.674Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.14ms","cpu":"0.64%","memory":"323MB","uptime":"2824s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:26:04.675Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.17ms","cpu":"0.35%","memory":"322MB","uptime":"2829s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:26:08.842Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"os","totalmem":"48187MB","freemem":"39110MB","loadavg":"0.8, 0.71, 0.77","uptime":"487436s"}
+{"level":30,"time":"2026-02-15T21:26:09.677Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.14ms","cpu":"0.44%","memory":"322MB","uptime":"2834s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:26:14.679Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.13ms","cpu":"0.31%","memory":"322MB","uptime":"2839s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:26:19.682Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.35ms","cpu":"0.59%","memory":"322MB","uptime":"2844s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:26:24.684Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.26ms","cpu":"0.29%","memory":"322MB","uptime":"2849s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:26:29.686Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.33ms","cpu":"0.49%","memory":"322MB","uptime":"2854s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:26:34.687Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.13ms","cpu":"0.31%","memory":"322MB","uptime":"2859s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:26:38.844Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"os","totalmem":"48187MB","freemem":"39181MB","loadavg":"0.8, 0.72, 0.77","uptime":"487466s"}
+{"level":30,"time":"2026-02-15T21:26:39.689Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.14ms","cpu":"0.45%","memory":"322MB","uptime":"2864s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:26:44.690Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.13ms","cpu":"1.09%","memory":"322MB","uptime":"2869s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:26:49.693Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.17ms","cpu":"0.78%","memory":"322MB","uptime":"2874s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:26:54.695Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.21ms","cpu":"0.39%","memory":"322MB","uptime":"2879s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:26:59.697Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.10ms","cpu":"0.66%","memory":"322MB","uptime":"2884s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:27:04.698Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.20ms","cpu":"0.42%","memory":"322MB","uptime":"2889s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:27:08.845Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"os","totalmem":"48187MB","freemem":"39122MB","loadavg":"0.71, 0.7, 0.76","uptime":"487496s"}
+{"level":30,"time":"2026-02-15T21:27:09.701Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.16ms","cpu":"0.48%","memory":"323MB","uptime":"2894s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:27:14.702Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.11ms","cpu":"0.61%","memory":"323MB","uptime":"2899s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:27:19.702Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.14ms","cpu":"0.41%","memory":"323MB","uptime":"2904s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:27:24.705Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.15ms","cpu":"0.28%","memory":"323MB","uptime":"2909s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:27:29.705Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.13ms","cpu":"0.50%","memory":"322MB","uptime":"2914s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:27:34.708Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.17ms","cpu":"0.20%","memory":"322MB","uptime":"2919s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:27:38.847Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"os","totalmem":"48187MB","freemem":"39181MB","loadavg":"0.81, 0.73, 0.77","uptime":"487526s"}
+{"level":30,"time":"2026-02-15T21:27:39.710Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.18ms","cpu":"0.37%","memory":"322MB","uptime":"2924s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:27:44.711Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.15ms","cpu":"1.48%","memory":"322MB","uptime":"2929s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:27:49.713Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.12ms","cpu":"0.81%","memory":"322MB","uptime":"2934s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:27:54.713Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.14ms","cpu":"0.46%","memory":"322MB","uptime":"2939s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:27:59.715Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.17ms","cpu":"1.00%","memory":"322MB","uptime":"2944s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:28:04.717Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.19ms","cpu":"0.18%","memory":"323MB","uptime":"2949s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:28:08.848Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"os","totalmem":"48187MB","freemem":"39175MB","loadavg":"1.43, 0.86, 0.81","uptime":"487556s"}
+{"level":30,"time":"2026-02-15T21:28:09.719Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.11ms","cpu":"0.39%","memory":"323MB","uptime":"2954s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:28:14.720Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.11ms","cpu":"0.45%","memory":"323MB","uptime":"2959s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:28:19.721Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.13ms","cpu":"0.38%","memory":"322MB","uptime":"2964s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:28:24.723Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.11ms","cpu":"0.23%","memory":"322MB","uptime":"2969s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:28:29.725Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.15ms","cpu":"0.35%","memory":"322MB","uptime":"2974s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:28:34.725Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.09ms","cpu":"0.18%","memory":"322MB","uptime":"2979s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:28:38.849Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"os","totalmem":"48187MB","freemem":"39172MB","loadavg":"1.12, 0.84, 0.81","uptime":"487586s"}
+{"level":30,"time":"2026-02-15T21:28:39.727Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.19ms","cpu":"0.31%","memory":"322MB","uptime":"2984s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:28:44.728Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.11ms","cpu":"1.61%","memory":"322MB","uptime":"2989s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:28:49.730Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.12ms","cpu":"0.92%","memory":"322MB","uptime":"2994s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:28:54.733Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.14ms","cpu":"0.41%","memory":"322MB","uptime":"2999s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:28:59.734Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.11ms","cpu":"0.73%","memory":"322MB","uptime":"3004s","msg":"[main]"}
+@uisp/utils cache total size: 0 keys
+{"level":30,"time":"2026-02-15T21:29:04.736Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.12ms","cpu":"0.21%","memory":"322MB","uptime":"3009s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:29:08.850Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"os","totalmem":"48187MB","freemem":"39187MB","loadavg":"0.82, 0.79, 0.79","uptime":"487616s"}
+{"level":30,"time":"2026-02-15T21:29:09.737Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.20ms","cpu":"0.40%","memory":"322MB","uptime":"3014s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:29:14.738Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.10ms","cpu":"0.36%","memory":"322MB","uptime":"3019s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:29:19.740Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.11ms","cpu":"0.30%","memory":"323MB","uptime":"3024s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:29:24.742Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.26ms","cpu":"0.56%","memory":"323MB","uptime":"3029s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:29:29.744Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.13ms","cpu":"0.42%","memory":"323MB","uptime":"3034s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:29:34.745Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.11ms","cpu":"0.20%","memory":"323MB","uptime":"3039s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:29:38.850Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"os","totalmem":"48187MB","freemem":"39138MB","loadavg":"1.08, 0.86, 0.82","uptime":"487646s"}
+{"level":30,"time":"2026-02-15T21:29:39.748Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.12ms","cpu":"0.32%","memory":"323MB","uptime":"3044s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:29:44.749Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.13ms","cpu":"1.55%","memory":"322MB","uptime":"3049s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:29:49.750Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.09ms","cpu":"0.62%","memory":"323MB","uptime":"3054s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:29:54.752Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.14ms","cpu":"0.52%","memory":"322MB","uptime":"3059s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:29:59.753Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.11ms","cpu":"0.50%","memory":"322MB","uptime":"3064s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:30:04.755Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.12ms","cpu":"0.41%","memory":"322MB","uptime":"3069s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:30:08.851Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"os","totalmem":"48187MB","freemem":"39120MB","loadavg":"1.61, 1, 0.86","uptime":"487676s"}
+{"level":30,"time":"2026-02-15T21:30:09.757Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.12ms","cpu":"0.45%","memory":"322MB","uptime":"3074s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:30:14.757Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.11ms","cpu":"0.33%","memory":"322MB","uptime":"3079s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:30:19.760Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.13ms","cpu":"0.38%","memory":"322MB","uptime":"3084s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:30:24.761Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.11ms","cpu":"0.27%","memory":"322MB","uptime":"3089s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:30:29.761Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.11ms","cpu":"0.51%","memory":"323MB","uptime":"3094s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:30:34.763Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.13ms","cpu":"0.34%","memory":"322MB","uptime":"3099s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:30:38.851Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"os","totalmem":"48187MB","freemem":"39123MB","loadavg":"1.64, 1.07, 0.89","uptime":"487706s"}
+{"level":30,"time":"2026-02-15T21:30:39.765Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.15ms","cpu":"0.63%","memory":"322MB","uptime":"3104s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:30:44.767Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.13ms","cpu":"1.26%","memory":"322MB","uptime":"3109s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:30:49.770Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.20ms","cpu":"0.93%","memory":"323MB","uptime":"3114s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:30:54.771Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.14ms","cpu":"0.40%","memory":"323MB","uptime":"3119s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:30:59.773Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.21ms","cpu":"1.29%","memory":"323MB","uptime":"3124s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:31:04.776Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.14ms","cpu":"0.17%","memory":"323MB","uptime":"3129s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:31:08.852Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"os","totalmem":"48187MB","freemem":"39151MB","loadavg":"1.66, 1.12, 0.92","uptime":"487736s"}
+{"level":30,"time":"2026-02-15T21:31:09.777Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.14ms","cpu":"0.50%","memory":"323MB","uptime":"3134s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:31:14.777Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.12ms","cpu":"0.36%","memory":"323MB","uptime":"3139s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:31:19.777Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.12ms","cpu":"0.52%","memory":"322MB","uptime":"3144s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:31:24.780Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.15ms","cpu":"0.38%","memory":"322MB","uptime":"3149s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:31:29.781Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.28ms","cpu":"0.67%","memory":"322MB","uptime":"3154s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:31:34.786Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.18ms","cpu":"0.54%","memory":"322MB","uptime":"3159s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:31:38.851Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"os","totalmem":"48187MB","freemem":"39103MB","loadavg":"1.69, 1.19, 0.95","uptime":"487766s"}
+{"level":30,"time":"2026-02-15T21:31:39.787Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.14ms","cpu":"0.49%","memory":"322MB","uptime":"3164s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:31:44.789Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.23ms","cpu":"1.65%","memory":"322MB","uptime":"3169s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:31:49.790Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.18ms","cpu":"1.06%","memory":"322MB","uptime":"3174s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:31:54.793Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.24ms","cpu":"0.52%","memory":"323MB","uptime":"3179s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:31:59.793Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.21ms","cpu":"0.83%","memory":"323MB","uptime":"3184s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:32:04.796Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.21ms","cpu":"0.55%","memory":"323MB","uptime":"3189s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:32:08.851Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"os","totalmem":"48187MB","freemem":"39113MB","loadavg":"1.91, 1.3, 0.99","uptime":"487796s"}
+{"level":30,"time":"2026-02-15T21:32:09.798Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.21ms","cpu":"0.68%","memory":"322MB","uptime":"3194s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:32:14.799Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.07ms","cpu":"0.43%","memory":"323MB","uptime":"3199s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:32:19.801Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.15ms","cpu":"0.38%","memory":"323MB","uptime":"3204s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:32:24.804Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.26ms","cpu":"0.37%","memory":"323MB","uptime":"3209s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:32:29.807Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.10ms","cpu":"0.48%","memory":"322MB","uptime":"3214s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:32:34.809Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.15ms","cpu":"0.35%","memory":"322MB","uptime":"3219s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:32:38.852Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"os","totalmem":"48187MB","freemem":"39153MB","loadavg":"2.19, 1.44, 1.05","uptime":"487826s"}
+{"level":30,"time":"2026-02-15T21:32:39.811Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.13ms","cpu":"0.52%","memory":"322MB","uptime":"3224s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:32:44.812Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.14ms","cpu":"0.81%","memory":"322MB","uptime":"3229s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:32:49.814Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.18ms","cpu":"0.90%","memory":"322MB","uptime":"3234s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:32:54.815Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.13ms","cpu":"0.41%","memory":"322MB","uptime":"3239s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:32:59.817Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.20ms","cpu":"0.72%","memory":"322MB","uptime":"3244s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:33:04.818Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"proc","delay":"0.13ms","cpu":"0.22%","memory":"322MB","uptime":"3249s","msg":"[main]"}
+{"level":30,"time":"2026-02-15T21:33:08.852Z","pid":1160,"hostname":"f7e8568fd75e","name":"app","name":"os","totalmem":"48187MB","freemem":"39169MB","loadavg":"1.51, 1.35, 1.03","uptime":"487856s"}

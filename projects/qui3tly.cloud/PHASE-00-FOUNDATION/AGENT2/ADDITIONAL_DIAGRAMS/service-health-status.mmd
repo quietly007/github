@@ -1,0 +1,102 @@
+```mermaid
+%%{init: {'theme': 'dark'}}%%
+graph TB
+    subgraph HEALTH["🏥 SERVICE HEALTH STATUS - February 15, 2026 18:55 UTC"]
+        direction TB
+    end
+    
+    subgraph MASTER_HEALTH["🖥️ MASTER SERVER HEALTH"]
+        subgraph M_HEALTHY["✅ HEALTHY (21 services)"]
+            MH1["traefik: Up 3d (healthy)"]
+            MH2["prometheus: Up 5d (healthy)"]
+            MH3["grafana: Up 5d (healthy)"]
+            MH4["loki: Up 5d (healthy)"]
+            MH5["alertmanager: Up 5d (healthy)"]
+            MH6["authelia: Up 5d (healthy)"]
+            MH7["crowdsec: Up 3d (healthy)"]
+            MH8["bouncer-traefik: Up 3d (healthy)"]
+            MH9["pihole: Up 3d (healthy)"]
+            MH10["admin-panel: Up 2d (healthy)"]
+            MH11["ntfy: Up 5d (healthy)"]
+            MH12["semaphore: Up 5d (healthy)"]
+            MH13["uptime-kuma: Up 5d (healthy)"]
+            MH14["gotify: Up 5d (healthy)"]
+            MH15["cadvisor: Up 5d (healthy)"]
+            MH16["fuckoff-page: Up 3d (healthy)"]
+            MH17["blackbox: Up 3d (healthy)"]
+        end
+        
+        subgraph M_RUNNING["🔵 RUNNING (4 services, no health check)"]
+            MR1["promtail: Up 5d"]
+            MR2["portainer: Up 5d"]
+            MR3["node-exporter: Up 5d"]
+            MR4["it-tools: Up 5d"]
+        end
+        
+        subgraph M_WARNING["⚠️ WARNINGS"]
+            MW1["traefik: access.log write error<br/>(file closed - minor)"]
+            MW2["prometheus: 76% memory usage<br/>(monitor retention)"]
+        end
+        
+        subgraph M_NATIVE["🖥️ NATIVE SERVICES"]
+            MN1["headscale: active (running)<br/>5d 12h uptime<br/>66.8M RAM<br/>13m CPU time"]
+        end
+    end
+    
+    subgraph LADY_HEALTH["🖥️ LADY SERVER HEALTH"]
+        subgraph L_HEALTHY["✅ HEALTHY (18 services)"]
+            LH1["nextcloud: Up 2d (healthy)"]
+            LH2["nextcloud-db: Up 2d (healthy)"]
+            LH3["nextcloud-redis: Up 2d (healthy)"]
+            LH4["odoo: Up 3d (healthy)"]
+            LH5["odoo-db: Up 3d (healthy)"]
+            LH6["unifi-db: Up 3d (healthy)"]
+            LH7["bouncer-traefik: Up 3d (healthy)"]
+            LH8["crowdsec: Up 3d (healthy)"]
+            LH9["fuckoff-page: Up 3d (healthy)"]
+            LH10["frigate: Up 42h (healthy)"]
+            LH11["clamd-mailcow: Up 5d (healthy)"]
+            LH12["unbound-mailcow: Up 5d (healthy)"]
+            LH13["cadvisor: Up 5d (healthy)"]
+        end
+        
+        subgraph L_RUNNING["🔵 RUNNING (21 services, no health check)"]
+            LR1["traefik: Up 3d"]
+            LR2["onlyoffice: Up 2d"]
+            LR3["unifi: Up 3d"]
+            LR4["uisp: Up 5d"]
+            LR5["homeassistant: Up 5d"]
+            LR6["node-exporter: Up 5d"]
+            LR7["mailcow stack: Up 5d (17 containers)"]
+        end
+        
+        subgraph L_WARNING["⚠️ WARNINGS"]
+            LW1["postfix: IPv6 disabled<br/>(Address family not supported)"]
+            LW2["rspamd: Up 37h<br/>(recently restarted)"]
+            LW3["uisp: 1.912 GiB RAM<br/>(high but expected)"]
+        end
+    end
+    
+    subgraph LOGS_SUMMARY["📋 LOG ANALYSIS SUMMARY"]
+        LOG_GOOD["✅ NO CRITICAL ERRORS<br/>━━━━━━━━━━━━━━━<br/>All core services operational<br/>No crash loops detected<br/>No OOM kills observed"]
+        
+        LOG_INFO["ℹ️ INFORMATIONAL<br/>━━━━━━━━━━━━━━━<br/>Prometheus: TSDB compaction OK<br/>Loki: Index upload OK<br/>Grafana: Plugin updates OK<br/>Authelia: Auth denials logged"]
+        
+        LOG_SECURITY["🛡️ SECURITY EVENTS<br/>━━━━━━━━━━━━━━━<br/>CrowdSec: Active protection<br/>Spam blocked: Multiple IPs<br/>DNSBL: Working correctly<br/>TLS: v1.3 enforced"]
+    end
+    
+    subgraph UPTIME["⏱️ UPTIME SUMMARY"]
+        UP1["🟢 Master: 5d 12h 37m<br/>Load: 0.50, 0.75, 0.79"]
+        UP2["🟢 Lady: 5d 12h 41m<br/>Load: 1.51, 0.91, 0.80"]
+    end
+    
+    classDef healthy fill:#2E7D32,stroke:#1B5E20,color:#fff
+    classDef running fill:#1565C0,stroke:#0D47A1,color:#fff
+    classDef warning fill:#F57C00,stroke:#E65100,color:#fff
+    classDef info fill:#424242,stroke:#212121,color:#fff
+    
+    class M_HEALTHY,L_HEALTHY,LOG_GOOD healthy
+    class M_RUNNING,L_RUNNING running
+    class M_WARNING,L_WARNING warning
+    class LOGS_SUMMARY,LOG_INFO,LOG_SECURITY info
+```

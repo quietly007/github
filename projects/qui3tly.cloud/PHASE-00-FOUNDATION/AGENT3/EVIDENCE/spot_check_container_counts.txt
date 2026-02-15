@@ -1,0 +1,14 @@
+]633;E;{   echo "# local timestamp"\x3b date -u\x3b   echo\x3b echo "# master container count"\x3b docker ps -q | wc -l\x3b   echo\x3b echo "# memory"\x3b free -h\x3b   echo\x3b echo "# disk"\x3b df -h /\x3b } > /home/qui3tly/projects/qui3tly.cloud/PHASE-00-FOUNDATION/AGENT3/EVIDENCE/spot_check_container_counts.txt 2>&1;cb80ee7f-9768-4bcb-9d38-2f473ba6c305]633;C# local timestamp
+Sun Feb 15 08:08:12 PM UTC 2026
+
+# master container count
+25
+
+# memory
+               total        used        free      shared  buff/cache   available
+Mem:            47Gi       4.9Gi        35Gi       7.5Mi       7.1Gi        42Gi
+Swap:          2.0Gi          0B       2.0Gi
+
+# disk
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sda1       985G   24G  921G   3% /

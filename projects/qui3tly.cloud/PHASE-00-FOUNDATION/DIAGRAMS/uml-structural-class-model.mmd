@@ -1,0 +1,69 @@
+classDiagram
+  class UserClient {
+    +id
+    +vpnSession
+    +requestService()
+  }
+
+  class Traefik {
+    +routeRequest()
+    +applyMiddleware()
+    +terminateTLS()
+  }
+
+  class Authelia {
+    +authenticate()
+    +validateSession()
+    +enforce2FA()
+  }
+
+  class MonitoringStack {
+    +collectMetrics()
+    +collectLogs()
+    +alert()
+  }
+
+  class Prometheus {
+    +scrapeTargets()
+    +evaluateRules()
+  }
+
+  class Grafana {
+    +visualize()
+    +queryPrometheus()
+    +queryLoki()
+  }
+
+  class Loki {
+    +ingestLogs()
+    +searchLogs()
+  }
+
+  class Alertmanager {
+    +routeAlerts()
+    +sendNtfy()
+  }
+
+  class ServiceWorkloads {
+    +masterServices
+    +ladyServices
+  }
+
+  class SecurityLayer {
+    +crowdsec
+    +fail2ban
+    +vpnOnlyPolicy
+  }
+
+  UserClient --> Traefik : HTTPS
+  Traefik --> Authelia : ForwardAuth
+  Traefik --> ServiceWorkloads : reverse proxy
+  MonitoringStack --> Prometheus : includes
+  MonitoringStack --> Grafana : includes
+  MonitoringStack --> Loki : includes
+  MonitoringStack --> Alertmanager : includes
+  Prometheus --> Alertmanager : alerts
+  Grafana --> Prometheus : queries
+  Grafana --> Loki : queries
+  SecurityLayer --> Traefik : middleware policies
+  SecurityLayer --> ServiceWorkloads : host/runtime protection

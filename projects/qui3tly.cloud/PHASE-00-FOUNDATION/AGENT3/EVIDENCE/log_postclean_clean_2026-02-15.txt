@@ -1,0 +1,18 @@
+# Post-clean Log Verification (clean extract)
+Timestamp (UTC): 2026-02-15T20:39Z
+
+## Runtime status after remediation
+- Prometheus config updated: ssl-certs module switched `http_ssl` -> `http_any`
+- Odoo DB healthcheck fixed on Lady: `pg_isready -U odoo -d postgres`
+- UISP runtime tuning applied on Lady: `PGUSER=postgres`, `cap_add=NET_RAW`, `no-new-privileges:false`
+
+## Error-level signatures (focused checks)
+- Master: no active error-level lines in broad sweep after remediation
+- Lady:
+  - Odoo transient startup errors observed during DB recreate, then service healthy (`/web/health` 200)
+  - UISP previous recurring `role "root" does not exist` resolved after reconfiguration/recreate
+  - One residual runtime error-class line still possible in UISP (`Failed to determine UNMS IP address`) and requires service-specific deep tuning outside Phase 00 closure scope
+
+## Conclusion
+- Major recurring log-noise sources addressed.
+- Infrastructure is in a significantly cleaner runtime state than pre-remediation baseline.

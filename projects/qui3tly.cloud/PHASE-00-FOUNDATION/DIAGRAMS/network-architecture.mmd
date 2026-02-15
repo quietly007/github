@@ -1,0 +1,76 @@
+graph TB
+    subgraph Internet
+        WAN[Public Internet]
+    end
+
+    subgraph Contabo Germany
+        Master[Master Server<br/>quietly.its.me<br/>213.136.68.108]
+        Lady[Lady Server<br/>quietly.online<br/>207.180.251.111]
+    end
+
+    subgraph Tailscale VPN Mesh<br/>100.64.0.0/10
+        MasterVPN[Master<br/>100.64.0.1]
+        LadyVPN[Lady<br/>100.64.0.2]
+        MacVPN[Mac Client<br/>100.64.0.3]
+        MobileVPN[Mobile Devices<br/>100.64.0.x]
+    end
+
+    subgraph WireGuard P2P<br/>10.10.0.0/30
+        MasterWG[Master<br/>10.10.0.1]
+        EdgeRouterWG[EdgeRouter<br/>10.10.0.2]
+    end
+
+    subgraph Home Network<br/>192.168.1.0/24
+        EdgeRouter[EdgeRouter X]
+        HomeDevices[Home Devices]
+    end
+
+    %% Internet connections
+    WAN -->|UFW: 80,443,41641| Master
+    WAN -->|UFW: 25,80,443,587,993,41642| Lady
+
+    %% Tailscale mesh - All interconnected
+    MasterVPN <--> LadyVPN
+    MasterVPN <--> MacVPN
+    MasterVPN <--> MobileVPN
+    LadyVPN <--> MacVPN
+    LadyVPN <--> MobileVPN
+    MacVPN <--> MobileVPN
+
+    %% Physical to VPN mapping
+    Master -.Headscale.-> MasterVPN
+    Lady -.Tailscale.-> LadyVPN
+    
+    %% WireGuard P2P tunnel
+    MasterWG <-->|WireGuard tunnel| EdgeRouterWG
+    Master -.-> MasterWG
+    EdgeRouter -.-> EdgeRouterWG
+
+    %% Home network
+    EdgeRouter --> HomeDevices
+
+    %% DNS
+    DNS[Cloudflare DNS<br/>1.1.1.1]
+    Master -->|Bootstrap DNS| DNS
+    Lady -->|Bootstrap DNS| DNS
+
+    %% Domains
+    Domain1[quietly.its.me]
+    Domain2[quietly.online]
+    Domain3[quietly.cloud]
+    WAN --> Domain1
+    WAN --> Domain2
+    WAN --> Domain3
+    Domain1 -.-> Master
+    Domain2 -.-> Lady
+    Domain3 -.wildcard.-> Master
+
+    classDef server fill:#4CAF50,stroke:#333,stroke-width:2px,color:#fff
+    classDef vpn fill:#2196F3,stroke:#333,stroke-width:2px,color:#fff
+    classDef external fill:#FF9800,stroke:#333,stroke-width:2px,color:#fff
+    classDef home fill:#9C27B0,stroke:#333,stroke-width:2px,color:#fff
+
+    class Master,Lady server
+    class MasterVPN,LadyVPN,MacVPN,MobileVPN,MasterWG,EdgeRouterWG vpn
+    class WAN,DNS,Domain1,Domain2,Domain3 external
+    class EdgeRouter,HomeDevices home

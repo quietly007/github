@@ -1,0 +1,160 @@
+```mermaid
+%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#2196F3', 'primaryTextColor': '#fff', 'primaryBorderColor': '#1976D2', 'lineColor': '#64B5F6', 'secondaryColor': '#4CAF50', 'tertiaryColor': '#424242'}}}%%
+graph TB
+    subgraph INTERNET["🌐 INTERNET"]
+        USER[("👥 Users<br/>Web/Mobile")]
+        ATTACKERS[("🔴 Attackers<br/>Bad Actors")]
+    end
+    
+    subgraph CF["☁️ CLOUDFLARE"]
+        CF_DNS["DNS<br/>quietly.its.me<br/>quietly.online"]
+        CF_WAF["WAF Protection"]
+    end
+    
+    subgraph MASTER["🖥️ MASTER SERVER - quietly.its.me"]
+        subgraph MASTER_EDGE["Edge Layer"]
+            TRAEFIK_M["🚦 Traefik v3.6.6<br/>Reverse Proxy<br/>52.95 MiB RAM"]
+            CROWDSEC_M["🛡️ CrowdSec v1.6.8<br/>IPS/WAF<br/>154.4 MiB RAM<br/>25,505 CAPI Bans"]
+            BOUNCER_M["🔒 Bouncer<br/>Auto-ban<br/>30.16 MiB RAM"]
+        end
+        
+        subgraph MASTER_AUTH["Authentication"]
+            AUTHELIA["🔐 Authelia 4.39.15<br/>SSO + 2FA<br/>85.03 MiB RAM"]
+        end
+        
+        subgraph MASTER_MONITORING["📊 Monitoring Stack"]
+            PROMETHEUS["📈 Prometheus v2.54.1<br/>Metrics (20 targets)<br/>1.518 GiB/2GiB (76%)"]
+            GRAFANA["📊 Grafana 11.4.0<br/>12+ Dashboards<br/>228.3 MiB/1GiB"]
+            LOKI["📝 Loki 3.3.2<br/>Log Aggregation<br/>137MB storage<br/>201 MiB RAM"]
+            ALERTMANAGER["🔔 Alertmanager v0.27<br/>→ NTFY (not Gotify)<br/>49.6 MiB/256MiB"]
+            PROMTAIL_M["📤 Promtail 3.4.2<br/>Log Shipper<br/>143.6 MiB RAM"]
+        end
+        
+        subgraph MASTER_INFRA["Infrastructure Services"]
+            PIHOLE["🕳️ Pi-hole 2025.11.1<br/>DNS Filtering<br/>62.42 MiB RAM"]
+            CLOUDFLARED["☁️ Cloudflared<br/>DoH Upstream<br/>24.42 MiB RAM"]
+            PORTAINER_M["🐳 Portainer CE 2.33.6<br/>Docker UI<br/>88.71 MiB RAM"]
+        end
+        
+        subgraph MASTER_APPS["Applications"]
+            ADMIN_PANEL["🎛️ Admin Panel<br/>Python 3.11<br/>36.42 MiB (4.41% CPU)"]
+            SEMAPHORE["🎭 Semaphore v2.10.22<br/>Ansible UI<br/>55.86 MiB RAM"]
+            UPTIME_KUMA["📡 Uptime Kuma 1.23.17<br/>Status Page<br/>169.7 MiB RAM"]
+            IT_TOOLS["🔧 IT-Tools<br/>Developer Utils<br/>13.53 MiB RAM"]
+            NTFY["📲 NTFY v2.16.0<br/>Push Notifications<br/>54.72 MiB RAM"]
+            GOTIFY["📲 Gotify 2.5.0<br/>Push Notifications<br/>41.32 MiB RAM"]
+        end
+        
+        subgraph MASTER_VPN["VPN/Mesh"]
+            HEADSCALE["🌐 Headscale (Native)<br/>Systemd Service<br/>66.8 MiB RAM<br/>5 days uptime"]
+            HEADSCALE_UI["🖥️ Headscale UI<br/>18.8 MiB RAM"]
+            HEADSCALE_ADMIN["⚙️ Headscale Admin<br/>16.18 MiB RAM"]
+        end
+        
+        subgraph MASTER_METRICS["Metrics Exporters"]
+            NODE_EXP_M["📊 Node Exporter<br/>27.65 MiB RAM"]
+            CADVISOR_M["📊 cAdvisor<br/>339.2 MiB RAM"]
+            BLACKBOX["📊 Blackbox v0.28<br/>28.95 MiB RAM"]
+        end
+    end
+    
+    subgraph LADY["🖥️ LADY SERVER - quietly.online"]
+        subgraph LADY_EDGE["Edge Layer"]
+            TRAEFIK_L["🚦 Traefik<br/>57.18 MiB RAM"]
+            CROWDSEC_L["🛡️ CrowdSec<br/>130 MiB RAM"]
+            BOUNCER_L["🔒 Bouncer<br/>24.36 MiB RAM"]
+        end
+        
+        subgraph LADY_MAIL["📧 Mailcow Stack (18 containers)"]
+            NGINX_MC["nginx-mailcow<br/>18.87 MiB"]
+            DOVECOT["dovecot<br/>74.67 MiB"]
+            POSTFIX["postfix<br/>80.71 MiB"]
+            RSPAMD["rspamd<br/>218.9 MiB"]
+            MYSQL_MC["mysql<br/>366.2 MiB"]
+            REDIS_MC["redis<br/>17.9 MiB"]
+            SOGO["sogo<br/>293.5 MiB"]
+            CLAMD["clamd (AV)<br/>1021 MiB"]
+        end
+        
+        subgraph LADY_BUSINESS["💼 Business Apps"]
+            NEXTCLOUD["☁️ Nextcloud<br/>190.6 MiB RAM"]
+            ONLYOFFICE["📝 OnlyOffice<br/>615.2 MiB RAM"]
+            ODOO["🏢 Odoo ERP<br/>189.4 MiB/1GiB"]
+        end
+        
+        subgraph LADY_NETWORK["🌐 Network Management"]
+            UNIFI["📡 UniFi Controller<br/>850.6 MiB RAM"]
+            UNIFI_DB["🗃️ UniFi DB<br/>256 MiB RAM"]
+            UISP["📡 UISP<br/>1.912 GiB RAM"]
+        end
+        
+        subgraph LADY_HOME["🏠 Smart Home"]
+            HOMEASSISTANT["🏠 Home Assistant<br/>250 MiB RAM"]
+            FRIGATE["📹 Frigate NVR<br/>488.7 MiB RAM"]
+        end
+        
+        subgraph LADY_METRICS["Metrics"]
+            NODE_EXP_L["📊 Node Exporter<br/>17.09 MiB"]
+            CADVISOR_L["📊 cAdvisor<br/>387.2 MiB"]
+            MYSQLD_EXP["📊 MySQLd Exporter<br/>15.88 MiB"]
+            PROMTAIL_L["📤 Promtail<br/>89.81 MiB"]
+        end
+    end
+    
+    %% Internet connections
+    USER --> CF_DNS
+    ATTACKERS --> CF_WAF
+    CF_DNS --> TRAEFIK_M
+    CF_DNS --> TRAEFIK_L
+    CF_WAF -.->|"Blocked"| ATTACKERS
+    
+    %% Master internal connections
+    TRAEFIK_M --> CROWDSEC_M
+    CROWDSEC_M <--> BOUNCER_M
+    TRAEFIK_M --> AUTHELIA
+    AUTHELIA --> ADMIN_PANEL
+    AUTHELIA --> GRAFANA
+    AUTHELIA --> PROMETHEUS
+    AUTHELIA --> PORTAINER_M
+    
+    %% Monitoring connections
+    PROMETHEUS --> NODE_EXP_M
+    PROMETHEUS --> CADVISOR_M
+    PROMETHEUS --> NODE_EXP_L
+    PROMETHEUS --> CADVISOR_L
+    PROMETHEUS --> MYSQLD_EXP
+    PROMETHEUS --> BLACKBOX
+    PROMTAIL_M --> LOKI
+    PROMTAIL_L --> LOKI
+    ALERTMANAGER --> NTFY
+    GRAFANA --> PROMETHEUS
+    GRAFANA --> LOKI
+    
+    %% DNS
+    PIHOLE --> CLOUDFLARED
+    
+    %% VPN Mesh
+    HEADSCALE <-.->|"100.64.0.1"| MASTER
+    HEADSCALE <-.->|"100.64.0.2"| LADY
+    
+    %% Lady connections
+    TRAEFIK_L --> CROWDSEC_L
+    CROWDSEC_L <--> BOUNCER_L
+    TRAEFIK_L --> NGINX_MC
+    TRAEFIK_L --> NEXTCLOUD
+    TRAEFIK_L --> ODOO
+    TRAEFIK_L --> UNIFI
+    
+    %% Style
+    classDef master fill:#1565C0,stroke:#0D47A1,color:#fff
+    classDef lady fill:#2E7D32,stroke:#1B5E20,color:#fff
+    classDef security fill:#C62828,stroke:#B71C1C,color:#fff
+    classDef monitoring fill:#F57C00,stroke:#E65100,color:#fff
+    classDef external fill:#424242,stroke:#212121,color:#fff
+    
+    class MASTER,MASTER_EDGE,MASTER_AUTH,MASTER_MONITORING,MASTER_INFRA,MASTER_APPS,MASTER_VPN,MASTER_METRICS master
+    class LADY,LADY_EDGE,LADY_MAIL,LADY_BUSINESS,LADY_NETWORK,LADY_HOME,LADY_METRICS lady
+    class CROWDSEC_M,CROWDSEC_L,BOUNCER_M,BOUNCER_L,AUTHELIA security
+    class PROMETHEUS,GRAFANA,LOKI,ALERTMANAGER monitoring
+    class CF,INTERNET external
+```

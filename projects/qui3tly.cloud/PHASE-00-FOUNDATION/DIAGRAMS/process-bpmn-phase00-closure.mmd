@@ -1,0 +1,27 @@
+flowchart LR
+  subgraph User[User Lane]
+    U1([Request final comprehensive audit]) --> U2([Review closure package])
+    U2 --> U3([Approve Phase 00])
+  end
+
+  subgraph Agent[Agent Lane]
+    A1([Read docs + rules]) --> A2([Audit live infra + logs])
+    A2 --> A3{Findings clean?}
+    A3 -->|No| A4([Apply minimal safe remediation])
+    A4 --> A5([Re-run verification])
+    A3 -->|Yes| A6([Build final evidence + diagrams])
+    A5 --> A6
+    A6 --> A7([Publish closure report])
+  end
+
+  subgraph Platform[Infrastructure Lane]
+    P1([Master services])
+    P2([Lady services])
+    P3([Monitoring + alerting])
+  end
+
+  U1 --> A1
+  A2 --> P1
+  A2 --> P2
+  A2 --> P3
+  A7 --> U2

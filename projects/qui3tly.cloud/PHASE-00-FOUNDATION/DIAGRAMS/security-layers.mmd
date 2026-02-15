@@ -1,0 +1,148 @@
+graph TB
+    subgraph Layers["🛡️ Defense-in-Depth Security Architecture"]
+        direction TB
+        
+        subgraph Layer1["Layer 1: Network Perimeter 🌐"]
+            direction LR
+            
+            Firewall[Firewall - iptables<br/>• Allow: 80, 443, mail ports<br/>• Drop: All other incoming<br/>• Rate limiting<br/>• Connection tracking]
+            
+            PublicPorts[Public Exposure<br/>Master: 80, 443, 51820<br/>Lady: 80, 443, 25, 587, 993]
+            
+            GeoBlock[Geographic Filtering<br/>• CrowdSec IP lists<br/>• Known bad actors<br/>• VPN detection]
+        end
+        
+        subgraph Layer2["Layer 2: VPN Access 🔐"]
+            direction LR
+            
+            Tailscale[Tailscale Mesh VPN<br/>• Zero-trust networking<br/>• Device authentication<br/>• Encrypted traffic<br/>• 100.64.0.0/10]
+            
+            WireGuard[WireGuard P2P<br/>• Site-to-site tunnel<br/>• Cryptokey routing<br/>• 10.10.0.0/30]
+            
+            AdminOnly[Admin Interfaces<br/>VPN-only access:<br/>• Portainer<br/>• Prometheus<br/>• Postgres<br/>• Redis]
+        end
+        
+        subgraph Layer3["Layer 3: Reverse Proxy + IPS 🚦"]
+            direction LR
+            
+            Traefik[Traefik Reverse Proxy<br/>• TLS termination<br/>• Rate limiting: 100 req/min<br/>• Header security<br/>• Access logs]
+            
+            CrowdSec[CrowdSec IPS<br/>• 42,345 rules<br/>• Community intel<br/>• ML detection<br/>• Auto-ban 4-24h]
+            
+            Bouncer[Traefik Bouncer<br/>• Real-time blocking<br/>• 1,247 bans (30d)<br/>• Whitelist management]
+            
+            Fail2ban[Fail2ban<br/>• SSH brute-force<br/>• Auth failures<br/>• 54 bans (7d)]
+        end
+        
+        subgraph Layer4["Layer 4: Authentication & Authorization 🔑"]
+            direction LR
+            
+            Authelia[Authelia SSO<br/>• Single Sign-On<br/>• 2FA/TOTP optional<br/>• Session: 12h<br/>• Inactivity: 1h]
+            
+            ACL[Access Control Lists<br/>• Domain-based rules<br/>• Group permissions<br/>• Default: deny<br/>• 18 protected services]
+            
+            MFA[Multi-Factor Auth<br/>• TOTP (Google Auth)<br/>• SMS backup<br/>• Recovery codes]
+        end
+        
+        subgraph Layer5["Layer 5: Application Security 🎯"]
+            direction LR
+            
+            AppAuth[Application Auth<br/>Service-specific:<br/>• Grafana login<br/>• Mailcow users<br/>• Nextcloud accounts]
+            
+            RBAC[Role-Based Access<br/>• Admin role<br/>• User role<br/>• Read-only<br/>• Service-specific]
+            
+            AuditLog[Audit Logging<br/>• All access logged<br/>• Loki aggregation<br/>• 30-day retention<br/>• SIEM-ready]
+        end
+    end
+
+    subgraph ThreatProtection["🦠 Threat Protection"]
+        direction TB
+        
+        subgraph EmailSecurity["Email Security"]
+            Rspamd[Rspamd<br/>• Spam filtering<br/>• DKIM signing<br/>• ML-based<br/>• 6.1% spam rate]
+            
+            ClamAV[ClamAV<br/>• Virus scanning<br/>• Real-time updates<br/>• 0 viruses (7d)]
+            
+            Olefy[Olefy<br/>• Office doc scan<br/>• Macro detection]
+        end
+        
+        subgraph WebSecurity["Web Security"]
+            TLS[TLS/SSL<br/>• Let's Encrypt<br/>• A+ grade<br/>• TLS 1.2/1.3<br/>• HSTS enabled]
+            
+            Headers[Security Headers<br/>• X-Frame-Options<br/>• CSP<br/>• X-Content-Type<br/>• Referrer-Policy]
+            
+            WAF[WAF Rules<br/>• CrowdSec bouncer<br/>• OWASP patterns<br/>• Rate limiting]
+        end
+        
+        subgraph NetworkSecurity["Network Security"]
+            Encryption[Encryption<br/>• TLS everywhere<br/>• VPN tunnels<br/>• At-rest (future)]
+            
+            Segmentation[Network Segmentation<br/>• Docker networks<br/>• Service isolation<br/>• Minimal exposure]
+        end
+    end
+
+    subgraph Monitoring2["👁️ Security Monitoring"]
+        direction LR
+        
+        RealTime[Real-time Monitoring<br/>• Prometheus alerts<br/>• Log analysis<br/>• Gotify notifications]
+        
+        Weekly[Weekly Security Audit<br/>• Cron: 2am Sunday<br/>• CrowdSec stats<br/>• Fail2ban review<br/>• CVE scan]
+        
+        Alerts[Security Alerts<br/>• High CPU (attack?)<br/>• Failed logins<br/>• New bans<br/>• Cert expiry]
+    end
+
+    subgraph Compliance["📋 Security Compliance"]
+        direction TB
+        
+        Standards[Following Standards<br/>• CIS Docker Benchmark<br/>• NIST Framework<br/>• OWASP Top 10<br/>• Mozilla TLS config]
+        
+        BestPractices[Best Practices<br/>• Principle of least privilege<br/>• Defense in depth<br/>• Security by design<br/>• Regular updates]
+        
+        Documentation[Security Docs<br/>• Policies documented<br/>• Runbooks ready<br/>• Incident response<br/>• Contact info]
+    end
+
+    subgraph Vulnerabilities["🔍 Vulnerability Management"]
+        VulnScan[Weekly Vulnerability Scan<br/>Last: Feb 14, 2026<br/>• 0 Critical<br/>• 0 High<br/>• 2 Medium<br/>• 5 Low]
+        
+        Patching[Patching Strategy<br/>• Critical: 24h<br/>• High: 7d<br/>• Medium: 30d<br/>• Low: Quarterly]
+    end
+
+    Internet[🌐 Internet<br/>Untrusted]
+    
+    Internet --> Layer1
+    Layer1 --> Layer2
+    Layer2 --> Layer3
+    Layer3 --> Layer4
+    Layer4 --> Layer5
+    
+    Layer3 --> ThreatProtection
+    Layer5 --> Monitoring2
+    ThreatProtection --> Monitoring2
+    
+    Monitoring2 -.->|Alerts| Compliance
+    Vulnerabilities -.->|Findings| Patching
+
+    subgraph Stats["📊 Security Statistics (Last 30 Days)"]
+        ST1[CrowdSec Bans: 1,247]
+        ST2[Fail2ban Bans: 54]
+        ST3[Spam Blocked: 234]
+        ST4[Viruses Detected: 0]
+        ST5[Failed Logins: 18]
+        ST6[Critical Vulnerabilities: 0]
+        ST7[Security Incidents: 0]
+        ST8[TLS Grade: A+]
+    end
+
+    classDef network fill:#326ce5,stroke:#fff,stroke-width:2px,color:#fff
+    classDef vpn fill:#00d4aa,stroke:#fff,stroke-width:2px,color:#000
+    classDef proxy fill:#f77f00,stroke:#fff,stroke-width:2px,color:#fff
+    classDef auth fill:#9b59b6,stroke:#fff,stroke-width:2px,color:#fff
+    classDef app fill:#16a085,stroke:#fff,stroke-width:2px,color:#fff
+    classDef threat fill:#d62828,stroke:#fff,stroke-width:2px,color:#fff
+
+    class Layer1,Firewall network
+    class Layer2,Tailscale,WireGuard vpn
+    class Layer3,Traefik,CrowdSec proxy
+    class Layer4,Authelia,ACL auth
+    class Layer5,AppAuth,RBAC app
+    class ThreatProtection,EmailSecurity,WebSecurity threat

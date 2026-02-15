@@ -1,0 +1,77 @@
+sequenceDiagram
+    participant User as User/Client
+    participant Traefik as Traefik<br/>Reverse Proxy
+    participant Authelia as Authelia<br/>2FA Gateway
+    participant Service as Backend Service<br/>(Grafana, Portainer, etc)
+    participant VPN as Tailscale VPN<br/>100.64.0.0/10
+
+    Note over User,Service: Public Service Access Flow
+
+    User->>Traefik: HTTPS Request<br/>https://grafana.quietly.its.me
+    
+    alt VPN-Only Service
+        Traefik->>Traefik: Check Source IP
+        alt IP not in VPN network
+            Traefik-->>User: 403 Forbidden<br/>"VPN Required"
+            Note over User: Must connect to<br/>Tailscale VPN first
+        end
+    end
+
+    Traefik->>Traefik: Check Middleware<br/>"authelia@docker"
+    
+    alt Has Valid Session
+        Note over Traefik,Authelia: Session cookie valid
+        Traefik->>Service: Forward Request<br/>Add headers
+        Service->>Service: Process Request
+        Service-->>Traefik: Response
+        Traefik-->>User: Response
+    else No Session or Expired
+        Traefik->>Authelia: Verify Authentication
+        
+        alt Not Authenticated
+            Authelia-->>Traefik: 302 Redirect
+            Traefik-->>User: Redirect to Login<br/>https://auth.quietly.its.me
+            User->>Authelia: Login Page
+            User->>Authelia: Submit Credentials
+            
+            alt Invalid Credentials
+                Authelia-->>User: Login Failed<br/>Try Again
+            else Valid Credentials
+                Authelia->>Authelia: Check 2FA Required
+                
+                alt 2FA Required
+                    Authelia-->>User: Request 2FA Code
+                    User->>Authelia: Submit 2FA Code<br/>(TOTP)
+                    
+                    alt 2FA Invalid
+                        Authelia-->>User: 2FA Failed
+                    else 2FA Valid
+                        Authelia->>Authelia: Create Session
+                        Authelia-->>User: Set Session Cookie<br/>302 Redirect to Service
+                    end
+                else No 2FA
+                    Authelia->>Authelia: Create Session
+                    Authelia-->>User: Set Session Cookie<br/>302 Redirect to Service
+                end
+            end
+            
+            User->>Traefik: Request with Session
+            Traefik->>Authelia: Verify Session
+            Authelia-->>Traefik: Session Valid
+        end
+        
+        Traefik->>Service: Forward Request<br/>Remote-User, Remote-Email headers
+        Service->>Service: Process Request
+        Service-->>Traefik: Response
+        Traefik-->>User: Response
+    end
+
+    Note over User,Service: VPN Mesh Access (Internal)
+    
+    User->>VPN: Connect Tailscale<br/>(Mobile/Mac/Laptop)
+    VPN-->>User: Assigned 100.64.0.x IP
+    User->>Service: Direct Access<br/>http://100.64.0.1:port
+    Service-->>User: Response<br/>(No Traefik/Authelia)
+
+    Note over User,Service: Authentication Summary
+    Note over Traefik: - VPN-only middleware: Source IP check<br/>- Authelia middleware: User authentication<br/>- Session cookies: 12h expiry<br/>- 2FA: TOTP (Google Authenticator)

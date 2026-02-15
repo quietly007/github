@@ -1,0 +1,22 @@
+]633;E;{   echo "# prometheus targets via container API"\x3b   docker exec prometheus sh -lc 'wget -qO- http://localhost:9090/api/v1/targets 2>/dev/null | jq ".data.activeTargets | length"' 2>/dev/null || echo "unable_to_query"\x3b   echo\x3b echo "# prometheus targets fallback from config scrape_configs count"\x3b   docker exec prometheus sh -lc 'grep -c "^- job_name:" /etc/prometheus/prometheus.yml 2>/dev/null' 2>/dev/null || true\x3b } > /home/qui3tly/projects/qui3tly.cloud/PHASE-00-FOUNDATION/AGENT3/EVIDENCE/monitoring_metrics_verification.txt 2>&1;cb80ee7f-9768-4bcb-9d38-2f473ba6c305]633;C# backup dir size
+1.6G	/home/qui3tly/backups
+
+# backup tar files size summary
+965681556 /home/qui3tly/backups/prometheus_prometheus_data_20260215_201753.tar.gz
+532630594 /home/qui3tly/backups/monitoring_prometheus_data_20260215_201753.tar.gz
+117164123 /home/qui3tly/backups/loki_loki_data_20260215_201753.tar.gz
+51320849 /home/qui3tly/backups/monitoring_loki_data_20260215_201753.tar.gz
+9937737 /home/qui3tly/backups/monitoring_grafana_data_20260215_201753.tar.gz
+9663397 /home/qui3tly/backups/grafana_grafana_data_20260215_201753.tar.gz
+1017190 /home/qui3tly/backups/portainer_portainer_data_20260215_201753.tar.gz
+9899 /home/qui3tly/backups/compose_20260215_201753.tar.gz
+9899 /home/qui3tly/backups/compose_20260215_201653.tar.gz
+5904 /home/qui3tly/backups/secrets_20260215_201753.tar.gz
+5904 /home/qui3tly/backups/secrets_20260215_201653.tar.gz
+87 /home/qui3tly/backups/prometheus_data_20260215_201653.tar.gz
+87 /home/qui3tly/backups/portainer_data_20260215_201653.tar.gz
+87 /home/qui3tly/backups/loki_data_20260215_201653.tar.gz
+87 /home/qui3tly/backups/grafana_data_20260215_201653.tar.gz
+
+# backup tar total bytes
+1687447400

@@ -1,0 +1,32 @@
+Agent 3 verification summary
+Date (UTC): 2026-02-15
+
+Master checks:
+- docker ps -q | wc -l: 25
+- free -h: Mem total 47Gi, used 4.9Gi
+- df -h /: /dev/sda1 985G total, 24G used (3%)
+
+Lady spot-check:
+- ssh lady 'docker ps -q | wc -l': 39
+
+Monitoring checks:
+- Prometheus active targets (via prometheus API health up count): 19
+- Loki storage (du -sh /loki): 138.5M
+- Alertmanager integration: Ntfy webhook URLs present; Gotify not present in alertmanager.yml
+
+Authelia scope checks:
+- Explicit Traefik router middlewares with authelia@docker: 2
+  - quietly-its-me
+  - quietly-online
+- Note: This count reflects explicit compose label references discovered by grep.
+
+Backup checks:
+- Backup directory size: 1.6G (/home/qui3tly/backups)
+- Total .tar.gz bytes in /home/qui3tly/backups: 1687447400 bytes
+- Largest artifacts:
+  - prometheus_prometheus_data_20260215_201753.tar.gz: 965681556 bytes
+  - monitoring_prometheus_data_20260215_201753.tar.gz: 532630594 bytes
+  - loki_loki_data_20260215_201753.tar.gz: 117164123 bytes
+
+Cron execution logs:
+- No matching entries found in /var/log/syslog for daily_report|weekly_security|docker_backup during this check.

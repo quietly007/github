@@ -1,0 +1,127 @@
+graph LR
+    subgraph Master[Master Server - Control Plane - 25 Services]
+        subgraph Infrastructure
+            Traefik[Traefik<br/>Reverse Proxy]
+            Headscale[Headscale<br/>Native Systemd<br/>VPN Controller]
+            Cloudflared[Cloudflared<br/>DNS Tunnel]
+            Portainer[Portainer<br/>Container Mgmt]
+        end
+
+        subgraph Monitoring
+            Prometheus[Prometheus<br/>Metrics]
+            Grafana[Grafana<br/>Dashboards]
+            Loki[Loki<br/>Log Aggregation]
+            Promtail_M[Promtail<br/>Log Shipper]
+            Alertmanager[Alertmanager<br/>Alerts]
+            Uptime[Uptime Kuma<br/>Uptime Checks]
+        end
+
+        subgraph Security
+            CrowdSec[CrowdSec<br/>IPS/IDS]
+            Bouncer[Traefik Bouncer<br/>IP Blocker]
+            Fail2ban_M[fail2ban<br/>Brute Force]
+            Authelia[Authelia<br/>2FA Gateway]
+        end
+
+        subgraph Exporters
+            NodeExp_M[Node Exporter]
+            CAdvisor_M[cAdvisor]
+            Blackbox_M[Blackbox Exporter]
+        end
+
+        subgraph Apps
+            ITTools[IT Tools<br/>Admin Utils]
+            AdminPanel[Admin Panel<br/>Dashboard]
+        end
+    end
+
+    subgraph Lady[Lady Server - Worker & Business - 39 Services]
+        subgraph Email[Mailcow Stack - 18 Services]
+            Postfix[Postfix<br/>SMTP]
+            Dovecot[Dovecot<br/>IMAP]
+            SOGo[SOGo<br/>Webmail]
+            Rspamd[Rspamd<br/>Spam Filter]
+            ClamAV[ClamAV<br/>Antivirus]
+            MailcowUI[Mailcow UI]
+            Redis_Mail[Redis]
+            Memcached[Memcached]
+            MySQL[MariaDB]
+            Solr[Solr Search]
+            Nginx_Mail[Nginx]
+            Acme_Mail[ACME]
+        end
+
+        subgraph Business
+            Nextcloud[Nextcloud<br/>Cloud Storage]
+            OnlyOffice[OnlyOffice<br/>Docs Editor]
+            Odoo[Odoo<br/>ERP/CRM]
+            PostgreSQL[PostgreSQL<br/>DB]
+        end
+
+        subgraph Lady_Monitoring
+            Promtail_L[Promtail<br/>Log Shipper]
+            NodeExp_L[Node Exporter]
+            CAdvisor_L[cAdvisor]
+            Blackbox_L[Blackbox Exporter]
+        end
+
+        subgraph Lady_Security
+            Fail2ban_L[fail2ban<br/>Partial]
+        end
+
+        subgraph Lady_Infra
+            Watchtower[Watchtower<br/>Updates]
+        end
+    end
+
+    %% Master Internal Connections
+    Traefik --> Authelia
+    Authelia --> Grafana
+    Authelia --> Portainer
+    Authelia --> ITTools
+    Authelia --> AdminPanel
+    Traefik --> Uptime
+    Prometheus --> NodeExp_M
+    Prometheus --> CAdvisor_M
+    Prometheus --> Blackbox_M
+    Loki --> Promtail_M
+    CrowdSec --> Bouncer
+    Bouncer --> Traefik
+
+    %% Lady Internal Connections
+    Postfix --> Dovecot
+    Dovecot --> SOGo
+    Postfix --> Rspamd
+    Rspamd --> Redis_Mail
+    SOGo --> MySQL
+    Nextcloud --> PostgreSQL
+    Odoo --> PostgreSQL
+
+    %% Cross-Server Monitoring
+    Prometheus -.Scrape.-> NodeExp_L
+    Prometheus -.Scrape.-> CAdvisor_L
+    Prometheus -.Scrape.-> Blackbox_L
+    Loki -.Collect.-> Promtail_L
+
+    %% External Access
+    Internet[Internet Traffic] --> Traefik
+    Internet --> Postfix
+
+    %% VPN Mesh
+    VPN[Tailscale VPN<br/>100.64.0.0/10]
+    Master -.-> VPN
+    Lady -.-> VPN
+    Headscale -.Controls.-> VPN
+
+    classDef master fill:#4CAF50,stroke:#333,stroke-width:2px,color:#fff
+    classDef lady fill:#2196F3,stroke:#333,stroke-width:2px,color:#fff
+    classDef monitoring fill:#FF9800,stroke:#333,stroke-width:1px
+    classDef security fill:#F44336,stroke:#333,stroke-width:1px
+    classDef email fill:#9C27B0,stroke:#333,stroke-width:1px
+    classDef business fill:#00BCD4,stroke:#333,stroke-width:1px
+
+    class Traefik,Headscale,Portainer,Cloudflared master
+    class Postfix,Dovecot,SOGo,Rspamd,ClamAV lady
+    class Prometheus,Grafana,Loki,Alertmanager,Uptime monitoring
+    class CrowdSec,Bouncer,Authelia,Fail2ban_M,Fail2ban_L security
+    class Nextcloud,OnlyOffice,Odoo,PostgreSQL business

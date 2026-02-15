@@ -1,0 +1,13 @@
+flowchart TD
+  A[Start Final Phase 00 Audit] --> B[Read governance + instructions]
+  B --> C[Collect live infrastructure evidence]
+  C --> D[Verify containers, storage, monitoring, backup]
+  D --> E[Run deep log sweep master + lady]
+  E --> F{Critical errors found?}
+  F -->|Yes| G[Identify root cause + apply safe fix]
+  G --> H[Re-verify logs and service health]
+  H --> I[Update evidence and correction records]
+  F -->|No| I
+  I --> J[Generate closure diagrams and final report]
+  J --> K[User verification document]
+  K --> L[Phase 00 closure ready]

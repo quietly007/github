@@ -1,0 +1,96 @@
+```mermaid
+%%{init: {'theme': 'dark'}}%%
+flowchart TB
+    subgraph AUTOMATION["🤖 AUTOMATION ARCHITECTURE - VERIFIED"]
+        direction TB
+    end
+    
+    subgraph CRON["⏰ CRON JOBS (Master Only)"]
+        CRON1["📊 Daily Report<br/>━━━━━━━━━━━━━━━<br/>Schedule: 0 6 * * *<br/>Time: 6:00 AM daily<br/>Script: daily_report.sh"]
+        
+        CRON2["🔒 Weekly Security<br/>━━━━━━━━━━━━━━━<br/>Schedule: 0 2 * * 0<br/>Time: 2:00 AM Sunday<br/>Script: weekly_security.sh"]
+        
+        CRON3["📈 Monthly Report<br/>━━━━━━━━━━━━━━━<br/>Schedule: 0 3 1 * *<br/>Time: 3:00 AM 1st<br/>Script: monthly_report.sh"]
+        
+        CRON4["💾 Docker Backup<br/>━━━━━━━━━━━━━━━<br/>Schedule: 0 3 * * *<br/>Time: 3:00 AM daily<br/>Script: docker_backup.sh"]
+    end
+    
+    subgraph SCRIPTS["📜 AUTOMATION SCRIPTS (29 total)"]
+        subgraph AGENT_SCRIPTS["🤖 Agent Communication (4)"]
+            S1["agent-handshake.sh (139 lines)<br/>Twin server connectivity test"]
+            S2["agent-sync.sh (228 lines)<br/>Inter-agent communication"]
+            S3["dr-check.sh (249 lines)<br/>Disaster recovery verification"]
+            S4["ansible-health-check.sh (75 lines)<br/>Ansible playbook runner"]
+        end
+        
+        subgraph BACKUP_SCRIPTS["💾 Backup (2)"]
+            S5["backup-docs-phase1.sh (71 lines)<br/>Documentation backup"]
+            S6["backup-semaphore.sh (39 lines)<br/>Semaphore DB backup"]
+        end
+        
+        subgraph VPN_SCRIPTS["🌐 VPN/Network (4)"]
+            S7["check-wireguard.sh (49 lines)<br/>WireGuard health check"]
+            S8["exit-nat-rules.sh (18 lines)<br/>NAT masquerade rules"]
+            S9["exit-toggle.sh (51 lines)<br/>Exit node toggle"]
+            S10["fix-lady-ip.sh<br/>IP configuration fix"]
+        end
+        
+        subgraph DR_SCRIPTS["🚨 Disaster Recovery (1)"]
+            S11["deploy-dr.sh (454 lines)<br/>Complete DR orchestrator<br/>RTO: < 4 hours"]
+        end
+        
+        subgraph OTHER_SCRIPTS["🔧 Other (18)"]
+            S12["Various utility scripts<br/>System management<br/>Monitoring helpers<br/>Maintenance tools"]
+        end
+    end
+    
+    subgraph ANSIBLE["🎭 ANSIBLE AUTOMATION"]
+        SEMAPHORE["🎭 Semaphore v2.10.22<br/>━━━━━━━━━━━━━━━<br/>Ansible Web UI<br/>55.86 MiB RAM<br/>Up 5 days"]
+        
+        PLAYBOOKS["📚 Playbooks<br/>~/.github/ansible/"]
+        
+        INVENTORY["📋 Inventory<br/>Master + Lady"]
+    end
+    
+    subgraph LOCATIONS["📁 FILE LOCATIONS"]
+        LOC1["~/.copilot/cron/<br/>Cron scripts (4)"]
+        LOC2["~/.copilot/scripts/<br/>Automation scripts (29)"]
+        LOC3["~/.copilot/backups/<br/>Backup storage (933MB)"]
+        LOC4["~/.github/ansible/<br/>Ansible playbooks"]
+    end
+    
+    subgraph BACKUP_STORAGE["💾 BACKUP STORAGE VERIFIED"]
+        BS1["Total: 933 MiB<br/>━━━━━━━━━━━━━━━<br/>pre-consolidation.tar.gz: 432KB<br/>copilot-instructions-old: 14KB<br/>production/: [directory]<br/>qui3tly.cloud/: [directory]"]
+        
+        BS2["⚠️ DISCREPANCY<br/>━━━━━━━━━━━━━━━<br/>Documented: 140GB<br/>Actual: ~1GB<br/>Status: NEEDS REVIEW"]
+    end
+    
+    %% Connections
+    CRON1 --> LOC1
+    CRON2 --> LOC1
+    CRON3 --> LOC1
+    CRON4 --> LOC1
+    
+    AGENT_SCRIPTS --> LOC2
+    BACKUP_SCRIPTS --> LOC2
+    VPN_SCRIPTS --> LOC2
+    DR_SCRIPTS --> LOC2
+    OTHER_SCRIPTS --> LOC2
+    
+    SEMAPHORE --> PLAYBOOKS
+    PLAYBOOKS --> INVENTORY
+    
+    CRON4 --> BS1
+    
+    classDef cron fill:#7B1FA2,stroke:#4A148C,color:#fff
+    classDef script fill:#1565C0,stroke:#0D47A1,color:#fff
+    classDef ansible fill:#F57C00,stroke:#E65100,color:#fff
+    classDef storage fill:#2E7D32,stroke:#1B5E20,color:#fff
+    classDef warning fill:#C62828,stroke:#B71C1C,color:#fff
+    
+    class CRON,CRON1,CRON2,CRON3,CRON4 cron
+    class SCRIPTS,AGENT_SCRIPTS,BACKUP_SCRIPTS,VPN_SCRIPTS,DR_SCRIPTS,OTHER_SCRIPTS script
+    class ANSIBLE,SEMAPHORE,PLAYBOOKS,INVENTORY ansible
+    class LOCATIONS,LOC1,LOC2,LOC3,LOC4,BS1 storage
+    class BS2 warning
+```

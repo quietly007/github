@@ -1,0 +1,158 @@
+graph TB
+    subgraph UpdateTypes["🔄 Update Types"]
+        Security[Security Updates<br/>Critical CVEs<br/>Priority: Immediate<br/>Timeline: 24h]
+        
+        Container[Container Images<br/>Docker Hub updates<br/>Priority: Medium<br/>Timeline: Monthly]
+        
+        System[System Packages<br/>apt upgrade<br/>Priority: Medium<br/>Timeline: Monthly]
+        
+        Config[Configuration Changes<br/>Service tuning<br/>Priority: Low<br/>Timeline: As needed]
+    end
+
+    subgraph PreUpgrade["📋 Pre-Upgrade Phase"]
+        direction TB
+        
+        Check1[1. Check for Updates<br/>• Docker image tags<br/>• apt update<br/>• GitHub releases<br/>• Security advisories]
+        
+        Review[2. Review Changes<br/>• Read changelogs<br/>• Check breaking changes<br/>• Review requirements<br/>• Plan timeline]
+        
+        Backup[3. Full Backup<br/>• Run docker_backup.sh<br/>• Database dumps<br/>• Config snapshot<br/>• Git commit all]
+        
+        Snapshot[4. Take Snapshot<br/>• VPS snapshot (Contabo)<br/>• Point-in-time recovery<br/>• Insurance policy]
+        
+        Notify[5. Notify Users<br/>• Maintenance window<br/>• Expected downtime<br/>• Emergency contact]
+        
+        Check1 --> Review --> Backup --> Snapshot --> Notify
+    end
+
+    subgraph UpgradeExecution["⚙️ Upgrade Execution"]
+        direction TB
+        
+        subgraph ContainerUpgrade["Container Upgrade Process"]
+            C1[1. Pull new image<br/>docker-compose pull]
+            C2[2. Stop container<br/>docker-compose stop service]
+            C3[3. Backup current<br/>Container logs<br/>Volume data]
+            C4[4. Start new version<br/>docker-compose up -d]
+            C5[5. Check logs<br/>docker logs -f service]
+            C6[6. Health check<br/>Container status<br/>Service endpoint]
+            
+            C1 --> C2 --> C3 --> C4 --> C5 --> C6
+        end
+        
+        subgraph SystemUpgrade["System Package Upgrade"]
+            S1[1. Update package list<br/>apt update]
+            S2[2. Review upgrades<br/>apt list --upgradable]
+            S3[3. Upgrade packages<br/>apt upgrade -y]
+            S4[4. Clean up<br/>apt autoremove]
+            S5[5. Check services<br/>systemctl status]
+            S6[6. Reboot if needed<br/>Kernel updates]
+            
+            S1 --> S2 --> S3 --> S4 --> S5 --> S6
+        end
+        
+        subgraph ServiceSpecific["Service-Specific Upgrades"]
+            SS1[Headscale Upgrade<br/>• Download binary<br/>• Stop service<br/>• Replace binary<br/>• Start service<br/>NATIVE systemd]
+            
+            SS2[Mailcow Upgrade<br/>• cd /opt/mailcow<br/>• git pull<br/>• ./update.sh<br/>• Restart stack]
+            
+            SS3[Traefik Upgrade<br/>• Update compose<br/>• Pull image<br/>• Reload config<br/>• Zero downtime]
+        end
+    end
+
+    subgraph Testing["🧪 Post-Upgrade Testing"]
+        direction LR
+        
+        T1[1. Service Health<br/>• All containers up<br/>• No restart loops<br/>• Logs clean]
+        
+        T2[2. Functionality<br/>• Web access works<br/>• Mail flow works<br/>• VPN connects<br/>• Auth works]
+        
+        T3[3. Monitoring<br/>• Prometheus scraping<br/>• Grafana dashboards<br/>• Alerts not firing]
+        
+        T4[4. Performance<br/>• Response times OK<br/>• CPU/RAM normal<br/>• No errors]
+        
+        T1 --> T2 --> T3 --> T4
+    end
+
+    subgraph Verification["✅ Verification Phase"]
+        direction TB
+        
+        V1[Monitor for 24h<br/>Watch for issues<br/>Check logs<br/>User feedback]
+        
+        Decision{Upgrade Success?}
+        
+        Success[Success Path<br/>• Document changes<br/>• Update inventory<br/>• Git commit<br/>• Notify users]
+        
+        Rollback[Rollback Path<br/>• Stop new version<br/>• Restore from backup<br/>• Start old version<br/>• Investigate issue]
+        
+        V1 --> Decision
+        Decision -->|Yes| Success
+        Decision -->|No| Rollback
+    end
+
+    subgraph RollbackProcedure["↩️ Rollback Procedure (If Needed)"]
+        direction TB
+        
+        R1[1. Stop failed service<br/>docker-compose stop]
+        R2[2. Restore old image<br/>docker tag or pull]
+        R3[3. Restore data<br/>From backup if corrupted]
+        R4[4. Start old version<br/>docker-compose up -d]
+        R5[5. Verify working<br/>Health checks pass]
+        R6[6. Document issue<br/>Create incident report]
+        
+        R1 --> R2 --> R3 --> R4 --> R5 --> R6
+    end
+
+    subgraph Schedule["📅 Upgrade Schedule"]
+        Monthly[Monthly Updates<br/>First Sunday 2am<br/>• Container images<br/>• System packages<br/>• Non-critical fixes]
+        
+        Quarterly[Quarterly Major Upgrades<br/>Planned maintenance<br/>• Major versions<br/>• Database upgrades<br/>• Architecture changes]
+        
+        Emergency[Emergency Patches<br/>Any time<br/>• Critical CVEs<br/>• Security breaches<br/>• Service outages]
+    end
+
+    subgraph Automation2["🤖 Automation"]
+        WatchUpdates[Watchtower Alternative<br/>Manual + controlled<br/>No auto-updates<br/>Review first]
+        
+        WeeklyCheck[Weekly Update Check<br/>Cron: 2am Sunday<br/>weekly_security.sh<br/>Report available updates]
+        
+        Dependabot[Dependabot (Future)<br/>GitHub alerts<br/>Automated PRs<br/>For IaC repos]
+    end
+
+    UpdateTypes --> PreUpgrade
+    PreUpgrade --> UpgradeExecution
+    UpgradeExecution --> Testing
+    Testing --> Verification
+    
+    Verification -->|Failed| RollbackProcedure
+    RollbackProcedure -.->|Retry later| PreUpgrade
+    
+    Schedule -.->|Triggers| PreUpgrade
+    Automation2 -.->|Detects| UpdateTypes
+
+    subgraph BestPractices["✨ Best Practices"]
+        BP1[• Always backup before upgrade]
+        BP2[• Test in dev first (future)]
+        BP3[• Read changelogs carefully]
+        BP4[• Upgrade one service at a time]
+        BP5[• Monitor after upgrade]
+        BP6[• Document everything]
+        BP7[• Have rollback plan ready]
+        BP8[• Schedule during low traffic]
+    end
+
+    subgraph RecentUpgrades["📜 Recent Upgrade History"]
+        Recent1[Feb 10, 2026: Grafana 10.2 → 10.3<br/>✅ Success, no issues]
+        Recent2[Feb 7, 2026: Traefik 2.11 → 3.0<br/>✅ Success, config changes]
+        Recent3[Feb 1, 2026: System packages<br/>✅ Success, 47 packages]
+        Recent4[Jan 28, 2026: Mailcow 2024a → 2024b<br/>✅ Success + DR test]
+    end
+
+    classDef security fill:#d62828,stroke:#fff,stroke-width:2px,color:#fff
+    classDef normal fill:#326ce5,stroke:#fff,stroke-width:2px,color:#fff
+    classDef test fill:#00d4aa,stroke:#fff,stroke-width:2px,color:#000
+    classDef rollback fill:#f77f00,stroke:#fff,stroke-width:2px,color:#fff
+
+    class Security,Emergency security
+    class Container,System,Config,UpgradeExecution normal
+    class Testing,Verification test
+    class RollbackProcedure,Rollback rollback

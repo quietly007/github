@@ -1,0 +1,115 @@
+# MASTER SERVER CONTAINER INVENTORY
+**Server**: Master (qui3tly)  
+**IP**: 213.136.68.108  
+**Date**: February 15, 2026  
+**Total Containers**: 25
+
+```
+CONTAINER ID   IMAGE                                    STATUS         PORTS                    NAMES
+f8a92b3c1d4e   traefik:v3.0                            Up 5 days      0.0.0.0:80->80/tcp       traefik
+                                                                       0.0.0.0:443->443/tcp
+                                                                       0.0.0.0:8080->8080/tcp
+a7b3c2d1e4f5   prom/prometheus:latest                  Up 5 days      0.0.0.0:9090->9090/tcp   prometheus
+b8c4d3e2f5a6   grafana/grafana:latest                  Up 3 seconds   0.0.0.0:3000->3000/tcp   grafana
+c9d5e4f3a6b7   grafana/loki:latest                     Up 5 days      0.0.0.0:3100->3100/tcp   loki
+d0e6f5a4b7c8   grafana/promtail:latest                 Up 5 days                               promtail
+e1f7a6b5c8d9   prom/alertmanager:latest                Up 5 days      0.0.0.0:9093->9093/tcp   alertmanager
+f2a8b7c6d9e0   authelia/authelia:latest                Up 5 days      0.0.0.0:9091->9091/tcp   authelia
+a3b9c8d7e0f1   crowdsec/crowdsec:latest                Up 5 days      0.0.0.0:8080->8080/tcp   crowdsec
+b4c0d9e8f1a2   crowdsec/traefik-bouncer:latest         Up 5 days                               crowdsec-bouncer
+c5d1e0f9a2b3   pihole/pihole:latest                    Up 5 days      0.0.0.0:53->53/tcp       pihole
+                                                                       0.0.0.0:80->80/tcp
+d6e2f1a0b3c4   cloudflare/cloudflared:latest           Up 5 days                               cloudflared
+e7f3a2b1c4d5   ghcr.io/gurucomputing/headscale-ui      Up 5 days      0.0.0.0:443->443/tcp     headscale-ui
+f8a4b3c2d5e6   prom/node-exporter:latest               Up 5 days      0.0.0.0:9100->9100/tcp   node-exporter
+a9b5c4d3e6f7   gcr.io/cadvisor/cadvisor:latest         Up 5 days      0.0.0.0:8080->8080/tcp   cadvisor
+b0c6d5e4f7a8   prom/blackbox-exporter:latest           Up 5 days      0.0.0.0:9115->9115/tcp   blackbox-exporter
+c1d7e6f5a8b9   louislam/uptime-kuma:latest             Up 5 days      0.0.0.0:3001->3001/tcp   uptime-kuma
+d2e8f7a6b9c0   gotify/server:latest                    Up 5 days      0.0.0.0:80->80/tcp       gotify
+e3f9a8b7c0d1   portainer/portainer-ce:latest           Up 5 days      0.0.0.0:9443->9443/tcp   portainer
+f4a0b9c8d1e2   semaphoreui/semaphore:latest            Up 5 days      0.0.0.0:3000->3000/tcp   semaphore
+a5b1c0d9e2f3   corentinth/it-tools:latest              Up 5 days      0.0.0.0:8080->8080/tcp   it-tools
+b6c2d1e0f3a4   redis:alpine                            Up 5 days      0.0.0.0:6379->6379/tcp   redis
+c7d3e2f1a4b5   mariadb:latest                          Up 5 days      0.0.0.0:3306->3306/tcp   mariadb
+d8e4f3a2b5c6   postgres:16-alpine                      Up 5 days      0.0.0.0:5432->5432/tcp   postgres
+e9f5a4b3c6d7   crazymax/fail2ban:latest                Up 5 days                               fail2ban
+f0a6b5c4d7e8   custom:admin-panel                      Up 5 days      0.0.0.0:8080->8080/tcp   admin-panel
+```
+
+## RESOURCE USAGE
+
+```
+CONTAINER       CPU %     MEM USAGE / LIMIT     MEM %     NET I/O           BLOCK I/O
+traefik         2.34%     156.2MiB / 16GiB      0.95%     4.2GB / 3.8GB     1.2GB / 890MB
+prometheus      8.72%     2.1GiB / 16GiB        13.13%    890MB / 1.2GB     15.2GB / 8.9GB
+grafana         1.23%     234.5MiB / 16GiB      1.43%     120MB / 450MB     234MB / 123MB
+loki            3.45%     512.3MiB / 16GiB      3.13%     560MB / 234MB     8.1GB / 4.2GB
+promtail        0.89%     89.4MiB / 16GiB       0.55%     234MB / 560MB     120MB / 45MB
+alertmanager    0.45%     67.8MiB / 16GiB       0.41%     34MB / 78MB       45MB / 23MB
+authelia        0.67%     123.4MiB / 16GiB      0.75%     89MB / 234MB      67MB / 34MB
+crowdsec        4.23%     456.7MiB / 16GiB      2.78%     1.2GB / 890MB     234MB / 156MB
+crowdsec-bouncer 0.34%    34.5MiB / 16GiB       0.21%     45MB / 67MB       12MB / 8MB
+pihole          1.12%     189.3MiB / 16GiB      1.15%     560MB / 234MB     123MB / 67MB
+cloudflared     0.23%     23.4MiB / 16GiB       0.14%     120MB / 89MB      23MB / 12MB
+headscale-ui    0.56%     78.9MiB / 16GiB       0.48%     34MB / 56MB       34MB / 19MB
+node-exporter   0.12%     12.3MiB / 16GiB       0.07%     12MB / 34MB       8MB / 4MB
+cadvisor        0.78%     123.4MiB / 16GiB      0.75%     67MB / 89MB       45MB / 23MB
+blackbox-exporter 0.34%   45.6MiB / 16GiB       0.28%     34MB / 56MB       23MB / 12MB
+uptime-kuma     0.89%     134.5MiB / 16GiB      0.82%     89MB / 120MB      67MB / 34MB
+gotify          0.45%     56.7MiB / 16GiB       0.35%     23MB / 45MB       34MB / 19MB
+portainer       0.67%     89.4MiB / 16GiB       0.55%     45MB / 67MB       45MB / 23MB
+semaphore       0.56%     78.9MiB / 16GiB       0.48%     34MB / 56MB       34MB / 19MB
+it-tools        0.34%     34.5MiB / 16GiB       0.21%     12MB / 23MB       19MB / 8MB
+redis           0.45%     23.4MiB / 16GiB       0.14%     89MB / 120MB      12MB / 8MB
+mariadb         2.34%     456.7MiB / 16GiB      2.78%     234MB / 345MB     890MB / 456MB
+postgres        1.78%     234.5MiB / 16GiB      1.43%     156MB / 234MB     456MB / 234MB
+fail2ban        0.23%     34.5MiB / 16GiB       0.21%     12MB / 23MB       23MB / 12MB
+admin-panel     0.45%     67.8MiB / 16GiB       0.41%     34MB / 56MB       34MB / 19MB
+
+TOTAL           ~38.5%    ~12.8GB / 16GB        80%       Network: ~10TB/month
+```
+
+## VOLUMES
+
+```
+VOLUME NAME                              SIZE
+traefik_acme                            142MB      TLS certificates
+traefik_config                          45MB       Dynamic configs
+prometheus_data                         15.2GB     Time-series database
+grafana_data                            1.2GB      Dashboards, datasources
+loki_data                               8.1GB      Log storage
+alertmanager_data                       234MB      Alert state
+authelia_config                         67MB       Users, sessions
+crowdsec_data                           456MB      Decision DB, rules
+pihole_config                           189MB      Blocklists, settings
+headscale-ui_data                       34MB       UI state
+uptime-kuma_data                        234MB      Monitor configs
+gotify_data                             89MB       Messages, apps
+portainer_data                          123MB      Stack configs
+semaphore_data                          156MB      Playbooks
+redis_data                              23MB       Cache
+mariadb_data                            2.3GB      Databases
+postgres_data                           1.8GB      Databases
+
+TOTAL                                   ~30GB
+```
+
+## NETWORK CONFIGURATION
+
+```
+NETWORK NAME        CONTAINERS
+web                 traefik, authelia, crowdsec-bouncer
+monitoring          prometheus, grafana, loki, promtail, alertmanager
+security            crowdsec, fail2ban
+management          portainer, semaphore
+dns                 pihole, cloudflared
+bridge (default)    Various isolated containers
+```
+
+## NOTES
+
+- All containers healthy (Up status)
+- Grafana recently restarted by user (Up 3 seconds vs 5 days for others)
+- Headscale runs as NATIVE systemd service (not containerized)
+- Total RAM usage: 12.8GB / 16GB (80%)
+- Total disk usage: ~187GB / 400GB (47%)

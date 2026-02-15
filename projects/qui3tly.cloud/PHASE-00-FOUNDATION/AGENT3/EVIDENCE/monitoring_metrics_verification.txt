@@ -1,0 +1,6 @@
+]633;E;{   echo "# prometheus targets via container API"\x3b   docker exec prometheus sh -lc 'wget -qO- http://localhost:9090/api/v1/targets 2>/dev/null | jq ".data.activeTargets | length"' 2>/dev/null || echo "unable_to_query"\x3b   echo\x3b echo "# prometheus targets fallback from config scrape_configs count"\x3b   docker exec prometheus sh -lc 'grep -c "^- job_name:" /etc/prometheus/prometheus.yml 2>/dev/null' 2>/dev/null || true\x3b } > /home/qui3tly/projects/qui3tly.cloud/PHASE-00-FOUNDATION/AGENT3/EVIDENCE/monitoring_metrics_verification.txt 2>&1;cb80ee7f-9768-4bcb-9d38-2f473ba6c305]633;C# prometheus targets via container API
+unable_to_query
+
+# scrape job count from prometheus.yml
+0
+unable_to_count

@@ -1,0 +1,38 @@
+graph TB
+  Internet((Internet))
+
+  subgraph Master[Master VPS - quietly.its.me]
+    M_PUBLIC[213.136.68.108]
+    M_TAIL[100.64.0.1]
+    M_WG[10.10.0.1]
+    M_TRAEFIK[Traefik]
+    M_MON[Prometheus/Grafana/Loki]
+    M_SEC[CrowdSec + fail2ban]
+  end
+
+  subgraph Lady[Lady VPS - quietly.online]
+    L_PUBLIC[207.180.251.111]
+    L_TAIL[100.64.0.2]
+    L_TRAEFIK[Traefik]
+    L_APPS[Mailcow/Nextcloud/Odoo/etc]
+    L_SEC[CrowdSec + fail2ban]
+  end
+
+  subgraph Home[Home Site]
+    ER[EdgeRouter]
+    ER_WG[10.10.0.2]
+    MAC[Client Mac]
+  end
+
+  Internet --> M_PUBLIC
+  Internet --> L_PUBLIC
+  Internet --> ER
+
+  M_TAIL <-->|Tailscale 100.64.0.0/10| L_TAIL
+  M_TAIL <-->|Tailscale| MAC
+  M_WG <-->|WireGuard 10.10.0.0/30| ER_WG
+
+  M_TRAEFIK --> M_MON
+  M_TRAEFIK --> M_SEC
+  L_TRAEFIK --> L_APPS
+  L_TRAEFIK --> L_SEC

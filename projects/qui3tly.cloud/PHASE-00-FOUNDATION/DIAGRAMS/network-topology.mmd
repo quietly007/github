@@ -1,0 +1,70 @@
+graph TB
+    subgraph Internet["🌐 Internet"]
+        CF[Cloudflare DNS]
+        Users[External Users]
+    end
+
+    subgraph ContaboGermany["☁️ Contabo Germany Datacenter"]
+        subgraph MasterServer["🖥️ Master Server<br/>qui3tly<br/>213.136.68.108"]
+            MasterPorts["Public Ports:<br/>80/tcp, 443/tcp<br/>51820/udp WireGuard<br/>41641/udp DERP"]
+            Traefik["Traefik<br/>Reverse Proxy"]
+            Headscale["Headscale v0.27.1<br/>NATIVE systemd<br/>100.64.0.1<br/>65.9MB RAM"]
+            Services1["Prometheus<br/>Grafana<br/>Loki<br/>Authelia<br/>CrowdSec<br/>Pi-hole"]
+        end
+
+        subgraph LadyServer["🖥️ Lady Server<br/>Lady<br/>207.180.251.111"]
+            LadyPorts["Public Ports:<br/>80/tcp, 443/tcp<br/>25/tcp, 465/tcp, 587/tcp<br/>993/tcp, 995/tcp"]
+            Mailcow["Mailcow Stack<br/>18 containers"]
+            BusinessApps["Nextcloud<br/>OnlyOffice<br/>Odoo<br/>UniFi<br/>Frigate<br/>HomeAssistant"]
+        end
+    end
+
+    subgraph HomeNetwork["🏠 Home Network<br/>Montenegro"]
+        EdgeRouter["EdgeRouter X<br/>10.10.0.2"]
+        MacClient["Mac Mini<br/>100.64.0.3"]
+    end
+
+    subgraph VPNNetworks["🔐 VPN Networks"]
+        TailscaleMesh["Tailscale Mesh VPN<br/>100.64.0.0/10<br/>Full mesh topology"]
+        WireGuardTunnel["WireGuard P2P<br/>10.10.0.0/30<br/>Master ↔ EdgeRouter"]
+    end
+
+    subgraph DNSFlow["🔍 DNS Resolution"]
+        DNS1["1.1.1.1<br/>Cloudflare<br/>/etc/resolv.conf"]
+        PiHole["Pi-hole<br/>100.64.0.1<br/>Ad blocking"]
+        Cloudflared["cloudflared<br/>DNS-over-HTTPS"]
+    end
+
+    Users -->|HTTPS| CF
+    CF -->|Routing| MasterPorts
+    CF -->|Routing| LadyPorts
+    
+    MasterPorts --> Traefik
+    Traefik --> Services1
+    
+    LadyPorts --> Mailcow
+    LadyPorts --> BusinessApps
+
+    Headscale -.->|Controls| TailscaleMesh
+    TailscaleMesh -.->|Mesh| MasterServer
+    TailscaleMesh -.->|Mesh| LadyServer
+    TailscaleMesh -.->|Mesh| MacClient
+
+    MasterServer -.->|P2P| WireGuardTunnel
+    EdgeRouter -.->|P2P| WireGuardTunnel
+
+    Services1 -.->|Internal DNS| PiHole
+    PiHole -.->|Upstream| Cloudflared
+    Cloudflared -.->|DoH| DNS1
+    
+    MasterServer -->|Fallback| DNS1
+
+    classDef server fill:#326ce5,stroke:#fff,stroke-width:2px,color:#fff
+    classDef vpn fill:#00d4aa,stroke:#fff,stroke-width:2px,color:#000
+    classDef dns fill:#ff6b35,stroke:#fff,stroke-width:2px,color:#fff
+    classDef internet fill:#57cc99,stroke:#fff,stroke-width:2px,color:#000
+
+    class MasterServer,LadyServer server
+    class TailscaleMesh,WireGuardTunnel vpn
+    class DNS1,PiHole,Cloudflared dns
+    class Internet,CF internet

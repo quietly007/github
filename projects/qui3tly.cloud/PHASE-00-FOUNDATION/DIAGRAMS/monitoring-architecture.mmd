@@ -1,0 +1,132 @@
+graph TB
+    subgraph Sources["📊 Metric Sources"]
+        direction TB
+        
+        subgraph MasterMetrics["Master Server Metrics"]
+            NodeExp1[node-exporter<br/>:9100<br/>CPU, RAM, Disk]
+            Cadvisor1[cadvisor<br/>:8080<br/>Container stats]
+            TraefikM[Traefik<br/>:8080<br/>HTTP metrics]
+            PrometheusM[Prometheus<br/>:9090<br/>Self metrics]
+        end
+        
+        subgraph LadyMetrics["Lady Server Metrics<br/>(via VPN 100.64.0.2)"]
+            NodeExp2[node-exporter<br/>:9100]
+            Cadvisor2[cadvisor<br/>:8080]
+            MailcowM[Mailcow<br/>:9999<br/>Mail metrics]
+            NextcloudM[Nextcloud<br/>Custom metrics]
+        end
+        
+        subgraph Probes["Blackbox Probing"]
+            BBExporter[blackbox-exporter<br/>:9115<br/>HTTP/TCP/ICMP]
+            Endpoints["30+ endpoints<br/>monitored"]
+        end
+        
+        subgraph Exporters["Specialized Exporters"]
+            MySQLExp[mysqld-exporter<br/>Database]
+            PostgresExp[postgres-exporter<br/>Database]
+            RedisExp[redis-exporter<br/>Cache]
+        end
+    end
+
+    subgraph Collection["🔍 Collection Layer"]
+        Prometheus["<b>Prometheus</b><br/>Port: 9090<br/>Scrape interval: 15s<br/>Retention: 15 days<br/>TSDB: 15.2GB<br/>52 active targets"]
+    end
+
+    subgraph Storage["💾 Storage"]
+        TSDB[Time Series Database<br/>15.2GB on Master<br/>/var/lib/prometheus]
+        Snapshots[Prometheus Snapshots<br/>Daily backup<br/>7 day retention]
+    end
+
+    subgraph Visualization["📈 Visualization"]
+        Grafana["<b>Grafana</b><br/>Port: 3000<br/>12 dashboards<br/>Users: 3"]
+        
+        subgraph Dashboards["Dashboards"]
+            D1[Infrastructure Overview]
+            D2[Node Exporter Full]
+            D3[Docker Containers]
+            D4[Traefik Metrics]
+            D5[Prometheus Stats]
+            D6[Loki Logs]
+            D7[CrowdSec Overview]
+            D8[Mailcow Stats]
+            D9[Network Performance]
+            D10[Backup Status]
+            D11[Alert Manager]
+            D12[Tailscale Mesh]
+        end
+    end
+
+    subgraph Logs["📝 Log Aggregation"]
+        Loki["<b>Loki</b><br/>Port: 3100<br/>Storage: 8GB<br/>Retention: 30 days"]
+        
+        Promtail1[Promtail Master<br/>Container logs<br/>System logs]
+        Promtail2[Promtail Lady<br/>Container logs<br/>System logs]
+    end
+
+    subgraph Alerting["🚨 Alerting"]
+        Alertmanager["<b>Alertmanager</b><br/>Port: 9093<br/>Routing rules<br/>Grouping<br/>Silence"]
+        
+        Gotify[Gotify<br/>Push notifications<br/>Mobile app]
+        
+        Email[Email<br/>Critical alerts]
+        
+        subgraph AlertRules["Alert Rules"]
+            R1[High CPU > 80%]
+            R2[High RAM > 90%]
+            R3[Disk Space < 10%]
+            R4[Container Down]
+            R5[Service Timeout]
+            R6[Certificate Expiry]
+            R7[Backup Failed]
+            R8[Security Event]
+        end
+    end
+
+    subgraph Status["📊 Status Page"]
+        UptimeKuma["<b>Uptime Kuma</b><br/>Port: 3001<br/>Public status page<br/>30+ monitors"]
+    end
+
+    NodeExp1 -->|Scrape| Prometheus
+    Cadvisor1 -->|Scrape| Prometheus
+    TraefikM -->|Scrape| Prometheus
+    PrometheusM -->|Self scrape| Prometheus
+    
+    NodeExp2 -->|Scrape via VPN| Prometheus
+    Cadvisor2 -->|Scrape via VPN| Prometheus
+    MailcowM -->|Scrape via VPN| Prometheus
+    NextcloudM -->|Scrape via VPN| Prometheus
+    
+    BBExporter -->|Scrape| Prometheus
+    Endpoints -->|Probe| BBExporter
+    
+    MySQLExp -->|Scrape| Prometheus
+    PostgresExp -->|Scrape| Prometheus
+    RedisExp -->|Scrape| Prometheus
+
+    Prometheus --> TSDB
+    Prometheus --> Snapshots
+    
+    Prometheus --> Grafana
+    Grafana --> Dashboards
+    
+    Prometheus --> Alertmanager
+    AlertRules --> Alertmanager
+    Alertmanager --> Gotify
+    Alertmanager --> Email
+    
+    Promtail1 -->|Push| Loki
+    Promtail2 -->|Push via VPN| Loki
+    Loki --> Grafana
+    
+    Prometheus -->|Metrics| UptimeKuma
+    BBExporter -->|Status| UptimeKuma
+
+    classDef prometheus fill:#e6522c,stroke:#fff,stroke-width:2px,color:#fff
+    classDef grafana fill:#f46800,stroke:#fff,stroke-width:2px,color:#fff
+    classDef loki fill:#00e5ff,stroke:#000,stroke-width:2px,color:#000
+    classDef alert fill:#d62828,stroke:#fff,stroke-width:2px,color:#fff
+
+    class Prometheus,Collection prometheus
+    class Grafana,Visualization,Dashboards grafana
+    class Loki,Logs loki
+    class Alertmanager,Alerting,AlertRules alert

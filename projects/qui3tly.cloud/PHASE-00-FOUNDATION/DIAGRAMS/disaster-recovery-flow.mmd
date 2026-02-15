@@ -1,0 +1,157 @@
+graph TB
+    subgraph Disaster["💥 Disaster Scenarios"]
+        S1[Server Hardware Failure<br/>CPU, RAM, Disk]
+        S2[Datacenter Outage<br/>Network, Power]
+        S3[Data Corruption<br/>Filesystem, Database]
+        S4[Security Breach<br/>Ransomware, Hack]
+        S5[Human Error<br/>Config deletion, rm -rf]
+        S6[Service Failure<br/>Critical container down]
+    end
+
+    subgraph Detection["🔍 Detection & Alert"]
+        Monitor[Monitoring Detects Issue<br/>• Prometheus alerts<br/>• Uptime Kuma<br/>• Blackbox exporter]
+        
+        Alert[Alertmanager Fires<br/>• Gotify push notification<br/>• Email to admin<br/>• Severity: CRITICAL]
+        
+        Verify[Admin Verifies<br/>• SSH access check<br/>• Service status<br/>• Log review]
+    end
+
+    subgraph Assessment["📋 Assessment Phase"]
+        Assess[Damage Assessment<br/>• What's affected?<br/>• Data lost?<br/>• Services down?]
+        
+        Decision{Recovery Strategy}
+        
+        QuickFix[Quick Fix<br/>• Container restart<br/>• Service reload<br/>• Config rollback]
+        
+        PartialRestore[Partial Restore<br/>• Single service<br/>• Database only<br/>• Quick recovery]
+        
+        FullDR[Full DR Activation<br/>• Complete rebuild<br/>• New server<br/>• All data restore]
+    end
+
+    subgraph QuickRecovery["⚡ Quick Recovery (RTO: 15 min)"]
+        QR1[1. Identify failed service<br/>docker ps -a]
+        QR2[2. Check logs<br/>docker logs container_name]
+        QR3[3. Restart service<br/>docker restart or<br/>systemctl restart]
+        QR4[4. Verify health<br/>Check metrics<br/>Test functionality]
+        QR5[5. Monitor<br/>Watch for recurrence]
+        
+        QR1 --> QR2 --> QR3 --> QR4 --> QR5
+    end
+
+    subgraph PartialRecover["🔧 Partial Recovery (RTO: 1-2 hours)"]
+        PR1[1. Stop affected service<br/>docker-compose down]
+        PR2[2. Backup current state<br/>Just in case]
+        PR3[3. Restore from backup<br/>• Latest daily backup<br/>• Database dump<br/>• Volume restore]
+        PR4[4. Restore configs<br/>Git pull latest]
+        PR5[5. Start service<br/>docker-compose up -d]
+        PR6[6. Verify + test<br/>Functionality check]
+        
+        PR1 --> PR2 --> PR3 --> PR4 --> PR5 --> PR6
+    end
+
+    subgraph FullRecovery["🏗️ Full DR Recovery (RTO: 4 hours)"]
+        direction TB
+        
+        subgraph Provision["Phase 1: Provision (1h)"]
+            F1[1. Order new VPS<br/>Contabo Germany<br/>6vCPU, 16GB RAM, 400GB]
+            F2[2. Install Debian 12<br/>Base OS + SSH keys]
+            F3[3. Configure network<br/>Firewall, IPs]
+        end
+        
+        subgraph BaseInstall["Phase 2: Base Install (30min)"]
+            F4[4. Install Docker<br/>Docker + Compose]
+            F5[5. Install Tailscale<br/>Connect to VPN mesh]
+            F6[6. Setup directories<br/>/opt/, /backup/, etc.]
+        end
+        
+        subgraph ConfigRestore["Phase 3: Config Restore (15min)"]
+            F7[7. Clone Git repo<br/>All configs + IaC]
+            F8[8. Restore /etc/<br/>System configs]
+            F9[9. Setup Headscale<br/>If Master server<br/>NATIVE systemd]
+        end
+        
+        subgraph DataRestore["Phase 4: Data Restore (2h)"]
+            F10[10. Restore backups<br/>• Docker volumes<br/>• Databases<br/>• 45GB data<br/>From /backup/]
+            F11[11. Decompress<br/>tar + gunzip]
+            F12[12. Set permissions<br/>chown, chmod]
+        end
+        
+        subgraph ServiceStart["Phase 5: Service Start (1h)"]
+            F13[13. Start services<br/>docker-compose up -d<br/>All containers]
+            F14[14. Verify health<br/>• Container status<br/>• Service endpoints<br/>• Log check]
+            F15[15. Update DNS<br/>If IP changed<br/>5-60min propagation]
+            F16[16. Test everything<br/>• Web access<br/>• Mail flow<br/>• VPN mesh<br/>• Monitoring]
+        end
+        
+        F1 --> F2 --> F3 --> F4 --> F5 --> F6 --> F7 --> F8 --> F9 --> F10 --> F11 --> F12 --> F13 --> F14 --> F15 --> F16
+    end
+
+    subgraph Verification["✅ Verification Checklist"]
+        direction TB
+        
+        V1["☐ All containers running<br/>docker ps - 64 containers"]
+        V2["☐ Metrics collecting<br/>Prometheus scraping"]
+        V3["☐ Logs flowing<br/>Loki receiving"]
+        V4["☐ Alerts working<br/>Test alert fires"]
+        V5["☐ Web access<br/>All services via browser"]
+        V6["☐ Mail flow<br/>Send + receive test"]
+        V7["☐ VPN mesh<br/>All nodes connected"]
+        V8["☐ Backups running<br/>First backup completes"]
+        V9["☐ DNS resolved<br/>All domains work"]
+        V10["☐ TLS certs valid<br/>HTTPS working"]
+    end
+
+    subgraph Documentation["📚 DR Documentation"]
+        Runbook["/root/DR_RUNBOOK.md<br/>• Detailed procedures<br/>• Commands<br/>• Contacts<br/>• Vendor info"]
+        
+        LastTest["Last DR Test:<br/>January 28, 2026<br/>✅ Successful<br/>RTO achieved: 3h 45min<br/>(target: 4h)"]
+        
+        NextTest["Next DR Test:<br/>Phase 06<br/>• Full rebuild test<br/>• Multi-datacenter<br/>• Documented"]
+    end
+
+    subgraph Improvements["🎯 DR Improvements (Phase 06)"]
+        I1[Second Datacenter<br/>• Different provider<br/>• Geographic diversity<br/>• Active-passive]
+        
+        I2[Automated Failover<br/>• DNS automation<br/>• Health check triggers<br/>• Minimal downtime]
+        
+        I3[Backup MX<br/>• Secondary mail server<br/>• Queue messages<br/>• No mail loss]
+        
+        I4[Regular Testing<br/>• Quarterly DR drills<br/>• Runbook updates<br/>• Team training]
+    end
+
+    Disaster --> Detection
+    Detection --> Monitor --> Alert --> Verify
+    Verify --> Assessment
+    Assessment --> Assess --> Decision
+    
+    Decision -->|Minor issue| QuickFix
+    Decision -->|Service issue| PartialRestore
+    Decision -->|Server failure| FullDR
+    
+    QuickFix --> QuickRecovery
+    PartialRestore --> PartialRecover
+    FullDR --> FullRecovery
+    
+    QuickRecovery --> Verification
+    PartialRecover --> Verification
+    FullRecovery --> Verification
+    
+    Verification -.->|Reference| Documentation
+    Documentation -.->|Improve| Improvements
+
+    subgraph Metrics["📊 DR Metrics"]
+        M1["RTO: 4 hours<br/>(Recovery Time Objective)"]
+        M2["RPO: 24 hours<br/>(Recovery Point Objective)<br/>Last daily backup"]
+        M3["Last Test: Jan 28, 2026<br/>Result: Success"]
+        M4["Test Frequency: Quarterly<br/>Next: Phase 06"]
+    end
+
+    classDef disaster fill:#d62828,stroke:#fff,stroke-width:2px,color:#fff
+    classDef quick fill:#00d4aa,stroke:#fff,stroke-width:2px,color:#000
+    classDef partial fill:#f77f00,stroke:#fff,stroke-width:2px,color:#fff
+    classDef full fill:#326ce5,stroke:#fff,stroke-width:2px,color:#fff
+
+    class Disaster,S1,S2,S3,S4,S5,S6 disaster
+    class QuickRecovery,QR1,QR2,QR3,QR4,QR5 quick
+    class PartialRecover,PR1,PR2,PR3,PR4,PR5,PR6 partial
+    class FullRecovery,Provision,BaseInstall,ConfigRestore,DataRestore,ServiceStart full

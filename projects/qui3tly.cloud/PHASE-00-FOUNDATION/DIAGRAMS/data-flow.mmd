@@ -1,0 +1,160 @@
+graph LR
+    subgraph External["🌐 Data Ingress"]
+        Users[End Users<br/>Web browsers<br/>Email clients<br/>Mobile apps]
+        MailSenders[Email Senders<br/>External mail servers<br/>SMTP traffic]
+        APIs[API Requests<br/>Webhooks<br/>Integrations]
+    end
+
+    subgraph EdgeProcessing["🚪 Edge Layer"]
+        DNS[DNS Resolution<br/>Pi-hole + Cloudflared<br/>Split-horizon DNS<br/>Ad blocking]
+        
+        TraefikIngress[Traefik Ingress<br/>:80 → :443 redirect<br/>TLS termination<br/>Request routing]
+        
+        MailIngress[Postfix SMTP<br/>Port 25, 465, 587<br/>SPF/DKIM check<br/>Greylisting]
+    end
+
+    subgraph SecurityProcessing["🛡️ Security Processing"]
+        CrowdSecCheck[CrowdSec Check<br/>IP reputation<br/>Ban decision<br/>CAPTCHA challenge]
+        
+        AuthCheck[Authelia Check<br/>Session validation<br/>SSO token<br/>2FA if required]
+        
+        SpamFilter[Rspamd Filter<br/>Spam score<br/>Machine learning<br/>Custom rules]
+        
+        VirusScan[ClamAV Scan<br/>Virus detection<br/>Quarantine if infected]
+    end
+
+    subgraph ApplicationLayer["🎯 Application Processing"]
+        direction TB
+        
+        subgraph WebApps["Web Applications"]
+            Grafana2[Grafana<br/>Query Prometheus<br/>Render dashboards]
+            Nextcloud2[Nextcloud<br/>File operations<br/>Sync protocol]
+            Mailcow2[SOGo Webmail<br/>Read/write mail<br/>Calendar sync]
+        end
+        
+        subgraph MailProcessing["Mail Processing"]
+            Dovecot2[Dovecot<br/>IMAP protocol<br/>Maildir access<br/>Full-text search]
+            Delivery[Mail Delivery<br/>Local delivery<br/>Sieve filtering<br/>Mailbox storage]
+        end
+        
+        subgraph BusinessLogic["Business Logic"]
+            Odoo2[Odoo ERP<br/>Business processes<br/>CRM operations]
+            OnlyOffice2[OnlyOffice<br/>Document editing<br/>Real-time collab]
+        end
+    end
+
+    subgraph DataLayer["💾 Data Storage & Retrieval"]
+        direction TB
+        
+        subgraph Databases["Databases"]
+            MySQL2[MySQL<br/>• User accounts<br/>• Mail metadata<br/>• Shared data]
+            Postgres2[PostgreSQL<br/>• Nextcloud DB<br/>• Authelia users<br/>• Odoo data]
+        end
+        
+        subgraph FileStorage["File Storage"]
+            NCFiles[Nextcloud Files<br/>128GB user data<br/>Versioning<br/>Encryption at rest]
+            MailStore[Mail Storage<br/>Maildir format<br/>73GB mailboxes<br/>Per-user quotas]
+        end
+        
+        subgraph Cache["Caching Layer"]
+            Redis2[Redis<br/>• Session cache<br/>• Object cache<br/>• Job queue]
+            Memcached2[Memcached<br/>• Query cache<br/>• Fast lookups]
+        end
+        
+        subgraph Search["Search Indices"]
+            Solr2[Solr<br/>Mail full-text search<br/>Fast queries]
+            NCSearch[Nextcloud Search<br/>File indexing]
+        end
+    end
+
+    subgraph Monitoring3["📊 Observability Flow"]
+        MetricsFlow[Metrics Collection<br/>Prometheus scrapes<br/>15s interval<br/>52 targets]
+        
+        LogsFlow[Logs Collection<br/>Promtail tails logs<br/>Push to Loki<br/>Parse & label]
+        
+        AlertsFlow[Alert Evaluation<br/>Prometheus rules<br/>Threshold checks<br/>Fire to Alertmanager]
+    end
+
+    subgraph EgressData["📤 Data Egress"]
+        ResponseWeb[HTTP Responses<br/>HTML, JSON, binary<br/>Gzip compression<br/>CDN headers]
+        
+        ResponseMail[Mail Delivery<br/>SMTP to recipients<br/>DKIM signed<br/>SPF aligned]
+        
+        Notifications[Notifications<br/>Gotify push<br/>Email alerts<br/>Webhooks]
+        
+        Backups2[Backup Exports<br/>Daily to /backup/<br/>Compressed archives<br/>Git push configs]
+    end
+
+    Users -->|HTTPS| DNS
+    MailSenders -->|SMTP| MailIngress
+    APIs -->|HTTPS| TraefikIngress
+    
+    DNS --> TraefikIngress
+    
+    TraefikIngress --> CrowdSecCheck
+    CrowdSecCheck -->|Allow| AuthCheck
+    CrowdSecCheck -->|Deny| Block[❌ 403 Forbidden]
+    
+    AuthCheck -->|Authenticated| WebApps
+    AuthCheck -->|Denied| Login[🔐 Login page]
+    
+    MailIngress --> SpamFilter
+    SpamFilter --> VirusScan
+    VirusScan -->|Clean| Dovecot2
+    VirusScan -->|Infected| Quarantine[☣️ Quarantine]
+    SpamFilter -->|Spam| SpamBox[📪 Spam folder]
+    
+    WebApps --> Databases
+    WebApps --> FileStorage
+    WebApps --> Cache
+    
+    Grafana2 -->|Query| MetricsFlow
+    Nextcloud2 -->|Read/Write| NCFiles
+    Nextcloud2 -->|Query| Postgres2
+    Mailcow2 -->|IMAP| Dovecot2
+    
+    Dovecot2 --> MailStore
+    Dovecot2 --> Solr2
+    Dovecot2 --> MySQL2
+    
+    Odoo2 --> Postgres2
+    OnlyOffice2 --> NCFiles
+    
+    Databases --> Cache
+    FileStorage --> Search
+    
+    ApplicationLayer -.->|Metrics| MetricsFlow
+    ApplicationLayer -.->|Logs| LogsFlow
+    SecurityProcessing -.->|Events| LogsFlow
+    
+    MetricsFlow --> AlertsFlow
+    AlertsFlow -->|Fire| Notifications
+    
+    WebApps --> ResponseWeb
+    Dovecot2 --> ResponseMail
+    MetricsFlow --> Backups2
+    
+    ResponseWeb --> Users
+    ResponseMail --> MailSenders
+    Notifications --> Users
+
+    subgraph DataStats["📈 Data Flow Statistics"]
+        DS1[Web Requests: ~146k/day]
+        DS2[Mail Messages: ~550/day]
+        DS3[Prometheus Samples: ~5M/sec]
+        DS4[Log Lines: ~80k/day]
+        DS5[Backup Data: 45GB/day]
+        DS6[Network Traffic: ~400GB/month]
+    end
+
+    classDef ingress fill:#00d4aa,stroke:#fff,stroke-width:2px,color:#000
+    classDef security fill:#d62828,stroke:#fff,stroke-width:2px,color:#fff
+    classDef app fill:#326ce5,stroke:#fff,stroke-width:2px,color:#fff
+    classDef data fill:#f77f00,stroke:#fff,stroke-width:2px,color:#fff
+    classDef egress fill:#9b59b6,stroke:#fff,stroke-width:2px,color:#fff
+
+    class EdgeProcessing,DNS,TraefikIngress ingress
+    class SecurityProcessing,CrowdSecCheck,AuthCheck security
+    class ApplicationLayer,WebApps,MailProcessing,BusinessLogic app
+    class DataLayer,Databases,FileStorage,Cache,Search data
+    class EgressData,ResponseWeb,ResponseMail,Notifications egress

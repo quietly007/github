@@ -1,0 +1,73 @@
+graph TB
+    Start[Phase XX Start] --> Execute
+
+    subgraph Layer1[Layer 1: Primary Agent Lucky Luke]
+        Execute[Execute All Tasks]
+        Execute --> SelfTest[Self-Test Functionality]
+        SelfTest --> CollectEvidence[Collect Evidence<br/>Screenshots, Logs, Tests]
+        CollectEvidence --> CreateDocs[Create Phase Documents]
+        CreateDocs --> SelfVerify{Self-Verification<br/>Checklist}
+        
+        SelfVerify -->|Issues Found| FixIssues[Fix Issues]
+        FixIssues --> SelfTest
+        
+        SelfVerify -->|All Good| Deliverables[Package Deliverables:<br/>- Phase README<br/>- Documents<br/>- Evidence Folder<br/>- External Agent Request]
+    end
+
+    Deliverables --> HandoffExternal[Handoff to<br/>External Agent]
+
+    subgraph Layer2[Layer 2: External Agent Independent]
+        HandoffExternal --> ReadDocs[Read All Documents]
+        ReadDocs --> IndependentTest[Test Functionality<br/>Independently]
+        IndependentTest --> CheckReqs[Check Requirements<br/>RFP + Master Plan]
+        CheckReqs --> CheckConsistency[Check Consistency<br/>No Contradictions]
+        CheckConsistency --> QualityAssess[Quality Assessment]
+        
+        QualityAssess --> Decision{Recommendation}
+        
+        Decision -->|No Critical Issues| Pass[PASS<br/>All requirements met<br/>Quality acceptable]
+        Decision -->|Minor Issues| Conditional[CONDITIONAL<br/>Small fixes needed<br/>Non-blocking]
+        Decision -->|Critical Issues| Fail[FAIL<br/>Major problems<br/>Must fix]
+        
+        Pass --> ReportPass[Write Verification Report<br/>Recommend: PASS]
+        Conditional --> ReportConditional[Write Verification Report<br/>Recommend: CONDITIONAL<br/>List conditions]
+        Fail --> ReportFail[Write Verification Report<br/>Recommend: FAIL<br/>List critical issues]
+        
+        ReportPass --> SendUser
+        ReportConditional --> SendUser
+        ReportFail --> SendUser
+    end
+
+    SendUser[Send Report to User]
+
+    subgraph Layer3[Layer 3: User qui3tly Final Authority]
+        SendUser --> UserReview[User Reviews:<br/>- Deliverables<br/>- Verification Report]
+        UserReview --> UserTest[User Tests<br/>Critical Functionality]
+        UserTest --> UserDecision{User Decision}
+        
+        UserDecision -->|Satisfied| Approved[APPROVED<br/>Phase Locked<br/>Proceed]
+        UserDecision -->|Minor Fixes OK| ConditionalApprove[CONDITIONAL APPROVED<br/>Fix conditions<br/>Then proceed]
+        UserDecision -->|Not Satisfied| Rejected[REJECTED<br/>Fix issues<br/>Re-verify]
+        
+        Approved --> NextPhase[Unlock Next Phase<br/>Phase XX Complete ✅]
+        
+        ConditionalApprove --> PrimaryFix[Primary Agent<br/>Fixes Conditions]
+        PrimaryFix --> NextPhase
+        
+        Rejected --> PrimaryRework[Primary Agent<br/>Reworks Phase]
+        PrimaryRework --> HandoffExternal
+    end
+
+    NextPhase --> End[Phase XX Complete]
+
+    classDef primary fill:#4CAF50,stroke:#333,stroke-width:2px,color:#fff
+    classDef external fill:#2196F3,stroke:#333,stroke-width:2px,color:#fff
+    classDef user fill:#FF9800,stroke:#333,stroke-width:2px,color:#fff
+    classDef decision fill:#F44336,stroke:#333,stroke-width:2px,color:#fff
+    classDef success fill:#8BC34A,stroke:#333,stroke-width:2px,color:#fff
+
+    class Execute,SelfTest,CollectEvidence,CreateDocs,SelfVerify,FixIssues,Deliverables,PrimaryFix,PrimaryRework primary
+    class HandoffExternal,ReadDocs,IndependentTest,CheckReqs,CheckConsistency,QualityAssess,Decision,Pass,Conditional,Fail,ReportPass,ReportConditional,ReportFail,SendUser external
+    class UserReview,UserTest,UserDecision,Approved,ConditionalApprove,Rejected user
+    class SelfVerify,Decision,UserDecision decision
+    class NextPhase,End success

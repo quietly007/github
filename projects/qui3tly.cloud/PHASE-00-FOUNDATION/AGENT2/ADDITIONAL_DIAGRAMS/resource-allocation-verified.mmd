@@ -1,0 +1,73 @@
+```mermaid
+%%{init: {'theme': 'dark'}}%%
+graph TB
+    subgraph RESOURCES["📊 VERIFIED RESOURCE ALLOCATION - February 15, 2026"]
+        direction TB
+    end
+    
+    subgraph MASTER["🖥️ MASTER SERVER (quietly.its.me)"]
+        subgraph MASTER_HW["Hardware Specs"]
+            M_CPU["CPU: 12 vCPU<br/>AMD EPYC with IBPB"]
+            M_RAM["RAM: 47Gi (48GB)<br/>Used: 6.4 GiB (13.6%)<br/>Available: 40 GiB"]
+            M_DISK["Disk: 985 GiB (1TB)<br/>Used: 22 GiB (3%)<br/>Free: 923 GiB"]
+        end
+        
+        subgraph MASTER_CONTAINERS["Container Resources (25 total)"]
+            M_HIGH["🔴 HIGH USAGE:<br/>• prometheus: 1.518G/2G (76%)<br/>• grafana: 228M/1G (22%)<br/>• alertmanager: 49.6M/256M (19%)"]
+            M_MED["🟡 MEDIUM USAGE:<br/>• cadvisor: 339.2 MiB<br/>• loki: 201 MiB<br/>• uptime-kuma: 169.7 MiB<br/>• crowdsec: 154.4 MiB<br/>• promtail: 143.6 MiB"]
+            M_LOW["🟢 LOW USAGE:<br/>• portainer: 88.71 MiB<br/>• authelia: 85.03 MiB<br/>• pihole: 62.42 MiB<br/>• headscale: 66.8 MiB<br/>• traefik: 52.95 MiB"]
+        end
+        
+        subgraph MASTER_CPU_TOP["Top CPU Consumers"]
+            M_CPU1["crowdsec: 7.22%"]
+            M_CPU2["cadvisor: 6.79%"]
+            M_CPU3["admin-panel: 4.41%"]
+            M_CPU4["promtail: 2.65%"]
+            M_CPU5["loki: 1.84%"]
+        end
+    end
+    
+    subgraph LADY["🖥️ LADY SERVER (quietly.online)"]
+        subgraph LADY_HW["Hardware Specs"]
+            L_CPU["CPU: 12 vCPU<br/>AMD EPYC with IBPB"]
+            L_RAM["RAM: 47Gi (48GB)<br/>Used: 8.8 GiB (18.7%)<br/>Available: 38 GiB"]
+            L_DISK["Disk: 985 GiB (1TB)<br/>Used: 63 GiB (7%)<br/>Free: 882 GiB"]
+        end
+        
+        subgraph LADY_CONTAINERS["Container Resources (39 total)"]
+            L_HIGH["🔴 HIGH USAGE:<br/>• uisp: 1.912 GiB<br/>• clamd (AV): 1021 MiB<br/>• unifi: 850.6 MiB<br/>• onlyoffice: 615.2 MiB<br/>• frigate: 488.7 MiB"]
+            L_MED["🟡 MEDIUM USAGE:<br/>• cadvisor: 387.2 MiB<br/>• mysql-mailcow: 366.2 MiB<br/>• sogo: 293.5 MiB<br/>• unifi-db: 256 MiB<br/>• homeassistant: 250 MiB<br/>• rspamd: 218.9 MiB"]
+            L_LOW["🟢 LOW USAGE:<br/>• nextcloud: 190.6 MiB<br/>• odoo: 189.4 MiB<br/>• php-fpm: 143.2 MiB<br/>• crowdsec: 130 MiB<br/>• promtail: 89.81 MiB"]
+        end
+        
+        subgraph LADY_CPU_TOP["Top CPU Consumers"]
+            L_CPU1["promtail: 4.04%"]
+            L_CPU2["uisp: 3.51%"]
+            L_CPU3["frigate: 1.65%"]
+            L_CPU4["unifi-db: 1.38%"]
+            L_CPU5["nextcloud-redis: 0.85%"]
+        end
+    end
+    
+    subgraph TOTALS["📊 INFRASTRUCTURE TOTALS"]
+        TOTAL_CONTAINERS["Total Containers: 64<br/>Master: 25 | Lady: 39"]
+        TOTAL_RAM["Total RAM: 96 GiB<br/>Used: ~15.2 GiB (15.8%)<br/>Available: ~78 GiB"]
+        TOTAL_DISK["Total Disk: 1.97 TB<br/>Used: 85 GiB (4.3%)<br/>Available: 1.8 TB"]
+        TOTAL_CPU["Total vCPUs: 24<br/>Average Load: Low<br/>Master: 0.50-0.79<br/>Lady: 0.80-1.51"]
+    end
+    
+    %% Health indicators
+    M_HIGH -->|"⚠️ WATCH"| PROMETHEUS
+    PROMETHEUS["Prometheus at 76%<br/>Consider retention tuning"]
+    
+    L_HIGH -->|"⚠️ EXPECTED"| AV_LOAD
+    AV_LOAD["ClamAV: 1GB expected<br/>UISP: Business critical"]
+    
+    classDef good fill:#2E7D32,stroke:#1B5E20,color:#fff
+    classDef warning fill:#F57C00,stroke:#E65100,color:#fff
+    classDef info fill:#1565C0,stroke:#0D47A1,color:#fff
+    
+    class MASTER_HW,LADY_HW info
+    class M_HIGH,L_HIGH warning
+    class TOTALS,M_LOW,L_LOW good
+```

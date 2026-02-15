@@ -1,0 +1,112 @@
+```mermaid
+%%{init: {'theme': 'dark'}}%%
+flowchart TB
+    subgraph MAILCOW["📧 MAILCOW ARCHITECTURE - VERIFIED"]
+        direction TB
+    end
+    
+    subgraph ENTRY["🚪 Entry Points"]
+        SMTP["📨 SMTP<br/>Port 25/587/465"]
+        IMAP["📬 IMAP<br/>Port 993"]
+        WEB["🌐 Webmail<br/>mail.quietly.online"]
+    end
+    
+    subgraph FRONTEND["Frontend Layer"]
+        NGINX["🌐 nginx-mailcow<br/>━━━━━━━━━━━━━━━<br/>TLS Termination<br/>Reverse Proxy<br/>💾 18.87 MiB RAM<br/>Up 5 days"]
+    end
+    
+    subgraph MTA["Mail Transfer"]
+        POSTFIX["📨 postfix-mailcow<br/>━━━━━━━━━━━━━━━<br/>SMTP MTA<br/>TLS: AES_256_GCM_SHA384<br/>💾 80.71 MiB RAM<br/>Up 5 days"]
+        
+        TLSPOL["🔒 postfix-tlspol<br/>━━━━━━━━━━━━━━━<br/>TLS Policy Enforcement<br/>💾 42.93 MiB RAM"]
+    end
+    
+    subgraph MDA["Mail Delivery"]
+        DOVECOT["📬 dovecot-mailcow<br/>━━━━━━━━━━━━━━━<br/>IMAP/POP3 Server<br/>Mailbox Storage<br/>💾 74.67 MiB RAM<br/>Up 5 days"]
+    end
+    
+    subgraph SECURITY["📧 Mail Security"]
+        RSPAMD["🛡️ rspamd-mailcow<br/>━━━━━━━━━━━━━━━<br/>Spam Filtering<br/>ML-based Detection<br/>💾 218.9 MiB RAM<br/>Up 37 hours"]
+        
+        CLAMD["🦠 clamd-mailcow<br/>━━━━━━━━━━━━━━━<br/>ClamAV Antivirus<br/>Virus Scanning<br/>💾 1021 MiB RAM<br/>Up 5 days (healthy)"]
+        
+        OLEFY["📄 olefy-mailcow<br/>━━━━━━━━━━━━━━━<br/>Office Doc Scanner<br/>Macro Detection<br/>💾 14.62 MiB RAM"]
+        
+        NETFILTER["🔥 netfilter-mailcow<br/>━━━━━━━━━━━━━━━<br/>Firewall Rules<br/>Rate Limiting<br/>💾 29.29 MiB RAM"]
+    end
+    
+    subgraph WEBMAIL["Webmail & Groupware"]
+        SOGO["📧 sogo-mailcow<br/>━━━━━━━━━━━━━━━<br/>SOGo Groupware<br/>Calendar + Contacts<br/>💾 293.5 MiB RAM<br/>Up 5 days"]
+        
+        PHP["🐘 php-fpm-mailcow<br/>━━━━━━━━━━━━━━━<br/>PHP Processing<br/>Admin Panel<br/>💾 143.2 MiB RAM"]
+    end
+    
+    subgraph DATA["Data Layer"]
+        MYSQL["🗃️ mysql-mailcow<br/>━━━━━━━━━━━━━━━<br/>User Database<br/>Configuration<br/>💾 366.2 MiB RAM<br/>Up 5 days"]
+        
+        REDIS["⚡ redis-mailcow<br/>━━━━━━━━━━━━━━━<br/>Session Cache<br/>Rate Limiting<br/>💾 17.9 MiB RAM"]
+        
+        MEMCACHED["💨 memcached-mailcow<br/>━━━━━━━━━━━━━━━<br/>Object Cache<br/>Performance<br/>💾 3.406 MiB RAM"]
+    end
+    
+    subgraph DNS["DNS Layer"]
+        UNBOUND["🌐 unbound-mailcow<br/>━━━━━━━━━━━━━━━<br/>DNS Resolver<br/>DNSBL Checks<br/>💾 44.56 MiB RAM<br/>Up 5 days (healthy)"]
+    end
+    
+    subgraph MANAGEMENT["Management"]
+        WATCHDOG["👁️ watchdog-mailcow<br/>━━━━━━━━━━━━━━━<br/>Health Monitoring<br/>Container Checks<br/>💾 35.44 MiB RAM"]
+        
+        ACME["🔐 acme-mailcow<br/>━━━━━━━━━━━━━━━<br/>Let's Encrypt<br/>Certificate Renewal<br/>💾 2.695 MiB RAM"]
+        
+        OFELIA["⏰ ofelia-mailcow<br/>━━━━━━━━━━━━━━━<br/>Cron Scheduler<br/>Maintenance Tasks<br/>💾 267.2 MiB RAM"]
+        
+        DOCKERAPI["🐳 dockerapi-mailcow<br/>━━━━━━━━━━━━━━━<br/>Docker Socket Proxy<br/>Security Layer<br/>💾 56.15 MiB RAM"]
+    end
+    
+    subgraph LOGS["📋 Recent Activity (Verified)"]
+        LOG1["✅ Spam blocked: 77.90.185.65<br/>DNSBL rank 29<br/>zen.spamhaus.org lists"]
+        LOG2["✅ TLS: TLSv1.3 AES_256_GCM<br/>RSA-PSS 4096-bit"]
+        LOG3["⚠️ IPv6 disabled<br/>(Address family not supported)"]
+    end
+    
+    %% Connections
+    SMTP --> POSTFIX
+    IMAP --> DOVECOT
+    WEB --> NGINX
+    
+    NGINX --> SOGO
+    NGINX --> PHP
+    
+    POSTFIX --> RSPAMD
+    POSTFIX --> TLSPOL
+    RSPAMD --> CLAMD
+    RSPAMD --> OLEFY
+    
+    POSTFIX --> DOVECOT
+    
+    DOVECOT --> MYSQL
+    SOGO --> MYSQL
+    SOGO --> REDIS
+    SOGO --> MEMCACHED
+    
+    RSPAMD --> UNBOUND
+    
+    WATCHDOG --> DOCKERAPI
+    ACME --> NGINX
+    OFELIA --> POSTFIX
+    OFELIA --> DOVECOT
+    
+    NETFILTER --> POSTFIX
+    
+    classDef frontend fill:#1565C0,stroke:#0D47A1,color:#fff
+    classDef security fill:#C62828,stroke:#B71C1C,color:#fff
+    classDef data fill:#7B1FA2,stroke:#4A148C,color:#fff
+    classDef mail fill:#2E7D32,stroke:#1B5E20,color:#fff
+    classDef mgmt fill:#F57C00,stroke:#E65100,color:#fff
+    
+    class ENTRY,FRONTEND,NGINX frontend
+    class SECURITY,RSPAMD,CLAMD,OLEFY,NETFILTER security
+    class DATA,MYSQL,REDIS,MEMCACHED,DNS,UNBOUND data
+    class MTA,MDA,POSTFIX,DOVECOT,WEBMAIL,SOGO,PHP mail
+    class MANAGEMENT,WATCHDOG,ACME,OFELIA,DOCKERAPI mgmt
+```

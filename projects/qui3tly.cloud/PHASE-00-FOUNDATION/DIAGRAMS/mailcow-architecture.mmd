@@ -1,0 +1,127 @@
+graph TB
+    subgraph Internet["🌐 Internet"]
+        MailClients[Email Clients<br/>Thunderbird, Outlook, Mobile]
+        WebBrowsers[Web Browsers<br/>SOGo Webmail]
+        Senders[Sending Mail Servers]
+    end
+
+    subgraph Mailcow["📧 MAILCOW STACK - Lady Server (18 containers)"]
+        direction TB
+        
+        subgraph Frontend["Web Frontend"]
+            Nginx[nginx<br/>• Web UI<br/>• TLS termination<br/>• Reverse proxy<br/>Port: 443]
+        end
+        
+        subgraph MailAccess["Mail Access"]
+            Dovecot[Dovecot<br/>• IMAP/IMAPS<br/>• POP3/POP3S<br/>• ManageSieve<br/>Port: 993, 995, 4190]
+        end
+        
+        subgraph MailTransfer["Mail Transfer"]
+            Postfix[Postfix<br/>• SMTP MTA<br/>• Submission<br/>• TLS enforcement<br/>Port: 25, 465, 587]
+        end
+        
+        subgraph Filtering["Spam & Virus Filtering"]
+            Rspamd[Rspamd<br/>• Spam detection<br/>• DKIM signing<br/>• Rate limiting<br/>• Machine learning]
+            ClamAV[ClamAV<br/>• Virus scanning<br/>• Real-time updates]
+            Olefy[Olefy<br/>• Office doc scanner<br/>• Macro detection]
+        end
+        
+        subgraph Webmail["Webmail & Groupware"]
+            SOGo[SOGo<br/>• Webmail UI<br/>• Calendar (CalDAV)<br/>• Contacts (CardDAV)<br/>• ActiveSync]
+        end
+        
+        subgraph Search["Search Engine"]
+            Solr[Apache Solr<br/>• Full-text search<br/>• Mail indexing<br/>• Fast queries]
+        end
+        
+        subgraph Database["Data Storage"]
+            MySQL[MySQL<br/>• User accounts<br/>• Mail metadata<br/>• Settings]
+            MailStorage[Mail Storage<br/>• Maildir format<br/>• /var/vmail/<br/>• 73GB data]
+        end
+        
+        subgraph Cache["Caching Layer"]
+            Redis[Redis<br/>• Session cache<br/>• Rate limiting<br/>• Temp data]
+            Memcached[Memcached<br/>• Object cache<br/>• Performance]
+        end
+        
+        subgraph DNS["DNS Resolution"]
+            Unbound[Unbound<br/>• Recursive DNS<br/>• DNSSEC validation<br/>• SPF/DKIM lookup]
+        end
+        
+        subgraph Automation["Automation & Health"]
+            Ofelia[Ofelia<br/>• Cron scheduler<br/>• Maintenance tasks<br/>• Log rotation]
+            Watchdog[Watchdog<br/>• Container health<br/>• Auto-restart<br/>• Notifications]
+        end
+        
+        subgraph Security["Security Layer"]
+            DockerAPI[Docker API Proxy<br/>• Socket protection<br/>• Limited access]
+            Netfilter[Netfilter<br/>• Firewall rules<br/>• Connection tracking<br/>• Fail2ban integration]
+            IPv6NAT[IPv6 NAT<br/>• IPv6 support<br/>• Address translation]
+        end
+        
+        subgraph Certificates["TLS Certificates"]
+            ACME[ACME<br/>• Let's Encrypt<br/>• Auto-renewal<br/>• Multi-domain]
+        end
+    end
+
+    subgraph External["🔗 External Services"]
+        DNS_Servers[DNS Servers<br/>• MX records<br/>• SPF, DKIM, DMARC<br/>• MTA-STS]
+        LE[Let's Encrypt<br/>ACME CA]
+    end
+
+    MailClients -->|IMAP/POP3| Dovecot
+    WebBrowsers -->|HTTPS| Nginx
+    Senders -->|SMTP| Postfix
+    
+    Nginx --> SOGo
+    
+    Postfix --> Rspamd
+    Rspamd --> ClamAV
+    Rspamd --> Olefy
+    Rspamd --> Dovecot
+    Dovecot --> MailStorage
+    
+    Dovecot --> Solr
+    SOGo --> Dovecot
+    SOGo --> MySQL
+    SOGo --> Memcached
+    
+    Postfix --> MySQL
+    Dovecot --> MySQL
+    Rspamd --> Redis
+    
+    Postfix --> Unbound
+    Rspamd --> Unbound
+    Unbound --> DNS_Servers
+    
+    Ofelia -.->|Schedules| Watchdog
+    Watchdog -.->|Monitors| Postfix
+    Watchdog -.->|Monitors| Dovecot
+    Watchdog -.->|Monitors| SOGo
+    
+    DockerAPI -.->|Protects| Watchdog
+    Netfilter -.->|Filters| Postfix
+    Netfilter -.->|Filters| Dovecot
+    
+    ACME -->|Requests| LE
+    ACME -.->|Provides certs| Nginx
+    ACME -.->|Provides certs| Postfix
+    ACME -.->|Provides certs| Dovecot
+
+    subgraph Stats["📊 Statistics (Last 7 Days)"]
+        S1[Total Messages: 3,842]
+        S2[Spam Detected: 234 - 6.1%]
+        S3[Ham: 3,608 - 93.9%]
+        S4[Viruses: 0]
+        S5[False Positives: 2]
+    end
+
+    classDef frontend fill:#326ce5,stroke:#fff,stroke-width:2px,color:#fff
+    classDef mail fill:#00d4aa,stroke:#fff,stroke-width:2px,color:#000
+    classDef security fill:#d62828,stroke:#fff,stroke-width:2px,color:#fff
+    classDef data fill:#f77f00,stroke:#fff,stroke-width:2px,color:#fff
+
+    class Nginx,Frontend frontend
+    class Postfix,Dovecot,Rspamd,ClamAV mail
+    class Netfilter,DockerAPI,ACME security
+    class MySQL,Redis,MailStorage data

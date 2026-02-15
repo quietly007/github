@@ -1,0 +1,124 @@
+graph TB
+    subgraph Sources["💾 Backup Sources"]
+        direction TB
+        
+        subgraph MasterData["Master Server Data"]
+            DockerVol1[Docker Volumes<br/>25 containers<br/>~30GB]
+            PrometheusData[Prometheus TSDB<br/>15.2GB<br/>15 days metrics]
+            GrafanaData[Grafana<br/>Dashboards<br/>Datasources<br/>Users]
+            HeadscaleDB[Headscale DB<br/>SQLite<br/>Node info]
+            ConfigsMaster[Configs<br/>• Traefik<br/>• Authelia<br/>• Prometheus<br/>• All services]
+        end
+        
+        subgraph LadyData["Lady Server Data"]
+            DockerVol2[Docker Volumes<br/>39 containers<br/>~50GB]
+            MailcowData[Mailcow Data<br/>• Mail store: 73GB<br/>• MySQL DB<br/>• Redis data<br/>• Configs]
+            NextcloudData[Nextcloud<br/>• User files: 128GB<br/>• Database<br/>• Config]
+            OdooData[Odoo<br/>• Database<br/>• Attachments]
+            ConfigsLady[Configs<br/>• Mailcow<br/>• Business apps<br/>• All services]
+        end
+        
+        subgraph Databases["Database Backups"]
+            MySQL[MySQL Dumps<br/>• Mailcow DB<br/>• MariaDB users]
+            Postgres[PostgreSQL Dumps<br/>• Nextcloud DB<br/>• Odoo DB<br/>• Authelia DB]
+            Redis[Redis RDB<br/>• Snapshots<br/>• AOF logs]
+        end
+        
+        subgraph Code["Code & Scripts"]
+            Automation[Automation Scripts<br/>29 scripts<br/>~/.copilot/scripts/]
+            Ansible[Ansible Playbooks<br/>Infrastructure as Code]
+            CustomCode[Custom Apps<br/>• Admin panel<br/>• Scripts]
+        end
+    end
+
+    subgraph Schedule["⏰ Backup Schedule"]
+        direction LR
+        
+        Daily["<b>DAILY</b> (3am)<br/>• Docker volumes<br/>• Databases<br/>• Headscale DB<br/>• Prometheus snapshot"]
+        
+        Weekly["<b>WEEKLY</b> (2am Sunday)<br/>• Full system backup<br/>• Configuration audit<br/>• Security scan"]
+        
+        Monthly["<b>MONTHLY</b> (3am 1st)<br/>• Complete snapshot<br/>• Off-site sync<br/>• Archive cold storage"]
+        
+        OnChange["<b>ON CHANGE</b><br/>• Git commit configs<br/>• Git push automation<br/>• Instant sync"]
+    end
+
+    subgraph Scripts["🤖 Backup Scripts"]
+        direction TB
+        
+        Cron["Cron Job<br/>0 3 * * *<br/>/root/.copilot/scripts/docker_backup.sh"]
+        
+        ScriptList["<b>Backup Scripts:</b><br/>• docker_backup.sh (312 lines)<br/>• prometheus_snapshot.sh (91 lines)<br/>• grafana_backup.sh (103 lines)<br/>• headscale_backup.sh (87 lines)<br/>• mysql_backup.sh (167 lines)<br/>• postgres_backup.sh (154 lines)<br/>• redis_snapshot.sh (82 lines)<br/>• config_sync.sh (198 lines)<br/>• mailcow_backup.sh (Mailcow native)"]
+    end
+
+    subgraph Storage["💿 Storage Locations"]
+        direction TB
+        
+        subgraph Local["Local Storage"]
+            BackupDir["/backup/<br/>45GB total<br/>Master + Lady"]
+            
+            subgraph Retention["Retention Policies"]
+                R1[Daily: 30 days]
+                R2[Weekly: 12 weeks]
+                R3[Monthly: 12 months]
+            end
+        end
+        
+        subgraph Remote["Remote Storage"]
+            Git["GitHub Private Repo<br/>• Configs<br/>• Scripts<br/>• IaC<br/>Infinite retention"]
+        end
+        
+        subgraph Future["🎯 Future (Phase 06)"]
+            OffSite[Off-site Backup<br/>• Second datacenter<br/>• Cloud storage<br/>• Encrypted]
+        end
+    end
+
+    subgraph Process["🔄 Backup Process"]
+        direction LR
+        
+        P1[1. Pre-backup checks<br/>• Disk space<br/>• Service health]
+        P2[2. Container pause<br/>• Optional<br/>• For consistency]
+        P3[3. Data backup<br/>• Volumes<br/>• Databases<br/>• Configs]
+        P4[4. Compression<br/>• gzip -9<br/>• tar archives]
+        P5[5. Verification<br/>• Checksum<br/>• List contents]
+        P6[6. Cleanup<br/>• Remove old<br/>• Apply retention]
+        P7[7. Notification<br/>• Gotify alert<br/>• Log entry]
+        
+        P1 --> P2 --> P3 --> P4 --> P5 --> P6 --> P7
+    end
+
+    subgraph Testing["🧪 Restore Testing"]
+        LastTest["<b>Last Restore Test:</b><br/>January 28, 2026<br/>✅ Successful<br/><br/>RTO: 4 hours<br/>RPO: 24 hours"]
+        
+        NextTest["<b>Next Test:</b><br/>Phase 06<br/>• Full DR drill<br/>• Multi-datacenter<br/>• Documented runbook"]
+    end
+
+    Sources --> Schedule
+    Schedule --> Scripts
+    Scripts --> Process
+    Process --> Storage
+    Storage -.->|Restore from| Testing
+
+    MasterData --> Daily
+    LadyData --> Daily
+    Databases --> Daily
+    Code --> OnChange
+    
+    Daily --> Cron
+    Weekly --> Cron
+    Monthly --> Cron
+    OnChange --> Git
+    
+    Cron --> ScriptList
+    ScriptList --> BackupDir
+    Code --> Git
+
+    classDef daily fill:#00d4aa,stroke:#fff,stroke-width:2px,color:#000
+    classDef weekly fill:#326ce5,stroke:#fff,stroke-width:2px,color:#fff
+    classDef monthly fill:#f77f00,stroke:#fff,stroke-width:2px,color:#fff
+    classDef storage fill:#d62828,stroke:#fff,stroke-width:2px,color:#fff
+
+    class Daily,Cron daily
+    class Weekly weekly
+    class Monthly monthly
+    class Storage,BackupDir,Git storage

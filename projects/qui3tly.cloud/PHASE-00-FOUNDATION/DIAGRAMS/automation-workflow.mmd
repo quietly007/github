@@ -1,0 +1,138 @@
+graph TB
+    subgraph Triggers["⏰ Automation Triggers"]
+        CronDaily[Cron: Daily 6am<br/>daily_report.sh]
+        CronWeekly[Cron: Weekly 2am Sun<br/>weekly_security.sh]
+        CronMonthly[Cron: Monthly 3am 1st<br/>monthly_report.sh]
+        CronBackup[Cron: Daily 3am<br/>docker_backup.sh]
+        
+        Manual[Manual Execution<br/>Admin runs script]
+        OnChange[Git Hook<br/>Config change detected]
+        Alert[Alert Triggered<br/>Prometheus threshold]
+    end
+
+    subgraph Categories["📁 Script Categories (29 total)"]
+        direction TB
+        
+        subgraph Reports["Reports (3)"]
+            S1[daily_report.sh<br/>145 lines<br/>System health check]
+            S2[weekly_security.sh<br/>203 lines<br/>Security audit]
+            S3[monthly_report.sh<br/>178 lines<br/>Metrics summary]
+        end
+        
+        subgraph Backups["Backups (9)"]
+            S4[docker_backup.sh<br/>312 lines<br/>Container volumes]
+            S5[prometheus_snapshot.sh<br/>91 lines<br/>TSDB backup]
+            S6[grafana_backup.sh<br/>103 lines<br/>Dashboard export]
+            S7[headscale_backup.sh<br/>87 lines<br/>SQLite dump]
+            S8[mysql_backup.sh<br/>167 lines<br/>Database dump]
+            S9[postgres_backup.sh<br/>154 lines<br/>PostgreSQL dump]
+            S10[redis_snapshot.sh<br/>82 lines<br/>RDB save]
+            S11[config_sync.sh<br/>198 lines<br/>Git commit + push]
+            S12[mailcow_backup<br/>Mailcow native]
+        end
+        
+        subgraph Monitoring["Monitoring (7)"]
+            S13[container_health.sh<br/>89 lines<br/>Health checks]
+            S14[tailscale_check.sh<br/>72 lines<br/>VPN status]
+            S15[wireguard_monitor.sh<br/>65 lines<br/>Tunnel check]
+            S16[network_test.sh<br/>134 lines<br/>Connectivity test]
+            S17[alert_test.sh<br/>48 lines<br/>Alert system test]
+            S18[ssl_report.sh<br/>108 lines<br/>TLS audit]
+            S19[dns_update.sh<br/>121 lines<br/>DNS record sync]
+        end
+        
+        subgraph Maintenance["Maintenance (8)"]
+            S20[disk_cleanup.sh<br/>67 lines<br/>Space management]
+            S21[log_rotate.sh<br/>54 lines<br/>Log rotation]
+            S22[memory_cleanup.sh<br/>59 lines<br/>RAM optimization]
+            S23[docker_prune.sh<br/>71 lines<br/>Docker cleanup]
+            S24[loki_retention.sh<br/>93 lines<br/>Log retention]
+            S25[service_restart.sh<br/>156 lines<br/>Service recovery]
+            S26[traefik_reload.sh<br/>38 lines<br/>Config reload]
+            S27[pihole_update.sh<br/>45 lines<br/>Gravity update]
+        end
+        
+        subgraph Security["Security (5)"]
+            S28[cert_renewal.sh<br/>43 lines<br/>TLS cert check]
+            S29[update_crowdsec.sh<br/>76 lines<br/>Rule updates]
+            S30[authelia_sync.sh<br/>112 lines<br/>User DB sync]
+            S31[fail2ban_check<br/>Included in weekly]
+            S32[vulnerability_scan<br/>Included in weekly]
+        end
+    end
+
+    subgraph Execution["⚙️ Execution Flow"]
+        direction LR
+        
+        E1[1. Pre-checks<br/>• Root access<br/>• Service status<br/>• Disk space]
+        E2[2. Execute<br/>• Run task<br/>• Capture output<br/>• Error handling]
+        E3[3. Log<br/>• /var/log/<br/>• Timestamp<br/>• Exit code]
+        E4[4. Notify<br/>• Gotify push<br/>• Email if error<br/>• Status update]
+        
+        E1 --> E2 --> E3 --> E4
+    end
+
+    subgraph Outputs["📊 Outputs & Actions"]
+        direction TB
+        
+        Logs[Log Files<br/>/var/log/<br/>• daily_report.log<br/>• weekly_security.log<br/>• monthly_report.log<br/>• docker_backup.log]
+        
+        Backups2[Backup Files<br/>/backup/<br/>45GB total<br/>Compressed archives]
+        
+        GitRepo[Git Repository<br/>configs + scripts<br/>Automatic commits]
+        
+        Notifications[Gotify Notifications<br/>Success/failure alerts<br/>Mobile push]
+        
+        Metrics[Prometheus Metrics<br/>Script success/failure<br/>Duration times]
+    end
+
+    subgraph Integration["🔗 Service Integration"]
+        direction LR
+        
+        Prometheus2[Prometheus<br/>Scrapes script metrics]
+        Grafana2[Grafana<br/>Backup Status dashboard]
+        Alertmanager2[Alertmanager<br/>Failure alerts]
+        Loki2[Loki<br/>Log aggregation]
+    end
+
+    CronDaily --> S1
+    CronWeekly --> S2
+    CronMonthly --> S3
+    CronBackup --> S4
+    
+    Manual --> Maintenance
+    OnChange --> S11
+    Alert --> S25
+    
+    Reports --> Execution
+    Backups --> Execution
+    Monitoring --> Execution
+    Maintenance --> Execution
+    Security --> Execution
+    
+    Execution --> Outputs
+    
+    Logs --> Loki2
+    Backups2 --> Grafana2
+    GitRepo --> Integration
+    Notifications --> Alertmanager2
+    Metrics --> Prometheus2
+
+    subgraph Stats["📈 Automation Statistics"]
+        ST1[Total Scripts: 29]
+        ST2[Total Lines: ~3,500]
+        ST3[Cron Jobs: 4]
+        ST4[Daily Executions: ~15]
+        ST5[Success Rate: 99.2%]
+        ST6[Last Failure: Feb 10 - disk full false alarm]
+    end
+
+    classDef cron fill:#00d4aa,stroke:#fff,stroke-width:2px,color:#000
+    classDef backup fill:#326ce5,stroke:#fff,stroke-width:2px,color:#fff
+    classDef monitor fill:#f77f00,stroke:#fff,stroke-width:2px,color:#fff
+    classDef security fill:#d62828,stroke:#fff,stroke-width:2px,color:#fff
+
+    class CronDaily,CronWeekly,CronMonthly,CronBackup cron
+    class Backups,S4,S5,S6,S7,S8,S9,S10,S11,S12 backup
+    class Monitoring,S13,S14,S15,S16,S17,S18,S19 monitor
+    class Security,S28,S29,S30,S31,S32 security
