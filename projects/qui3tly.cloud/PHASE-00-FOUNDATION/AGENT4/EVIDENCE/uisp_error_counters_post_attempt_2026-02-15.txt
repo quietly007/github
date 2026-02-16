@@ -1,3 +1,0 @@
-timestamp=2026-02-15T21:33:52Z
-uisp_makefile_errors_last10m=8
-uisp_unms_timeout_last10m=8

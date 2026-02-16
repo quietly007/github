@@ -1,1 +1,0 @@
-ls: cannot access '/home/qui3tly/.copilot/logs/': No such file or directory

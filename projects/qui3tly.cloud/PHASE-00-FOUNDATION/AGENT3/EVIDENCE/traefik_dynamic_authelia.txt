@@ -1,3 +1,0 @@
-]633;E;{   echo "# traefik dynamic config (container)"\x3b   docker exec traefik sh -lc 'ls -la /etc/traefik/dynamic/ && echo && sed -n "1,260p" /etc/traefik/dynamic/*.yaml' 2>/dev/null || true\x3b   echo\x3b echo "# traefik dynamic config (host)"\x3b   ls -la ~/.docker-compose/traefik/config/dynamic/ 2>/dev/null || true\x3b   sed -n '1,260p' ~/.docker-compose/traefik/config/dynamic/*.yaml 2>/dev/null || true\x3b } > /home/qui3tly/projects/qui3tly.cloud/PHASE-00-FOUNDATION/AGENT3/EVIDENCE/traefik_dynamic_authelia.txt 2>&1;cb80ee7f-9768-4bcb-9d38-2f473ba6c305]633;C# traefik dynamic config (container)
-
-# traefik dynamic config (host)
