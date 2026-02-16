@@ -1,26 +1,21 @@
 # TODO — qui3tly.cloud
 
-**Current work:** Steps 2+3 complete, UISP waiting on user (Step 1 of [PLAN.md](PLAN.md))  
-**Last update:** 2026-02-16 04:00 CET
+**Current work:** Steps 1-3 complete, Uptime Kuma configured (42 monitors, 7 groups)  
+**Last update:** 2026-02-16 04:40 CET
 
 ---
 
 ## Active
 
-| # | Task | Server | Status |
-|---|------|--------|--------|
-| 1 | UISP setup wizard — `isConfigured=false` in DB, needs web UI completion | Lady | BLOCKED (user action) |
-
-**UISP root cause:** `UnmsReadyCommand.php` checks `NmsOption::IS_CONFIGURED` in `nms_option_view` table → returns `false` → UCRM boot loop (278 Makefile error cycles). NMS API works fine (200 on 8081). Fix: complete setup wizard at https://uisp.quietly.online from Mac via Tailscale VPN.
+No active blockers.
 
 ## Next
 
 | # | Task | Blocked by |
 |---|------|------------|
-| 4 | Configure Uptime Kuma monitors (currently 0) | — |
 | 5 | Write service runbooks | — |
 | 6 | Test 3 DR methods, measure actual RTO | 5 |
-| 7 | Final verification pass | 1-6 |
+| 7 | Final verification pass | 5-6 |
 
 ## Done
 
@@ -47,6 +42,8 @@
 | — | Port scan: 4 exposed ports locked to VPN (blackbox 9115, frigate 5000/8554/8555, mysqld-exporter 9104) | 2026-02-16 |
 | — | mysqld-exporter: created compose file, pinned v0.16.0, VPN-only port | 2026-02-16 |
 | — | Documentation cleanup: 7 fixes (merged 28 docs, deleted archives, compressed reports, rewrote copilot-instructions + DOC_INVENTORY + START_HERE) | 2026-02-16 |
+| — | UISP setup wizard completed — boot loop resolved | 2026-02-16 |
+| — | Uptime Kuma: 42 monitors + 7 groups configured (42/42 UP) | 2026-02-16 |
 
 ## Closed (not broken / false alarm)
 

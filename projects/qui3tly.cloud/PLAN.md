@@ -17,7 +17,7 @@ The first baseline (Feb 15) identified 12 issues. Here's where they stand:
 
 | # | Issue | Status | Resolution |
 |---|-------|--------|------------|
-| 1 | UISP restart loop | **ACTIVE** | Not a restart — internal watchdog log noise. Container works (port 8081→200, RestartCount:0). Investigating timeout config. |
+| 1 | UISP restart loop | **CLOSED** | Setup wizard completed (2026-02-16). Boot loop was caused by `isConfigured=false` in DB. |
 | 2 | Odoo DB connection refused | **CLOSED** | Not reproducing. 0 errors/h, healthy, 0% CPU. |
 | 3 | Blackbox probe mail.quietly.online → 403 | **CLOSED** | By design — Mailcow nginx returns 403 on root. Probe passes with `http_any`. |
 | 4 | Blackbox probe quietly.its.me → 401 | **CLOSED** | By design — redirects to Authelia (302). Expected for VPN-only services. |
@@ -30,7 +30,7 @@ The first baseline (Feb 15) identified 12 issues. Here's where they stand:
 | 11 | Services documented: 6/54 (11%) | **OPEN** | Still a gap. `~/.docs/03-services/` has some docs but coverage is incomplete. |
 | 12 | Documentation scattered (452 files, 5 locations) | **OPEN** | Still scattered. `~/.docs/`, `~/.reports/`, `~/personal/`, `~/.copilot/`, this project. |
 
-**Score**: 8 closed/fixed, 2 open (documentation), 1 active (UISP noise).
+**Score**: 9 closed/fixed, 2 open (documentation), 0 active.
 
 ### What Works (don't touch)
 
@@ -53,17 +53,14 @@ The first baseline (Feb 15) identified 12 issues. Here's where they stand:
 
 Infrastructure fixes are 90% done. What remains is hardening, validation, and documentation.
 
-### Step 1: INVESTIGATE UISP (Active)
+### Step 1: INVESTIGATE UISP (DONE)
 
-The only active issue. UISP container works but floods logs with watchdog timeout errors.
+Root cause: `NmsOption::IS_CONFIGURED = false` in UCRM database. UISP NMS API worked fine (200 on 8081) but UCRM side looped because setup wizard was never completed.
 
-**Tasks:**
-- [ ] Review UISP `web.sh` watchdog configuration
-- [ ] Adjust timeout or disable watchdog if service is healthy
-- [ ] Verify zero errors after fix
+**Resolution:** User completed setup wizard at `https://uisp.quietly.online` via Tailscale VPN (2026-02-16).
 
 **Depends on:** Nothing  
-**Effort:** Small — config change
+**Effort:** Small — user action
 
 ---
 
