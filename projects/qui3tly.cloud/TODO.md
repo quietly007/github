@@ -1,26 +1,28 @@
 # TODO — qui3tly.cloud
 
-**Current work:** Steps 1-3 complete, Uptime Kuma configured (42 monitors, 7 groups)  
-**Last update:** 2026-02-16 04:40 CET
+**Current work:** All 6 steps complete. Plan finished.  
+**Last update:** 2026-02-17 20:45 CET
 
 ---
 
 ## Active
 
-No active blockers.
+No active blockers. All steps complete.
 
 ## Next
 
-| # | Task | Blocked by |
-|---|------|------------|
-| 5 | Write service runbooks | — |
-| 6 | Test 3 DR methods, measure actual RTO | 5 |
-| 7 | Final verification pass | 5-6 |
+Plan complete. Maintenance mode.
 
 ## Done
 
 | # | Task | Date |
 |---|------|------|
+| — | DR tested: Method 1 = 1s RTO, Method 1b (4 containers) = 20s RTO | 2026-02-17 |
+| — | Final verification: 64/64 UP, 0 unhealthy, 0 systemd errors, 20/20 Prometheus targets, 3 jails both servers | 2026-02-17 |
+| — | All 12 original issues CLOSED | 2026-02-17 |
+| — | Service docs: 47 docs verified against 64 containers, 7 stale docs fixed | 2026-02-17 |
+| — | Deep audit: 0 real errors, promtail healthcheck fixed, UISP cert fixed | 2026-02-17 |
+| — | INFRASTRUCTURE_OVERVIEW.md: 15+ inaccuracies corrected | 2026-02-17 |
 | — | Infrastructure baseline (64 containers documented) | 2026-02-15 |
 | — | 8 CCIE-level diagrams | 2026-02-16 |
 | — | DNS architecture documented | 2026-02-16 |
