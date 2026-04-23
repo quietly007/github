@@ -1,0 +1,65 @@
+--- condor ---
+hi  condor                           25.6.1-1+deb12                 amd64        distributed workload management system
+--- minicondor ---
+hi  minicondor                       25.6.1-1+deb12                 amd64        distributed workload management system - single node configuration
+--- pegasus ---
+ii  pegasus                          5.1.2-1+deb12                  amd64        Workflow management system for HTCondor, Grid, and Clouds
+--- pelican ---
+ii  pelican                          7.24.2-1                       amd64        Command-line copy tool for the Open Science Data Federation
+--- pelican-osdf-compat ---
+ii  pelican-osdf-compat              7.24.2-1                       all          OSDF compatibility files for Pelican
+--- libscitokens0 ---
+--- blahp ---
+
+### pelican packages
+pelican 7.24.2-1
+pelican-osdf-compat 7.24.2-1
+
+### what depends on condor (besides the pegasus-stack)
+condor
+Reverse Depends:
+  pegasus
+  pegasus
+  pegasus
+  pegasus
+  pegasus
+  pegasus
+  pegasus
+  minicondor
+  minicondor
+  minicondor
+  minicondor
+  minicondor
+  minicondor
+  minicondor
+  minicondor
+### what depends on pegasus
+pegasus
+Reverse Depends:
+
+### /opt/osg, /var/lib/condor, /var/lib/pegasus existence
+drwxr-xr-x 3 condor condor 4096 Feb 19 12:53 /var/lib/condor
+drwxr-xr-x 2 condor root 4096 Apr 23 14:01 /var/log/condor
+
+### pegasus user/group
+condor:x:107:114:HTCondor Daemons,,,:/var/lib/condor:/usr/sbin/nologin
+condor:x:114:
+
+### apt sources tied to pegasus/htcondor
+deb https://download.pegasus.isi.edu/wms/download/debian bookworm main
+# HTCondor repository for the 25.x feature versions
+deb [signed-by=/etc/apt/keyrings/htcondor.asc] https://htcss-downloads.chtc.wisc.edu/repo/debian/25.x bookworm main
+deb-src [signed-by=/etc/apt/keyrings/htcondor.asc] https://htcss-downloads.chtc.wisc.edu/repo/debian/25.x bookworm main
+
+# Beta test HTCondor repository for the 25.x feature versions
+#deb [signed-by=/etc/apt/keyrings/htcondor.asc] https://htcss-downloads.chtc.wisc.edu/repo/debian/25.x-beta bookworm main
+#deb-src [signed-by=/etc/apt/keyrings/htcondor.asc] https://htcss-downloads.chtc.wisc.edu/repo/debian/25.x-beta bookworm main
+
+# Alpha test HTCondor repository for the 25.x feature versions
+#deb [signed-by=/etc/apt/keyrings/htcondor.asc] https://htcss-downloads.chtc.wisc.edu/repo/debian/25.x-alpha bookworm main
+#deb-src [signed-by=/etc/apt/keyrings/htcondor.asc] https://htcss-downloads.chtc.wisc.edu/repo/debian/25.x-alpha bookworm main
+
+# Snapshot HTCondor repository for the 25.x feature versions
+#deb [signed-by=/etc/apt/keyrings/htcondor.asc] https://htcss-downloads.chtc.wisc.edu/repo/debian/25.x-snapshot bookworm main
+#deb-src [signed-by=/etc/apt/keyrings/htcondor.asc] https://htcss-downloads.chtc.wisc.edu/repo/debian/25.x-snapshot bookworm main
+

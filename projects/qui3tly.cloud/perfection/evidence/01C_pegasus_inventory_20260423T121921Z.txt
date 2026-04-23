@@ -1,0 +1,30 @@
+### packages
+condor 25.6.1-1+deb12
+minicondor 25.6.1-1+deb12
+pegasus 5.1.2-1+deb12
+
+### systemd services
+condor.service                                                                enabled         enabled
+pegasus-service.service                                                       enabled         enabled
+
+### running services
+  condor.service                                                                                        loaded active running   Condor Distributed High-Throughput-Computing
+  pegasus-service.service                                                                               loaded active running   Pegasus WMS Dashboard
+
+### pegasus files under /etc
+/etc/systemd/system/pegasus-service.service
+/etc/systemd/system/multi-user.target.wants/pegasus-service.service
+/etc/systemd/system/multi-user.target.wants/condor.service
+/etc/blahp/condor_local_submit_attributes.sh
+/etc/pegasus
+/etc/pegasus/sample.dot.pegasusrc
+/etc/apt/sources.list.d/pegasus.list
+/etc/apt/sources.list.d/htcondor.list
+/etc/apt/keyrings/htcondor.asc
+/etc/apt/trusted.gpg.d/pegasus.asc
+/etc/sysctl.d/99-htcondor.conf
+/etc/condor
+/etc/condor/condor_config
+/etc/condor/config.d/00-minicondor
+
+### pegasus files under /var

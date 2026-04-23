@@ -1,0 +1,10 @@
+### remaining packages
+✓ NONE
+
+### remaining services
+pegasus-service.service                                                       disabled        enabled
+
+### remaining processes
+✓ NONE
+
+### remaining filesystem traces

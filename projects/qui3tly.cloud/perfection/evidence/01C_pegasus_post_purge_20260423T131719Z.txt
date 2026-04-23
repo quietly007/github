@@ -1,0 +1,73 @@
+### remaining service unit file:
+ls: cannot access '/lib/systemd/system/pegasus-service.service': No such file or directory
+-rw-r--r-- 1 root root 297 Feb 19 13:05 /etc/systemd/system/pegasus-service.service
+
+### force-remove stale unit
+removed '/etc/systemd/system/pegasus-service.service'
+
+### FINAL listeners on 0.0.0.0 ###
+0.0.0.0:1006 users:(("sshd",pid=655,fd=3))
+0.0.0.0:25 users:(("docker-proxy",pid=5306,fd=8))
+0.0.0.0:4190 users:(("docker-proxy",pid=5665,fd=8))
+0.0.0.0:443 users:(("docker-proxy",pid=3509,fd=8))
+0.0.0.0:465 users:(("docker-proxy",pid=5381,fd=8))
+0.0.0.0:587 users:(("docker-proxy",pid=5461,fd=8))
+0.0.0.0:6789 users:(("docker-proxy",pid=4305,fd=8))
+0.0.0.0:80 users:(("docker-proxy",pid=3485,fd=8))
+0.0.0.0:993 users:(("docker-proxy",pid=5589,fd=8))
+0.0.0.0:995 users:(("docker-proxy",pid=5627,fd=8))
+
+### all unique LISTEN sockets
+0.0.0.0:1006
+0.0.0.0:25
+0.0.0.0:4190
+0.0.0.0:443
+0.0.0.0:465
+0.0.0.0:587
+0.0.0.0:6789
+0.0.0.0:80
+0.0.0.0:993
+0.0.0.0:995
+100.64.0.2:46590
+100.64.0.2:6060
+100.64.0.2:8081
+100.64.0.2:8082
+100.64.0.2:9001
+100.64.0.2:9100
+100.64.0.2:9104
+127.0.0.1:110
+127.0.0.1:13306
+127.0.0.1:143
+127.0.0.1:19991
+127.0.0.1:7654
+127.0.0.1:8080
+127.0.0.1:8843
+127.0.0.1:8880
+
+### disk
+/dev/sda1       985G  214G  731G  23% /
+
+### failed units
+● mailcow-tlsa.service loaded failed failed Update Mailcow TLSA and MTA-STS DNS records
+(empty = clean)
+
+### mailcow health
+18
+
+### port 5000 still bound?
+(empty = gone)
+
+### condor ports still bound?
+(empty = gone)
+
+### remaining systemd services (pegasus/condor)
+(empty = clean)
+
+### key configs check
+gone: /etc/pegasus
+gone: /etc/condor
+gone: /etc/sysctl.d/99-htcondor.conf
+gone: /etc/apt/sources.list.d/pegasus.list
+gone: /etc/apt/sources.list.d/htcondor.list
+gone: /etc/apt/keyrings/htcondor.asc
+gone: /etc/apt/trusted.gpg.d/pegasus.asc
