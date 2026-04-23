@@ -1,0 +1,6 @@
+--- pihole.quietly.its.me from public interface ---
+HTTP 403  redirect=
+--- headscale-ui.quietly.its.me from public interface ---
+HTTP 302  redirect=https://headscale-ui.quietly.its.me/web
+--- headscale-admin.quietly.its.me from public interface ---
+HTTP 404  redirect=

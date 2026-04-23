@@ -1,0 +1,6 @@
+headscale-admin@docker	Host(`headscale-admin.quietly.its.me`)	default-security-headers@file,crowdsec-bouncer@file,vpn-only@file
+headscale-qui3tly@file	Host(`headscale.qui3tly.cloud`)	default-security-headers@file,headscale-cors@file
+headscale-ui@docker	Host(`headscale-ui.quietly.its.me`)	default-security-headers@file,crowdsec-bouncer@file,vpn-only@file
+headscale@file	Host(`headscale.quietly.its.me`)	default-security-headers@file,headscale-cors@file
+pihole-secure@docker	Host(`pihole.quietly.its.me`)	default-security-headers@file,crowdsec-bouncer@file,vpn-only@file
+pihole@docker	Host(`pihole.quietly.its.me`)	pihole-https-redirect@docker

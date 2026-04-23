@@ -1,0 +1,42 @@
+/home/qui3tly/.docker/traefik/config/config/config.yaml:21:    vpn-only:
+/home/qui3tly/.docker/traefik/config/config/config.yaml:22:      ipWhiteList:
+/home/qui3tly/.docker/traefik/config/config/config.yaml:66:      ipWhiteList:
+/home/qui3tly/.docker/traefik/config/config/config.yaml:124:        - vpn-only
+/home/qui3tly/.docker/traefik/config/config/config.yaml:140:        - vpn-only
+/home/qui3tly/.docker/traefik/config/services/README.md:6:- `vpn-only@file` - VPN access only (toggle via admin panel)
+/home/qui3tly/.docker/traefik/config/services/README.md:15:  - "traefik.http.routers.SERVICE.middlewares=default-security-headers@file,crowdsec-bouncer@file,vpn-only@file"
+/home/qui3tly/.docker/traefik/config/config/config.yaml:21:    vpn-only:
+/home/qui3tly/.docker/traefik/config/config/config.yaml:22:      ipWhiteList:
+/home/qui3tly/.docker/traefik/config/config/config.yaml:66:      ipWhiteList:
+/home/qui3tly/.docker/traefik/config/config/config.yaml:124:        - vpn-only
+/home/qui3tly/.docker/traefik/config/config/config.yaml:140:        - vpn-only
+/home/qui3tly/.docker/traefik/config/services/README.md:6:- `vpn-only@file` - VPN access only (toggle via admin panel)
+/home/qui3tly/.docker/traefik/config/services/README.md:15:  - "traefik.http.routers.SERVICE.middlewares=default-security-headers@file,crowdsec-bouncer@file,vpn-only@file"
+/home/qui3tly/.docker/traefik/config/config/config.yaml:21:    vpn-only:
+/home/qui3tly/.docker/traefik/config/config/config.yaml:22:      ipWhiteList:
+/home/qui3tly/.docker/traefik/config/config/config.yaml:66:      ipWhiteList:
+/home/qui3tly/.docker/traefik/config/config/config.yaml:124:        - vpn-only
+/home/qui3tly/.docker/traefik/config/config/config.yaml:140:        - vpn-only
+/home/qui3tly/.docker/traefik/logs/traefik.log:169396:2026-04-13T20:35:30+02:00 WRN Middleware "vpn-only@file" of type IPWhiteList is deprecated, please use IPAllowList instead.
+/home/qui3tly/.docker/traefik/logs/traefik.log:169399:2026-04-13T20:35:30+02:00 WRN Middleware "vpn-only@file" of type IPWhiteList is deprecated, please use IPAllowList instead.
+/home/qui3tly/.docker/traefik/logs/traefik.log:169400:2026-04-13T20:35:30+02:00 WRN Middleware "vpn-only@file" of type IPWhiteList is deprecated, please use IPAllowList instead.
+/home/qui3tly/.docker/traefik/logs/traefik.log:169401:2026-04-13T20:35:30+02:00 WRN Middleware "vpn-only@file" of type IPWhiteList is deprecated, please use IPAllowList instead.
+/home/qui3tly/.docker/traefik/logs/traefik.log:169402:2026-04-13T20:35:30+02:00 WRN Middleware "vpn-only@file" of type IPWhiteList is deprecated, please use IPAllowList instead.
+/home/qui3tly/.docker/traefik/logs/traefik.log:169403:2026-04-13T20:35:30+02:00 WRN Middleware "vpn-only@file" of type IPWhiteList is deprecated, please use IPAllowList instead.
+/home/qui3tly/.docker/traefik/logs/traefik.log:169404:2026-04-13T20:35:31+02:00 WRN Middleware "vpn-only@file" of type IPWhiteList is deprecated, please use IPAllowList instead.
+/home/qui3tly/.docker/traefik/logs/traefik.log:169405:2026-04-13T20:35:31+02:00 WRN Middleware "vpn-only@file" of type IPWhiteList is deprecated, please use IPAllowList instead.
+/home/qui3tly/.docker/traefik/logs/traefik.log:169406:2026-04-13T20:35:31+02:00 WRN Middleware "vpn-only@file" of type IPWhiteList is deprecated, please use IPAllowList instead.
+/home/qui3tly/.docker/traefik/logs/traefik.log:169407:2026-04-13T20:35:31+02:00 WRN Middleware "vpn-only@file" of type IPWhiteList is deprecated, please use IPAllowList instead.
+/home/qui3tly/.docker/traefik/logs/traefik.log:169408:2026-04-13T20:35:31+02:00 WRN Middleware "vpn-only@file" of type IPWhiteList is deprecated, please use IPAllowList instead.
+/home/qui3tly/.docker/traefik/logs/traefik.log:169409:2026-04-13T20:35:31+02:00 WRN Middleware "vpn-only@file" of type IPWhiteList is deprecated, please use IPAllowList instead.
+/home/qui3tly/.docker/traefik/logs/traefik.log:169410:2026-04-13T20:35:31+02:00 WRN Middleware "vpn-only@file" of type IPWhiteList is deprecated, please use IPAllowList instead.
+/home/qui3tly/.docker/traefik/logs/traefik.log:169412:2026-04-13T20:35:33+02:00 WRN Middleware "vpn-only@file" of type IPWhiteList is deprecated, please use IPAllowList instead.
+/home/qui3tly/.docker/traefik/logs/traefik.log:169413:2026-04-13T20:35:33+02:00 WRN Middleware "vpn-only@file" of type IPWhiteList is deprecated, please use IPAllowList instead.
+/home/qui3tly/.docker/traefik/logs/traefik.log:169414:2026-04-13T20:35:33+02:00 WRN Middleware "vpn-only@file" of type IPWhiteList is deprecated, please use IPAllowList instead.
+/home/qui3tly/.docker/traefik/logs/traefik.log:169415:2026-04-13T20:35:33+02:00 WRN Middleware "vpn-only@file" of type IPWhiteList is deprecated, please use IPAllowList instead.
+/home/qui3tly/.docker/traefik/logs/traefik.log:169416:2026-04-13T20:35:33+02:00 WRN Middleware "vpn-only@file" of type IPWhiteList is deprecated, please use IPAllowList instead.
+/home/qui3tly/.docker/traefik/logs/traefik.log:169417:2026-04-13T20:35:33+02:00 WRN Middleware "vpn-only@file" of type IPWhiteList is deprecated, please use IPAllowList instead.
+/home/qui3tly/.docker/traefik/logs/traefik.log:169418:2026-04-13T20:35:33+02:00 WRN Middleware "vpn-only@file" of type IPWhiteList is deprecated, please use IPAllowList instead.
+/home/qui3tly/.docker/traefik/logs/traefik.log:169419:2026-04-13T20:35:33+02:00 WRN Middleware "vpn-only@file" of type IPWhiteList is deprecated, please use IPAllowList instead.
+/home/qui3tly/.docker/traefik/logs/traefik.log:169420:2026-04-13T20:35:41+02:00 WRN Middleware "vpn-only@file" of type IPWhiteList is deprecated, please use IPAllowList instead.
+/home/qui3tly/.docker/traefik/logs/traefik.log:169421:2026-04-13T20:35:41+02:00 WRN Middleware "vpn-only@file" of type IPWhiteList is deprecated, please use IPAllowList instead.

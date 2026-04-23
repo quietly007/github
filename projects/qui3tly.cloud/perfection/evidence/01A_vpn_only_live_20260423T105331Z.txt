@@ -1,0 +1,30 @@
+{
+  "name": "public@file",
+  "type": "ipwhitelist",
+  "ipAllowList": null,
+  "ipWhiteList": {
+    "sourceRange": [
+      "0.0.0.0/0"
+    ]
+  }
+}
+{
+  "name": "vpn-only@file",
+  "type": "ipwhitelist",
+  "ipAllowList": null,
+  "ipWhiteList": {
+    "sourceRange": [
+      "100.64.0.0/10",
+      "192.168.99.0/24",
+      "10.10.0.0/30",
+      "172.17.0.0/16",
+      "172.18.0.0/16",
+      "172.19.0.0/16",
+      "172.30.0.0/24",
+      "172.70.9.0/29",
+      "213.136.68.108/32",
+      "207.180.251.111/32",
+      "127.0.0.1/32"
+    ]
+  }
+}

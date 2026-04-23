@@ -1,0 +1,88 @@
+
+--- pihole.quietly.its.me ---
+request_id=3e555e2dk81f  nodes=ae1.node.check-host.net bg1.node.check-host.net ua1.node.check-host.net 
+{
+  "ae1.node.check-host.net": [
+    [
+      0,
+      1.01124000549316,
+      "Forbidden",
+      "403",
+      "213.136.68.108"
+    ]
+  ],
+  "bg1.node.check-host.net": [
+    [
+      0,
+      1.28850102424622,
+      "Forbidden",
+      "403",
+      "213.136.68.108"
+    ]
+  ],
+  "ua1.node.check-host.net": [
+    [
+      0,
+      0.494578838348389,
+      "Forbidden",
+      "403",
+      "213.136.68.108"
+    ]
+  ]
+}
+
+--- headscale-ui.quietly.its.me ---
+request_id=3e555e93kd83  nodes=rs1.node.check-host.net se1.node.check-host.net us4.node.check-host.net 
+{
+  "rs1.node.check-host.net": [
+    [
+      0,
+      0.248907089233398,
+      "Forbidden",
+      "403",
+      "213.136.68.108"
+    ]
+  ],
+  "se1.node.check-host.net": [
+    [
+      0,
+      0.182223081588745,
+      "Forbidden",
+      "403",
+      "213.136.68.108"
+    ]
+  ],
+  "us4.node.check-host.net": [
+    [
+      0,
+      0.447756052017212,
+      "Forbidden",
+      "403",
+      "213.136.68.108"
+    ]
+  ]
+}
+
+--- headscale-admin.quietly.its.me ---
+request_id=3e555f01k48d  nodes=br1.node.check-host.net ir1.node.check-host.net ro1.node.check-host.net 
+{
+  "br1.node.check-host.net": [
+    [
+      0,
+      0.849054098129272,
+      "Forbidden",
+      "403",
+      "213.136.68.108"
+    ]
+  ],
+  "ir1.node.check-host.net": null,
+  "ro1.node.check-host.net": [
+    [
+      0,
+      0.263822078704834,
+      "Forbidden",
+      "403",
+      "213.136.68.108"
+    ]
+  ]
+}

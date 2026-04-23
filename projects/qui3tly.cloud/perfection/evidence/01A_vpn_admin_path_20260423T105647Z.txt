@@ -1,0 +1,6 @@
+--- https://pihole.quietly.its.me/admin/ (from Master = allowlisted) ---
+HTTP 302  size=0  type=
+--- https://headscale-ui.quietly.its.me/web (from Master = allowlisted) ---
+HTTP 200  size=1283  type=text/html; charset=utf-8
+--- https://headscale-admin.quietly.its.me/ (from Master = allowlisted) ---
+HTTP 404  size=0  type=

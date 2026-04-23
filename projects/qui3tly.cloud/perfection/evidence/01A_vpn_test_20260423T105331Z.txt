@@ -1,0 +1,6 @@
+--- pihole.quietly.its.me from tailnet ---
+HTTP 403  ->  
+--- headscale-ui.quietly.its.me from tailnet ---
+HTTP 302  ->  https://headscale-ui.quietly.its.me/web
+--- headscale-admin.quietly.its.me from tailnet ---
+HTTP 404  ->  

@@ -1,0 +1,11 @@
+Phase 0 Safety Net — Contabo snapshots
+
+Date (UTC): 20260423T105136Z
+Operator:   qui3tly
+Label:      perfection-2026-04-23-pre
+
+lady_snapshot_id:   USER_CONFIRMED_DONE (2026-04-23)
+master_snapshot_id: USER_CONFIRMED_DONE (2026-04-23)
+
+Note: User confirmed both Contabo snapshots completed in session.
+Exact snapshot IDs to be retrieved from Contabo console and appended if needed for rollback.
