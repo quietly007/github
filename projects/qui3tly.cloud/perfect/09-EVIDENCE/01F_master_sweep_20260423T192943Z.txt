@@ -1,0 +1,92 @@
+================ MASTER sweep ================
+
+===== 1. FAILED units =====
+
+===== 2. All timers =====
+NEXT                         LEFT          LAST                         PASSED       UNIT                         ACTIVATES
+Thu 2026-04-23 21:30:00 CEST 16s left      Thu 2026-04-23 21:25:00 CEST 4min 43s ago service-monitor.timer        service-monitor.service
+Fri 2026-04-24 00:00:00 CEST 2h 30min left Thu 2026-04-23 00:00:01 CEST 21h ago      dpkg-db-backup.timer         dpkg-db-backup.service
+Fri 2026-04-24 00:00:00 CEST 2h 30min left Thu 2026-04-23 00:00:01 CEST 21h ago      logrotate.timer              logrotate.service
+Fri 2026-04-24 00:00:00 CEST 2h 30min left Thu 2026-04-23 00:00:01 CEST 21h ago      security-updates.timer       security-updates.service
+Fri 2026-04-24 00:18:05 CEST 2h 48min left Thu 2026-04-23 00:09:55 CEST 21h ago      aide.timer                   aide.service
+Fri 2026-04-24 02:12:47 CEST 4h 43min left Thu 2026-04-23 09:13:08 CEST 12h ago      man-db.timer                 man-db.service
+Fri 2026-04-24 06:38:09 CEST 9h left       Thu 2026-04-23 06:53:44 CEST 14h ago      apt-daily-upgrade.timer      apt-daily-upgrade.service
+Fri 2026-04-24 06:55:11 CEST 9h left       Thu 2026-04-23 18:40:46 CEST 2h 48min ago apt-daily.timer              apt-daily.service
+Fri 2026-04-24 20:50:33 CEST 23h left      Thu 2026-04-23 20:50:33 CEST 39min ago    systemd-tmpfiles-clean.timer systemd-tmpfiles-clean.service
+Sun 2026-04-26 03:10:26 CEST 2 days left   Sun 2026-04-19 03:10:17 CEST 4 days ago   e2scrub_all.timer            e2scrub_all.service
+Sun 2026-04-26 03:22:49 CEST 2 days left   Sun 2026-04-19 03:25:00 CEST 4 days ago   lynis.timer                  lynis.service
+Mon 2026-04-27 00:00:00 CEST 3 days left   Mon 2026-04-20 00:00:01 CEST 3 days ago   system-backup.timer          system-backup.service
+Mon 2026-04-27 00:38:13 CEST 3 days left   Mon 2026-04-20 01:21:40 CEST 3 days ago   fstrim.timer                 fstrim.service
+-                            -             -                            -            podman-auto-update.timer     
+
+14 timers listed.
+
+===== 3. journal err last 7d =====
+Apr 23 01:12:52 master systemd[1]: Failed to start aide.service - AIDE (Advanced Intrusion Detection Environment) integrity check.
+Apr 23 04:41:31 master systemd-networkd-wait-online[1654258]: Timeout occurred while waiting for network connectivity.
+Apr 23 06:54:14 master systemd-networkd-wait-online[1860339]: Timeout occurred while waiting for network connectivity.
+Apr 23 16:12:51 master systemd-networkd-wait-online[2703845]: Timeout occurred while waiting for network connectivity.
+Apr 23 18:41:16 master systemd-networkd-wait-online[2922319]: Timeout occurred while waiting for network connectivity.
+Apr 23 19:36:06 master systemd[1]: Failed to start aide.service - AIDE (Advanced Intrusion Detection Environment) integrity check.
+
+===== 4. /etc/cron.d =====
+total 32
+drwxr-xr-x   2 root root  4096 Jan 24 08:36 .
+drwxr-xr-x 129 root root 12288 Apr 12 00:00 ..
+-rw-r--r--   1 root root   201 Mar  5  2023 e2scrub_all
+-rw-r--r--   1 root root   589 Feb 24  2023 mdadm
+-rw-r--r--   1 root root   102 Mar  2  2023 .placeholder
+-rw-r--r--   1 root root    84 Jan 11 13:56 update-motd
+--- all user crontabs ---
+=== qui3tly ===
+# Automated Reports
+0 6 * * * /home/qui3tly/.copilot/cron/daily_report.sh >/dev/null 2>&1
+0 2 * * 0 /home/qui3tly/.copilot/cron/weekly_security.sh >/dev/null 2>&1
+0 3 1 * * /home/qui3tly/.copilot/cron/monthly_report.sh >/dev/null 2>&1
+# Docker backups - daily at 3am
+0 3 * * * /home/qui3tly/.copilot/cron/docker_backup.sh >/dev/null 2>&1
+
+===== 5. LIVE cert expiries on Master =====
+port 443: subject=CN = TRAEFIK DEFAULT CERT
+notAfter=Apr 20 01:03:02 2027 GMT
+port 8080: subject=CN = TRAEFIK DEFAULT CERT
+notAfter=Apr 20 01:03:02 2027 GMT
+
+===== 6. Docker unhealthy / exited =====
+--- exited ---
+
+===== 7. pending apt =====
+0
+
+===== 8. unattended-upgrades =====
+
+===== 9. disk / inodes =====
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sda1       985G   34G  911G   4% /
+/dev/sda15      124M   12M  113M  10% /boot/efi
+
+===== 10. big logs =====
+/var/log/account/pacct.0
+
+===== 11. reboots =====
+reboot   system boot  6.1.0-44-cloud-a Mon Apr 13 20:35   still running
+reboot   system boot  6.1.0-43-cloud-a Tue Feb 17 22:50 - 20:33 (54+20:43)
+reboot   system boot  6.1.0-43-cloud-a Tue Feb 10 07:05 - 22:48 (7+15:43)
+reboot   system boot  6.1.0-42-cloud-a Mon Feb  9 18:57 - 07:03  (12:06)
+
+
+===== 12. copilot cron scripts + last-run status =====
+total 28
+drwxr-xr-x  2 qui3tly qui3tly 4096 Feb 10 03:08 .
+drwxr-xr-x 12 qui3tly qui3tly 4096 Apr 13 19:22 ..
+-rwxr-xr-x  1 qui3tly qui3tly 3127 Apr 14 16:11 daily_report.sh
+-rwxr-xr-x  1 qui3tly qui3tly 1256 Feb 15 20:17 docker_backup.sh
+-rwxr-xr-x  1 qui3tly qui3tly 6189 Jan 10 22:27 monthly_report.sh
+-rwxr-xr-x  1 qui3tly qui3tly 3989 Jan 10 22:27 weekly_security.sh
+--- grep journal for copilot cron output ---
+Apr 23 03:00:01 master CRON[1506298]: (qui3tly) CMD (/home/qui3tly/.copilot/cron/docker_backup.sh >/dev/null 2>&1)
+Apr 23 06:00:01 master CRON[1777930]: (qui3tly) CMD (/home/qui3tly/.copilot/cron/daily_report.sh >/dev/null 2>&1)
+Apr 23 18:43:12 master aide[2888519]: WARNING: hash calculation: '/home/qui3tly/.copilot/logging/service-monitor.log' has been changed (changed attributes: s+c+m, hash could not be calculated)
+Apr 23 19:36:05 master aide[2888519]: Entry /home/qui3tly/.copilot/logging/service-monitor.log in databases has different attributes: -md5-sha1-rmd160-tiger-crc32-haval-gost-crc32b-sha256-sha512-whirlpool
+Apr 23 19:36:06 master aide[2888519]: f >b... mc..-.. . : /home/qui3tly/.copilot/logging/service-monitor.log
+Apr 23 19:36:07 master aide[2888519]: File: /home/qui3tly/.copilot/logging/service-monitor.log

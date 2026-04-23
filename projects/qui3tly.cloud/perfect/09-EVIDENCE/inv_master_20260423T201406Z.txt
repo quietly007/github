@@ -1,0 +1,220 @@
+# Master inventory - 2026-04-23T20:14:06+00:00
+
+## hostname/uname
+master
+Linux master 6.1.0-44-cloud-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.164-1 (2026-03-09) x86_64 GNU/Linux
+
+## uptime
+ 22:14:06 up 10 days,  1:39,  0 user,  load average: 2.43, 1.55, 1.91
+
+## /etc/os-release
+PRETTY_NAME="Debian GNU/Linux 12 (bookworm)"
+NAME="Debian GNU/Linux"
+VERSION_ID="12"
+VERSION="12 (bookworm)"
+VERSION_CODENAME=bookworm
+ID=debian
+HOME_URL="https://www.debian.org/"
+SUPPORT_URL="https://www.debian.org/support"
+BUG_REPORT_URL="https://bugs.debian.org/"
+
+## CPU/mem summary
+Architecture:                            x86_64
+CPU(s):                                  12
+Vendor ID:                               AuthenticAMD
+Model name:                              AMD EPYC Processor (with IBPB)
+Virtualization type:                     full
+
+               total        used        free      shared  buff/cache   available
+Mem:            47Gi       4.4Gi        13Gi       9.5Mi        29Gi        42Gi
+Swap:          2.0Gi          0B       2.0Gi
+
+## ip addr (all interfaces)
+lo inet 127.0.0.1/8
+eth0 inet 213.136.68.108/24
+wg0 inet 10.10.0.1/30
+tailscale0 inet 100.64.0.1/32
+br-0341e55be098 inet 172.30.0.1/24
+docker0 inet 172.17.0.1/16
+br-ca56054321aa inet 172.70.9.1/29
+br-fb776b4784ae inet 172.18.0.1/16
+
+## ip route
+default via 213.136.68.1 dev eth0 proto static 
+10.10.0.0/30 dev wg0 proto kernel scope link src 10.10.0.1 
+172.17.0.0/16 dev docker0 proto kernel scope link src 172.17.0.1 linkdown 
+172.18.0.0/16 dev br-fb776b4784ae proto kernel scope link src 172.18.0.1 
+172.30.0.0/24 dev br-0341e55be098 proto kernel scope link src 172.30.0.1 
+172.70.9.0/29 dev br-ca56054321aa proto kernel scope link src 172.70.9.1 
+192.168.99.0/24 dev wg0 scope link 
+213.136.68.0/24 dev eth0 proto kernel scope link src 213.136.68.108 
+
+## default gateway + DNS
+nameserver 1.1.1.1
+nameserver 8.8.8.8
+
+## lsattr /etc/resolv.conf (docs claim immutable)
+----i---------e------- /etc/resolv.conf
+
+## listening ports (0.0.0.0 + tailscale + localhost)
+Netid State  Recv-Q Send-Q Local Address:Port  Peer Address:PortProcess                                      
+udp   UNCONN 0      0            0.0.0.0:41641      0.0.0.0:*    users:(("tailscaled",pid=686,fd=21))        
+udp   UNCONN 0      0            0.0.0.0:51820      0.0.0.0:*                                                
+udp   UNCONN 0      0         100.64.0.1:53         0.0.0.0:*    users:(("docker-proxy",pid=552917,fd=8))    
+udp   UNCONN 0      0          10.10.0.1:53         0.0.0.0:*    users:(("docker-proxy",pid=552910,fd=8))    
+udp   UNCONN 0      0            0.0.0.0:3478       0.0.0.0:*    users:(("headscale",pid=682,fd=12))         
+tcp   LISTEN 0      65536     100.64.0.1:9115       0.0.0.0:*    users:(("docker-proxy",pid=552953,fd=8))    
+tcp   LISTEN 0      65536      10.10.0.1:53         0.0.0.0:*    users:(("docker-proxy",pid=552885,fd=8))    
+tcp   LISTEN 0      65536     100.64.0.1:53         0.0.0.0:*    users:(("docker-proxy",pid=552890,fd=8))    
+tcp   LISTEN 0      65536     100.64.0.1:3100       0.0.0.0:*    users:(("docker-proxy",pid=553014,fd=8))    
+tcp   LISTEN 0      128          0.0.0.0:8085       0.0.0.0:*    users:(("headscale",pid=682,fd=14))         
+tcp   LISTEN 0      65536        0.0.0.0:80         0.0.0.0:*    users:(("docker-proxy",pid=553031,fd=8))    
+tcp   LISTEN 0      65536        0.0.0.0:443        0.0.0.0:*    users:(("docker-proxy",pid=553045,fd=8))    
+tcp   LISTEN 0      128          0.0.0.0:1006       0.0.0.0:*    users:(("sshd",pid=639,fd=3))               
+tcp   LISTEN 0      65536     100.64.0.1:58436      0.0.0.0:*    users:(("tailscaled",pid=686,fd=13))        
+tcp   LISTEN 0      65536      127.0.0.1:9000       0.0.0.0:*    users:(("docker-proxy",pid=552978,fd=8))    
+tcp   LISTEN 0      128        127.0.0.1:9090       0.0.0.0:*    users:(("headscale",pid=682,fd=15))         
+tcp   LISTEN 0      65536      127.0.0.1:42393      0.0.0.0:*    users:(("code-560a9dba96",pid=2944691,fd=9))
+tcp   LISTEN 0      65536      127.0.0.1:9443       0.0.0.0:*    users:(("docker-proxy",pid=552994,fd=8))    
+tcp   LISTEN 0      65536      127.0.0.1:8053       0.0.0.0:*    users:(("docker-proxy",pid=552933,fd=8))    
+tcp   LISTEN 0      65536      127.0.0.1:8080       0.0.0.0:*    users:(("docker-proxy",pid=553062,fd=8))    
+
+## docker ps with ports
+NAMES             STATUS                 PORTS
+headscale-admin   Up 10 days             80/tcp, 443/tcp, 2019/tcp, 443/udp
+headscale-ui      Up 10 days             443/tcp
+pihole            Up 10 days (healthy)   67/udp, 10.10.0.1:53->53/tcp, 10.10.0.1:53->53/udp, 100.64.0.1:53->53/tcp, 100.64.0.1:53->53/udp, 123/udp, 443/tcp, 127.0.0.1:8053->80/tcp
+traefik           Up 10 days (healthy)   0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp, 127.0.0.1:8080->8080/tcp
+it-tools          Up 10 days             80/tcp
+promtail          Up 10 days (healthy)   
+blackbox          Up 10 days (healthy)   100.64.0.1:9115->9115/tcp
+cloudflared       Up 10 days             
+default-landing   Up 10 days             80/tcp
+fuckoff-page      Up 10 days (healthy)   80/tcp
+admin-panel       Up 10 days (healthy)   
+bouncer-traefik   Up 10 days (healthy)   
+crowdsec          Up 10 days (healthy)   
+ntfy              Up 10 days (healthy)   80/tcp
+semaphore         Up 10 days (healthy)   
+authelia          Up 10 days (healthy)   9091/tcp
+uptime-kuma       Up 10 days (healthy)   3001/tcp
+prometheus        Up 10 days (healthy)   9090/tcp
+loki              Up 10 days (healthy)   100.64.0.1:3100->3100/tcp
+grafana           Up 10 days (healthy)   3000/tcp
+alertmanager      Up 10 days (healthy)   9093/tcp
+portainer         Up 10 days             127.0.0.1:9000->9000/tcp, 8000/tcp, 127.0.0.1:9443->9443/tcp
+node-exporter     Up 10 days             9100/tcp
+gotify            Up 10 days (healthy)   80/tcp
+cadvisor          Up 10 days (healthy)   8080/tcp
+
+## docker network ls
+NETWORK ID     NAME              DRIVER    SCOPE
+b3058dd6796e   bridge            bridge    local
+935869819ca9   host              host      local
+0341e55be098   monitoring        bridge    local
+927aa2b70369   none              null      local
+ca56054321aa   pihole_internal   bridge    local
+fb776b4784ae   traefik           bridge    local
+
+## native systemd services of interest
+active
+active
+active
+
+● headscale.service - Headscale DNS Bootstrap Override
+     Loaded: loaded (/lib/systemd/system/headscale.service; enabled; preset: enabled)
+    Drop-In: /etc/systemd/system/headscale.service.d
+             └─dns-bootstrap.conf
+     Active: active (running) since Mon 2026-04-13 20:35:13 CEST; 1 week 3 days ago
+   Main PID: 682 (headscale)
+      Tasks: 15 (limit: 57798)
+     Memory: 66.6M
+        CPU: 50min 52.562s
+     CGroup: /system.slice/headscale.service
+             └─682 /usr/bin/headscale serve
+
+● tailscaled.service - Tailscale waits for Headscale
+     Loaded: loaded (/lib/systemd/system/tailscaled.service; enabled; preset: enabled)
+    Drop-In: /etc/systemd/system/tailscaled.service.d
+             └─after-headscale.conf, no-dns.conf
+     Active: active (running) since Mon 2026-04-13 20:35:15 CEST; 1 week 3 days ago
+       Docs: https://tailscale.com/docs/
+   Main PID: 686 (tailscaled)
+     Status: "Connected; qui3tly; 100.64.0.1 fd7a:115c:a1e0::1"
+      Tasks: 19 (limit: 57798)
+     Memory: 151.2M
+
+## tailscale status
+100.64.0.1  master  qui3tly  linux  -                                                               
+100.64.0.2  lady    lady     linux  active; direct 207.180.251.111:41641, tx 88801076 rx 967692784  
+100.64.0.3  mac     qui3tly  macOS  active; direct 79.143.107.91:41641, tx 30241692 rx 16143092     
+
+## wireguard
+interface: wg0
+  public key: wal/0u2DXphxjbMSt2mZDsp0pFWhzaffRaOOnv3LiB4=
+  private key: (hidden)
+  listening port: 51820
+
+peer: G72JPy0epHT2c/pNrlUee6REpkSf3nYv9ej6zNoU7EA=
+  endpoint: 62.4.55.119:33358
+  allowed ips: 10.10.0.0/30, 192.168.99.0/24
+  latest handshake: 29 seconds ago
+  transfer: 3.26 GiB received, 19.36 GiB sent
+  persistent keepalive: every 25 seconds
+
+## UFW status
+Status: active
+Logging: on (low)
+Default: deny (incoming), allow (outgoing), allow (routed)
+New profiles: skip
+
+To                         Action      From
+--                         ------      ----
+Anywhere                   REJECT IN   109.95.33.211              # by Fail2Ban after 3 attempts against sshd
+Anywhere                   REJECT IN   2.54.135.120               # by Fail2Ban after 3 attempts against sshd
+Anywhere                   REJECT IN   87.212.28.114              # by Fail2Ban after 3 attempts against sshd
+1006/tcp                   ALLOW IN    Anywhere                   # SSH
+80/tcp                     ALLOW IN    Anywhere                   # Headscale ACME
+443/tcp                    ALLOW IN    Anywhere                   # Headscale HTTPS
+8443/tcp                   ALLOW IN    Anywhere                   # headscale
+51820/udp                  ALLOW IN    Anywhere                   # WireGuard
+3478/udp                   ALLOW IN    Anywhere                   # Headscale DERP
+41641/udp                  ALLOW IN    Anywhere                   # Tailscale direct
+Anywhere on tailscale0     ALLOW IN    100.64.0.0/10              # Tailscale VPN
+8085/tcp                   ALLOW IN    172.18.0.0/16              # Traefik to Headscale
+Anywhere on wg0            ALLOW IN    192.168.99.0/24            # Office LAN via WireGuard
+Anywhere on wg0            ALLOW IN    10.10.0.0/30               # WireGuard P2P /30
+Anywhere                   ALLOW IN    100.64.0.0/10              # Tailscale
+81/tcp                     ALLOW IN    Anywhere                   # Headscale ACME alt
+Anywhere                   ALLOW IN    172.17.0.0/16              # Docker bridge
+Anywhere                   ALLOW IN    172.18.0.0/16              # Docker bridge
+Anywhere                   ALLOW IN    172.19.0.0/16              # Docker bridge
+Anywhere                   ALLOW IN    172.20.0.0/16              # Docker bridge
+Anywhere                   ALLOW IN    172.21.0.0/16              # Docker bridge
+Anywhere                   ALLOW IN    172.22.0.0/16              # Docker bridge
+Anywhere                   ALLOW IN    172.23.0.0/16              # Docker bridge
+Anywhere                   ALLOW IN    172.28.1.0/24              # Docker bridge
+
+53                         ALLOW OUT   Anywhere                   # DNS Outbound
+80/tcp                     ALLOW OUT   Anywhere                   # HTTP Outbound
+443/tcp                    ALLOW OUT   Anywhere                   # HTTPS Outbound
+
+Anywhere on eth0           ALLOW FWD   192.168.99.0/24 on wg0    
+Anywhere on tailscale0     ALLOW FWD   192.168.99.0/24 on wg0    
+192.168.99.0/24 on wg0     ALLOW FWD   100.64.0.0/10 on tailscale0
+Anywhere on eth0           ALLOW FWD   10.10.0.0/30 on wg0       
+Anywhere on tailscale0     ALLOW FWD   10.10.0.0/30 on wg0       
+
+
+## /etc/cron.d + user crontabs summary
+e2scrub_all
+mdadm
+update-motd
+
+-- crontab qui3tly --
+# Automated Reports
+0 6 * * * /home/qui3tly/.copilot/cron/daily_report.sh >/dev/null 2>&1
+0 2 * * 0 /home/qui3tly/.copilot/cron/weekly_security.sh >/dev/null 2>&1
+0 3 1 * * /home/qui3tly/.copilot/cron/monthly_report.sh >/dev/null 2>&1
+# Docker backups - daily at 3am
+0 3 * * * /home/qui3tly/.copilot/cron/docker_backup.sh >/dev/null 2>&1

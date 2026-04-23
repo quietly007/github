@@ -1,0 +1,243 @@
+################################################################
+# HOST: master
+################################################################
+
+===== 1. FAILED systemd units =====
+bash: systemctl --failed --no-legend --no-pager: command not found
+
+===== 2. ALL timers (look for failed/missed) =====
+bash: systemctl list-timers --all --no-pager: command not found
+
+===== 3. journal priority=err last 7d (top 50) =====
+bash: sudo journalctl -p 3 --since '7 days ago' --no-pager 2>/dev/null | tail -50: No such file or directory
+
+===== 4. crontabs =====
+bash: sudo ls -la /etc/cron.d /etc/cron.daily /etc/cron.hourly /etc/cron.weekly /etc/cron.monthly 2>/dev/null: No such file or directory
+--- user crontabs ---
+bash: for u in $(cut -f1 -d: /etc/passwd); do ct=$(sudo crontab -u $u -l 2>/dev/null); [ -n "$ct" ] && echo "== $u =="; echo "$ct"; done: No such file or directory
+
+===== 5. LIVE cert expiries (all endpoints on localhost) =====
+bash: for port in 443 465 587 993 995 8443; do
+    CERT=$(echo | timeout 3 openssl s_client -servername localhost -connect localhost:$port 2>/dev/null | openssl x509 -noout -subject -enddate 2>/dev/null)
+    [ -n "$CERT" ] && echo "port $port: $CERT"
+  done: No such file or directory
+
+===== 6. Docker unhealthy / exited =====
+bash: docker ps --filter health=unhealthy --format '{{.Names}}\t{{.Status}}' 2>/dev/null: No such file or directory
+--- exited ---
+bash: docker ps -a --filter status=exited --format '{{.Names}}\t{{.Status}}\t{{.Image}}' 2>/dev/null | head -20: No such file or directory
+
+===== 7. Pending apt upgrades =====
+bash: apt list --upgradable 2>/dev/null | grep -v '^Listing' | wc -l: No such file or directory
+
+===== 8. Unattended-upgrades errors last 7d =====
+bash: sudo ls -la /var/log/unattended-upgrades/ 2>/dev/null | head: No such file or directory
+bash: sudo grep -iE 'error|fail' /var/log/unattended-upgrades/*.log 2>/dev/null | tail -10: No such file or directory
+
+===== 9. Disk / inode pressure =====
+bash: df -h | grep -vE 'tmpfs|udev|overlay': command not found
+bash: df -i | grep -vE 'tmpfs|udev|overlay': command not found
+
+===== 10. /var/log big files (>50MB, possible runaway logs) =====
+bash: sudo find /var/log -type f -size +50M -exec ls -lah {} \; 2>/dev/null | head: No such file or directory
+
+===== 11. systemd services in 'activating' state >5 min (stuck) =====
+bash: systemctl list-units --state=activating --no-legend --no-pager: command not found
+
+===== 12. Last 5 reboots =====
+bash: last reboot 2>/dev/null | head -5: No such file or directory
+
+################################################################
+# HOST: lady
+################################################################
+
+===== 1. FAILED systemd units =====
+● mailcow-tlsa.service loaded failed failed Update Mailcow TLSA and MTA-STS DNS records
+
+===== 2. ALL timers (look for failed/missed) =====
+NEXT                         LEFT          LAST                         PASSED     UNIT                         ACTIVATES
+Fri 2026-04-24 00:00:00 CEST 2h 31min left -                            -          dpkg-db-backup.timer         dpkg-db-backup.service
+Fri 2026-04-24 05:19:03 CEST 7h left       Thu 2026-04-23 06:04:00 CEST 15h ago    apt-daily.timer              apt-daily.service
+Fri 2026-04-24 06:28:06 CEST 8h left       Thu 2026-04-23 06:23:31 CEST 15h ago    apt-daily-upgrade.timer      apt-daily-upgrade.service
+Fri 2026-04-24 11:09:10 CEST 13h left      Thu 2026-04-23 10:34:20 CEST 10h ago    man-db.timer                 man-db.service
+Fri 2026-04-24 14:10:49 CEST 16h left      Thu 2026-04-23 14:10:49 CEST 7h ago     mailcow-tlsa.timer           mailcow-tlsa.service
+Fri 2026-04-24 14:15:56 CEST 16h left      Thu 2026-04-23 14:15:56 CEST 7h ago     systemd-tmpfiles-clean.timer systemd-tmpfiles-clean.service
+Sun 2026-04-26 03:10:04 CEST 2 days left   Sun 2026-04-19 03:10:43 CEST 4 days ago e2scrub_all.timer            e2scrub_all.service
+Mon 2026-04-27 00:51:48 CEST 3 days left   Mon 2026-04-20 01:29:09 CEST 3 days ago fstrim.timer                 fstrim.service
+-                            -             -                            -          podman-auto-update.timer     
+
+9 timers listed.
+
+===== 3. journal priority=err last 7d (top 50) =====
+Apr 18 00:01:51 lady systemd[1]: Failed to start mailcow-tlsa.service - Update Mailcow TLSA and MTA-STS DNS records.
+Apr 18 04:18:17 lady systemd-networkd-wait-online[2612215]: Timeout occurred while waiting for network connectivity.
+Apr 18 06:02:18 lady systemd-networkd-wait-online[2824844]: Timeout occurred while waiting for network connectivity.
+Apr 18 16:56:55 lady systemd-networkd-wait-online[4148326]: Timeout occurred while waiting for network connectivity.
+Apr 18 17:42:48 lady sshd[49837]: error: kex_exchange_identification: client sent invalid protocol identifier "GET / HTTP/1.1"
+Apr 18 17:42:48 lady sshd[49839]: error: kex_exchange_identification: banner line contains invalid characters
+Apr 18 17:44:55 lady sshd[53773]: error: kex_exchange_identification: Connection closed by remote host
+Apr 18 18:11:02 lady systemd-networkd-wait-online[105623]: Timeout occurred while waiting for network connectivity.
+Apr 19 00:01:52 lady systemd[1]: Failed to start mailcow-tlsa.service - Update Mailcow TLSA and MTA-STS DNS records.
+Apr 19 06:06:10 lady systemd-networkd-wait-online[1540833]: Timeout occurred while waiting for network connectivity.
+Apr 19 17:35:06 lady systemd-networkd-wait-online[2909085]: Timeout occurred while waiting for network connectivity.
+Apr 19 20:34:10 lady sshd[3260893]: error: kex_exchange_identification: read: Connection reset by peer
+Apr 20 00:01:57 lady systemd[1]: Failed to start mailcow-tlsa.service - Update Mailcow TLSA and MTA-STS DNS records.
+Apr 20 04:26:06 lady systemd-networkd-wait-online[4159196]: Timeout occurred while waiting for network connectivity.
+Apr 20 06:07:12 lady systemd-networkd-wait-online[169387]: Timeout occurred while waiting for network connectivity.
+Apr 20 13:38:09 lady systemd-networkd-wait-online[1057244]: Timeout occurred while waiting for network connectivity.
+Apr 20 20:14:38 lady systemd-networkd-wait-online[1832084]: Timeout occurred while waiting for network connectivity.
+Apr 21 00:02:04 lady systemd[1]: Failed to start mailcow-tlsa.service - Update Mailcow TLSA and MTA-STS DNS records.
+Apr 21 06:35:37 lady systemd-networkd-wait-online[3048419]: Timeout occurred while waiting for network connectivity.
+Apr 21 16:39:51 lady systemd-networkd-wait-online[85986]: Timeout occurred while waiting for network connectivity.
+Apr 21 19:02:00 lady sshd[376095]: error: kex_exchange_identification: Connection closed by remote host
+Apr 22 00:02:03 lady systemd[1]: Failed to start mailcow-tlsa.service - Update Mailcow TLSA and MTA-STS DNS records.
+Apr 22 02:44:33 lady systemd-networkd-wait-online[1311111]: Timeout occurred while waiting for network connectivity.
+Apr 22 02:52:39 lady sshd[1329493]: error: kex_exchange_identification: read: Connection reset by peer
+Apr 22 02:52:40 lady sshd[1329542]: error: kex_exchange_identification: read: Connection reset by peer
+Apr 22 06:10:26 lady systemd-networkd-wait-online[1730188]: Timeout occurred while waiting for network connectivity.
+Apr 22 06:40:52 lady systemd-networkd-wait-online[1792231]: Timeout occurred while waiting for network connectivity.
+Apr 22 23:29:22 lady sshd[3818018]: error: kex_exchange_identification: banner line contains invalid characters
+Apr 23 00:02:06 lady systemd[1]: Failed to start mailcow-tlsa.service - Update Mailcow TLSA and MTA-STS DNS records.
+Apr 23 03:38:08 lady systemd-networkd-wait-online[106693]: Timeout occurred while waiting for network connectivity.
+Apr 23 06:04:31 lady systemd-networkd-wait-online[384520]: Timeout occurred while waiting for network connectivity.
+Apr 23 06:24:02 lady systemd-networkd-wait-online[420681]: Timeout occurred while waiting for network connectivity.
+-- Boot ad51386bcfa0430d81c97d2bf787e0e2 --
+Apr 23 14:01:27 lady sshd[1051]: error: kex_exchange_identification: Connection closed by remote host
+Apr 23 14:01:32 lady sshd[1571]: error: kex_exchange_identification: Connection closed by remote host
+Apr 23 14:10:50 lady systemd[1]: Failed to start mailcow-tlsa.service - Update Mailcow TLSA and MTA-STS DNS records.
+Apr 23 18:33:21 lady sshd[534496]: error: kex_exchange_identification: read: Connection reset by peer
+
+===== 4. crontabs =====
+/etc/cron.d:
+total 24
+drwx------  2 root root 4096 Jan 25 05:44 .
+drwxr-xr-x 98 root root 4096 Apr 23 14:24 ..
+-rw-r--r--  1 root root  102 Mar  2  2023 .placeholder
+-rw-r--r--  1 root root  201 Mar  5  2023 e2scrub_all
+-rw-r--r--  1 root root  589 Feb 24  2023 mdadm
+-rw-r--r--  1 root root  263 Jan 24 00:11 staticroute
+
+/etc/cron.daily:
+total 28
+drwx------  2 root root 4096 Jan 27 20:27 .
+drwxr-xr-x 98 root root 4096 Apr 23 14:24 ..
+-rw-r--r--  1 root root  102 Mar  2  2023 .placeholder
+-rwxr-xr-x  1 root root 1478 May 25  2023 apt-compat
+-rwxr-xr-x  1 root root  123 Mar 27  2023 dpkg
+-rwxr-xr-x  1 root root 1395 Mar 12  2023 man-db
+-rwxr-xr-x  1 root root  622 Feb 24  2023 mdadm
+
+/etc/cron.hourly:
+total 20
+drwx------  2 root root 4096 Jan 24 00:12 .
+drwxr-xr-x 98 root root 4096 Apr 23 14:24 ..
+-rw-r--r--  1 root root  102 Mar  2  2023 .placeholder
+-rwxr-xr-x  1 root root   44 Jan 24 00:11 free
+-rwxr-xr-x  1 root root   19 Jan 24 00:11 fstrim
+
+/etc/cron.monthly:
+total 12
+drwx------  2 root root 4096 Jan 24 00:12 .
+drwxr-xr-x 98 root root 4096 Apr 23 14:24 ..
+-rw-r--r--  1 root root  102 Mar  2  2023 .placeholder
+
+/etc/cron.weekly:
+total 16
+drwx------  2 root root 4096 Jan 24 00:12 .
+drwxr-xr-x 98 root root 4096 Apr 23 14:24 ..
+-rw-r--r--  1 root root  102 Mar  2  2023 .placeholder
+-rwxr-xr-x  1 root root 1055 Mar 12  2023 man-db
+--- user crontabs ---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+== qui3tly ==
+# Container health check - every 15 minutes
+*/15 * * * * /home/qui3tly/.copilot/cron/container_health.sh >/dev/null 2>&1
+# Automated Reports
+0 6 * * * /home/qui3tly/.copilot/cron/daily_report.sh >/dev/null 2>&1
+0 2 * * 0 /home/qui3tly/.copilot/cron/weekly_security.sh >/dev/null 2>&1
+0 3 1 * * /home/qui3tly/.copilot/cron/monthly_report.sh >/dev/null 2>&1
+
+
+
+
+
+
+===== 5. LIVE cert expiries (all endpoints on localhost) =====
+port 443: subject=CN = TRAEFIK DEFAULT CERT
+notAfter=Apr 23 12:02:56 2027 GMT
+port 465: subject=CN = mail.quietly.online
+notAfter=Apr 28 02:43:40 2026 GMT
+port 993: subject=CN = mail.quietly.online
+notAfter=Apr 28 02:43:40 2026 GMT
+port 995: subject=CN = mail.quietly.online
+notAfter=Apr 28 02:43:40 2026 GMT
+
+===== 6. Docker unhealthy / exited =====
+--- exited ---
+
+===== 7. Pending apt upgrades =====
+0
+
+===== 8. Unattended-upgrades errors last 7d =====
+total 144
+drwxr-x--- 2 root adm    4096 Jan 24 06:20 .
+drwxr-xr-x 9 root root   4096 Apr 23 14:23 ..
+-rw-r--r-- 1 root adm    3286 Jan 28 06:57 unattended-upgrades-dpkg.log
+-rw-r--r-- 1 root root   1936 Apr 23 14:01 unattended-upgrades-shutdown.log
+-rw-r--r-- 1 root root 124123 Apr 23 06:24 unattended-upgrades.log
+
+===== 9. Disk / inode pressure =====
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sda1       985G  214G  731G  23% /
+/dev/sda15      124M   12M  113M  10% /boot/efi
+Filesystem       Inodes   IUsed    IFree IUse% Mounted on
+/dev/sda1      65527808 1277576 64250232    2% /
+/dev/sda15            0       0        0     - /boot/efi
+
+===== 10. /var/log big files (>50MB, possible runaway logs) =====
+-rw-r-----+ 1 root systemd-journal 52M Apr 18 07:46 /var/log/journal/caf67f560dc44b189c21a3431583f01a/system@bc96c227567f448d98dd7fe57321167e-0000000002cc6fb0-00064fb3584a5a3b.journal
+-rw-r-----+ 1 root systemd-journal 52M Apr 19 19:25 /var/log/journal/caf67f560dc44b189c21a3431583f01a/system@bc96c227567f448d98dd7fe57321167e-0000000002dc456c-00064fd0e519158f.journal
+-rw-r-----+ 1 root systemd-journal 52M Apr 18 13:06 /var/log/journal/caf67f560dc44b189c21a3431583f01a/system@bc96c227567f448d98dd7fe57321167e-0000000002cedbf6-00064fb7cdfdeaaf.journal
+-rw-r-----+ 1 root systemd-journal 52M Apr 22 05:03 /var/log/journal/caf67f560dc44b189c21a3431583f01a/system@bc96c227567f448d98dd7fe57321167e-0000000002f4b04c-000650018a7d9195.journal
+-rw-r-----+ 1 root systemd-journal 52M Apr 19 05:21 /var/log/journal/caf67f560dc44b189c21a3431583f01a/system@bc96c227567f448d98dd7fe57321167e-0000000002d627af-00064fc554323106.journal
+-rw-r-----+ 1 root systemd-journal 52M Apr 20 16:44 /var/log/journal/caf67f560dc44b189c21a3431583f01a/system@bc96c227567f448d98dd7fe57321167e-0000000002e4e051-00064fe2d8f9703d.journal
+-rw-r-----+ 1 root systemd-journal 52M Apr 19 16:21 /var/log/journal/caf67f560dc44b189c21a3431583f01a/system@bc96c227567f448d98dd7fe57321167e-0000000002db09a2-00064fce72e34e43.journal
+-rw-r-----+ 1 root systemd-journal 52M Apr 23 09:36 /var/log/journal/caf67f560dc44b189c21a3431583f01a/system@bc96c227567f448d98dd7fe57321167e-000000000300c4c3-00065018fcdfee9a.journal
+-rw-r-----+ 1 root systemd-journal 52M Apr 22 13:02 /var/log/journal/caf67f560dc44b189c21a3431583f01a/system@bc96c227567f448d98dd7fe57321167e-0000000002f84fa1-000650083de50123.journal
+-rw-r-----+ 1 root systemd-journal 52M Apr 18 02:26 /var/log/journal/caf67f560dc44b189c21a3431583f01a/system@bc96c227567f448d98dd7fe57321167e-0000000002ca0349-00064faedf7ee81a.journal
+
+===== 11. systemd services in 'activating' state >5 min (stuck) =====
+
+===== 12. Last 5 reboots =====
+reboot   system boot  6.1.0-44-cloud-a Thu Apr 23 14:00   still running
+reboot   system boot  6.1.0-42-cloud-a Tue Feb 17 22:48 - 13:56 (64+14:08)
+reboot   system boot  6.1.0-42-cloud-a Tue Feb 10 07:02 - 22:48 (7+15:46)
+reboot   system boot  6.1.0-42-cloud-a Mon Feb  9 21:03 - 07:02  (09:58)
+reboot   system boot  6.1.0-42-cloud-a Mon Feb  9 18:57 - 21:03  (02:06)
+

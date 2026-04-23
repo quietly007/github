@@ -1,0 +1,147 @@
+# Lady inventory - 2026-04-23T20:15:10+00:00
+
+## hostname/uname
+lady
+Linux lady 6.1.0-44-cloud-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.164-1 (2026-03-09) x86_64 GNU/Linux
+
+## os-release
+PRETTY_NAME="Debian GNU/Linux 12 (bookworm)"
+NAME="Debian GNU/Linux"
+VERSION_ID="12"
+VERSION="12 (bookworm)"
+VERSION_CODENAME=bookworm
+ID=debian
+HOME_URL="https://www.debian.org/"
+SUPPORT_URL="https://www.debian.org/support"
+BUG_REPORT_URL="https://bugs.debian.org/"
+
+## cpu/mem
+Architecture:                            x86_64
+CPU(s):                                  12
+Model name:                              AMD EPYC Processor (with IBPB)
+Virtualization type:                     full
+               total        used        free      shared  buff/cache   available
+Mem:            47Gi       7.8Gi        34Gi       180Mi       5.4Gi        39Gi
+Swap:          2.0Gi          0B       2.0Gi
+
+## uptime
+ 22:15:21 up  8:14,  0 user,  load average: 11.73, 7.44, 7.05
+
+## ip addr
+lo inet 127.0.0.1/8
+eth0 inet 207.180.251.111/18
+tailscale0 inet 100.64.0.2/32
+br-f55304df6a53 inet 172.23.0.1/16
+br-f9e210a1a2f7 inet 172.21.0.1/16
+br-12d346c9fe84 inet 172.19.0.1/16
+br-44fe5bc60875 inet 172.20.0.1/16
+br-64228b449149 inet 172.18.0.1/16
+br-mailcow inet 172.28.1.1/24
+docker0 inet 172.17.0.1/16
+br-f49159028a5d inet 172.22.0.1/16
+
+## ip route
+default via 207.180.192.1 dev eth0 proto static 
+172.17.0.0/16 dev docker0 proto kernel scope link src 172.17.0.1 linkdown 
+172.18.0.0/16 dev br-64228b449149 proto kernel scope link src 172.18.0.1 
+172.19.0.0/16 dev br-12d346c9fe84 proto kernel scope link src 172.19.0.1 
+172.20.0.0/16 dev br-44fe5bc60875 proto kernel scope link src 172.20.0.1 
+172.21.0.0/16 dev br-f9e210a1a2f7 proto kernel scope link src 172.21.0.1 
+172.22.0.0/16 dev br-f49159028a5d proto kernel scope link src 172.22.0.1 
+172.23.0.0/16 dev br-f55304df6a53 proto kernel scope link src 172.23.0.1 
+172.28.1.0/24 dev br-mailcow proto kernel scope link src 172.28.1.1 
+207.180.192.0/18 dev eth0 proto kernel scope link src 207.180.251.111 
+
+## /etc/resolv.conf
+nameserver 100.64.0.1
+nameserver 1.1.1.1
+search qui3tly.cloud
+
+## docker ps
+NAMES                                        STATUS                 PORTS
+portainer-agent                              Up 8 hours             100.64.0.2:9001->9001/tcp
+mysqld-exporter                              Up 8 hours             100.64.0.2:9104->9104/tcp
+cadvisor                                     Up 8 hours (healthy)   100.64.0.2:8081->8080/tcp
+node-exporter                                Up 8 hours             100.64.0.2:9100->9100/tcp
+crowdsec                                     Up 8 hours (healthy)   100.64.0.2:6060->6060/tcp
+traefik                                      Up 8 hours             0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp, 127.0.0.1:8080->8080/tcp, 100.64.0.2:8082->8082/tcp
+nextcloud                                    Up 8 hours (healthy)   80/tcp, 443/tcp
+onlyoffice-documentserver                    Up 8 hours             80/tcp, 443/tcp
+nextcloud-db                                 Up 8 hours (healthy)   3306/tcp
+nextcloud-redis                              Up 8 hours (healthy)   6379/tcp
+uisp                                         Up 8 hours             80/tcp, 443/tcp, 2055/udp
+promtail                                     Up 8 hours             
+odoo-db                                      Up 8 hours (healthy)   5432/tcp
+odoo                                         Up 8 hours (healthy)   8069/tcp, 8071-8072/tcp
+bouncer-traefik                              Up 8 hours (healthy)   
+unifi                                        Up 8 hours             8080/tcp, 8443/tcp, 8843/tcp, 0.0.0.0:3478->3478/udp, 0.0.0.0:10001->10001/udp, 0.0.0.0:6789->6789/tcp, 8880/tcp
+unifi-db                                     Up 8 hours (healthy)   27017/tcp
+fuckoff-page                                 Up 8 hours (healthy)   80/tcp
+mailcowdockerized-nginx-mailcow-1            Up 8 hours             127.0.0.1:8843->8843/tcp, 80/tcp, 127.0.0.1:8880->8880/tcp
+mailcowdockerized-dovecot-mailcow-1          Up 8 hours             127.0.0.1:110->110/tcp, 0.0.0.0:993->993/tcp, 0.0.0.0:995->995/tcp, 127.0.0.1:143->143/tcp, 0.0.0.0:4190->4190/tcp, 127.0.0.1:19991->12345/tcp
+mailcowdockerized-mysql-mailcow-1            Up 8 hours             127.0.0.1:13306->3306/tcp
+mailcowdockerized-redis-mailcow-1            Up 8 hours             127.0.0.1:7654->6379/tcp
+mailcowdockerized-unbound-mailcow-1          Up 8 hours (healthy)   53/tcp, 53/udp
+homeassistant                                Up 8 hours             8123/tcp
+mta-sts                                      Up 8 hours             80/tcp
+mailcowdockerized-watchdog-mailcow-1         Up 8 hours             
+mailcowdockerized-acme-mailcow-1             Up 8 hours             
+mailcowdockerized-ofelia-mailcow-1           Up 8 hours             
+mailcowdockerized-rspamd-mailcow-1           Up 8 hours             
+mailcowdockerized-postfix-mailcow-1          Up 8 hours             0.0.0.0:25->25/tcp, 0.0.0.0:465->465/tcp, 0.0.0.0:587->587/tcp, 588/tcp
+mailcowdockerized-php-fpm-mailcow-1          Up 8 hours             9000/tcp
+mailcowdockerized-postfix-tlspol-mailcow-1   Up 8 hours             
+mailcowdockerized-clamd-mailcow-1            Up 8 hours (healthy)   
+mailcowdockerized-netfilter-mailcow-1        Up 8 hours             
+mailcowdockerized-sogo-mailcow-1             Up 8 hours             
+mailcowdockerized-memcached-mailcow-1        Up 8 hours             11211/tcp
+mailcowdockerized-dockerapi-mailcow-1        Up 8 hours             
+mailcowdockerized-olefy-mailcow-1            Up 8 hours             
+
+## docker network ls
+NETWORK ID     NAME                                DRIVER    SCOPE
+3cb08c91d3c2   bridge                              bridge    local
+62aaf1bd64f1   host                                host      local
+6f2bb298e843   mailcowdockerized_mailcow-network   bridge    local
+12d346c9fe84   monitoring                          bridge    local
+44fe5bc60875   nextcloud_nextcloud                 bridge    local
+c4ef8993f58d   none                                null      local
+f49159028a5d   odoo-internal                       bridge    local
+f9e210a1a2f7   portainer-agent_default             bridge    local
+64228b449149   traefik                             bridge    local
+f55304df6a53   unifi_unifi                         bridge    local
+
+## tailscale status
+100.64.0.2  lady    lady     linux  -                                                              
+100.64.0.3  mac     qui3tly  macOS  -                                                              
+100.64.0.1  master  qui3tly  linux  active; direct 213.136.68.108:41641, tx 978846080 rx 85636844  
+
+## ufw status verbose
+Status: active
+Logging: on (low)
+Default: deny (incoming), allow (outgoing), deny (routed)
+New profiles: skip
+
+To                         Action      From
+--                         ------      ----
+1006/tcp                   ALLOW IN    Anywhere                   # SSH
+60000:61000/udp            ALLOW IN    Anywhere                   # Mosh
+80/tcp                     ALLOW IN    Anywhere                   # HTTP
+443/tcp                    ALLOW IN    Anywhere                   # HTTPS
+41641/udp                  ALLOW IN    Anywhere                   # Tailscale
+25/tcp                     ALLOW IN    Anywhere                   # SMTP
+465/tcp                    ALLOW IN    Anywhere                   # SMTPS
+587/tcp                    ALLOW IN    Anywhere                   # Submission
+993/tcp                    ALLOW IN    Anywhere                   # IMAPS
+995/tcp                    ALLOW IN    Anywhere                   # POPS
+4190/tcp                   ALLOW IN    Anywhere                   # ManageSieve
+Anywhere                   ALLOW IN    100.64.0.0/10              # Tailscale VPN
+Anywhere                   ALLOW IN    172.17.0.0/16              # Docker bridge
+Anywhere                   ALLOW IN    172.18.0.0/16              # Docker bridge
+Anywhere                   ALLOW IN    172.19.0.0/16              # Docker bridge
+Anywhere                   ALLOW IN    172.20.0.0/16              # Docker bridge
+Anywhere                   ALLOW IN    172.21.0.0/16              # Docker bridge
+Anywhere                   ALLOW IN    172.22.0.0/16              # Docker bridge
+Anywhere                   ALLOW IN    172.23.0.0/16              # Docker bridge
+Anywhere                   ALLOW IN    172.28.1.0/24              # Docker bridge
+

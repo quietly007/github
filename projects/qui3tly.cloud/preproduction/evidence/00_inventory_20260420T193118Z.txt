@@ -1,0 +1,121 @@
+timestamp_utc=20260420T193118Z
+pwd=/home/qui3tly
+hostname=master
+--- project tree ---
+total 240
+drwxr-xr-x 5 qui3tly qui3tly   4096 Apr 20 21:06 .
+drwxr-xr-x 3 qui3tly qui3tly   4096 Feb 15 17:39 ..
+-rw-r--r-- 1 qui3tly qui3tly 202751 Feb 16 03:37 ARCHIVE.tar.gz
+drwxr-xr-x 4 qui3tly qui3tly   4096 Feb 16 03:02 BASELINE
+-rw-r--r-- 1 qui3tly qui3tly  11317 Feb 17 21:25 PLAN.md
+drwxr-xr-x 6 qui3tly qui3tly   4096 Apr 20 21:07 preproduction
+-rw-r--r-- 1 qui3tly qui3tly   1828 Feb 16 02:23 README.md
+drwxr-xr-x 2 qui3tly qui3tly   4096 Feb 16 04:34 scripts
+-rw-r--r-- 1 qui3tly qui3tly   3505 Feb 17 21:26 TODO.md
+--- preproduction tree ---
+/home/qui3tly/projects/qui3tly.cloud/preproduction/evidence/00_inventory_20260420T193118Z.txt
+/home/qui3tly/projects/qui3tly.cloud/preproduction/evidence/INGESTION_INDEX.md
+/home/qui3tly/projects/qui3tly.cloud/preproduction/plans/PREPRODUCTION_EXECUTION_PLAN.md
+/home/qui3tly/projects/qui3tly.cloud/preproduction/README.md
+/home/qui3tly/projects/qui3tly.cloud/preproduction/reports/PREPRODUCTION_AUDIT_MERGED.md
+/home/qui3tly/projects/qui3tly.cloud/preproduction/todo/PREPRODUCTION_TODO.md
+--- docs tree ---
+/home/qui3tly/.docs/00-standards/DOCUMENTATION_QUALITY_CHECKLIST.md
+/home/qui3tly/.docs/00-standards/DOCUMENTATION_STANDARD.md
+/home/qui3tly/.docs/00-standards/INFRASTRUCTURE_OVERVIEW.md
+/home/qui3tly/.docs/00-standards/PHASE_COMPLETION_TEMPLATE.md
+/home/qui3tly/.docs/00-standards/QUI3TLY_BRAND_GUIDELINES.md
+/home/qui3tly/.docs/01-architecture/DOCKER_ORGANIZATION_MANDATORY.md
+/home/qui3tly/.docs/01-architecture/DOMAIN_STRATEGY.md
+/home/qui3tly/.docs/01-architecture/DOMAIN_STRATEGY.v4.backup
+/home/qui3tly/.docs/01-architecture/GITHUB_ORGANIZATION_MANDATORY.md
+/home/qui3tly/.docs/01-architecture/NETWORK_ARCHITECTURE.md
+/home/qui3tly/.docs/02-operations/BACKUP_STRATEGY.md
+/home/qui3tly/.docs/02-operations/DISASTER_RECOVERY.md
+/home/qui3tly/.docs/02-operations/ERROR_REMEDIATION_PLAN.md
+/home/qui3tly/.docs/02-operations/MEMORY_DISCIPLINE.md
+/home/qui3tly/.docs/02-operations/MONITORING.md
+/home/qui3tly/.docs/02-operations/TROUBLESHOOTING.md
+/home/qui3tly/.docs/03-services/ADMIN_PANEL.md
+/home/qui3tly/.docs/03-services/ALERTMANAGER.md
+/home/qui3tly/.docs/03-services/AUTHELIA.md
+/home/qui3tly/.docs/03-services/BLACKBOX_EXPORTER.md
+/home/qui3tly/.docs/03-services/BOUNCER_TRAEFIK.md
+/home/qui3tly/.docs/03-services/CADVISOR.md
+/home/qui3tly/.docs/03-services/CADVISOR_PRIVILEGES.md
+/home/qui3tly/.docs/03-services/CLAMAV.md
+/home/qui3tly/.docs/03-services/CLOUDFLARED.md
+/home/qui3tly/.docs/03-services/CROWDSEC.md
+/home/qui3tly/.docs/03-services/DOVECOT.md
+/home/qui3tly/.docs/03-services/FAIL2BAN.md
+/home/qui3tly/.docs/03-services/FRIGATE.md
+/home/qui3tly/.docs/03-services/FUCKOFF_PAGE.md
+/home/qui3tly/.docs/03-services/GOTIFY.md
+/home/qui3tly/.docs/03-services/GRAFANA.md
+/home/qui3tly/.docs/03-services/HEADSCALE.md
+/home/qui3tly/.docs/03-services/HEADSCALE_UI.md
+/home/qui3tly/.docs/03-services/HOMEASSISTANT.md
+/home/qui3tly/.docs/03-services/IT_TOOLS.md
+/home/qui3tly/.docs/03-services/LOKI.md
+/home/qui3tly/.docs/03-services/MAILCOW.md
+/home/qui3tly/.docs/03-services/MARIADB.md
+/home/qui3tly/.docs/03-services/MONITORING_STACK.md
+/home/qui3tly/.docs/03-services/MTA_STS.md
+/home/qui3tly/.docs/03-services/MYSQLD_EXPORTER.md
+/home/qui3tly/.docs/03-services/NEXTCLOUD.md
+/home/qui3tly/.docs/03-services/NODE_EXPORTER.md
+/home/qui3tly/.docs/03-services/NTFY.md
+/home/qui3tly/.docs/03-services/ODOO.md
+/home/qui3tly/.docs/03-services/ONLYOFFICE.md
+/home/qui3tly/.docs/03-services/PIHOLE.md
+/home/qui3tly/.docs/03-services/PORTAINER.md
+/home/qui3tly/.docs/03-services/POSTFIX.md
+/home/qui3tly/.docs/03-services/POSTGRESQL.md
+/home/qui3tly/.docs/03-services/PROMETHEUS.md
+/home/qui3tly/.docs/03-services/PROMTAIL.md
+/home/qui3tly/.docs/03-services/REDIS.md
+/home/qui3tly/.docs/03-services/RSPAMD.md
+/home/qui3tly/.docs/03-services/SEMAPHORE.md
+/home/qui3tly/.docs/03-services/SOGO.md
+/home/qui3tly/.docs/03-services/TAILSCALE.md
+/home/qui3tly/.docs/03-services/TRAEFIK.md
+/home/qui3tly/.docs/03-services/UISP.md
+/home/qui3tly/.docs/03-services/UNIFI.md
+/home/qui3tly/.docs/03-services/UPTIME_KUMA.md
+/home/qui3tly/.docs/03-services/WIREGUARD.md
+/home/qui3tly/.docs/04-monitoring/ACTION_PLAN_COMPLETE.md
+/home/qui3tly/.docs/04-monitoring/ALERT_RULES.md
+/home/qui3tly/.docs/04-monitoring/alert-rules.yml
+/home/qui3tly/.docs/04-monitoring/DEPLOYMENT_GUIDE.md
+/home/qui3tly/.docs/04-monitoring/LESSONS-LEARNED.md
+/home/qui3tly/.docs/04-monitoring/LOGS_REFERENCE.md
+/home/qui3tly/.docs/04-monitoring/METRICS_REFERENCE.md
+/home/qui3tly/.docs/04-monitoring/MONITORING_PROJECT_GUIDE.md
+/home/qui3tly/.docs/04-monitoring/PROMETHEUS_TARGETS.md
+/home/qui3tly/.docs/04-monitoring/QUICK_REFERENCE.md
+/home/qui3tly/.docs/04-monitoring/README.md
+/home/qui3tly/.docs/06-security/FILE_PERMISSIONS_POLICY.md
+/home/qui3tly/.docs/06-security/SECURITY_INCIDENT_2026-01-28.md
+/home/qui3tly/.docs/06-security/SECURITY_STANDARDS.md
+/home/qui3tly/.docs/06-security/SYSTEMD_SERVICES.md
+/home/qui3tly/.docs/DOC_INVENTORY.md
+/home/qui3tly/.docs/.gitignore
+--- audits tree ---
+/home/qui3tly/personal/audits/01_AUDIT_REQUEST_PROJECT.md
+/home/qui3tly/personal/audits/02_AUDIT_REQUEST_DNS.md
+/home/qui3tly/personal/audits/03_AUDIT_REQUEST_SERVICES.md
+/home/qui3tly/personal/audits/04_AUDIT_REQUEST_PERFORMANCE.md
+/home/qui3tly/personal/audits/05_AUDIT_REQUEST_SECURITY_PERMISSIONS.md
+/home/qui3tly/personal/audits/06_AUDIT_REQUEST_MAIL_SYSTEM.md
+/home/qui3tly/personal/audits/07_AUDIT_REQUEST_MONITORING_SYSTEM.md
+/home/qui3tly/personal/audits/08_AUDIT_REQUEST_BRANDING_DESIGN.md
+/home/qui3tly/personal/audits/09_AUDIT_REQUEST_GOVERNANCE.md
+/home/qui3tly/personal/audits/10_AUDIT_REQUEST_DOMAIN_STRATEGY.md
+/home/qui3tly/personal/audits/11_AUDIT_REQUEST_AUDIT_OF_AUDIT.md
+/home/qui3tly/personal/audits/12_AUDIT_REQUEST_FQDN_SWEEP.md
+/home/qui3tly/personal/audits/13_AUDIT_REQUEST_CREDENTIALS_SWEEP.md
+/home/qui3tly/personal/audits/AUDIT_REQUEST.md
+/home/qui3tly/personal/audits/AUDIT_REQUESTS_SUMMARY.md
+/home/qui3tly/personal/audits/DNS_PIHOLE_CHANGE_REPORT.md
+/home/qui3tly/personal/audits/GITHUB_COMPREHENSIVE_AUDIT.md
+/home/qui3tly/personal/audits/TAILSCALE_OUTAGE_INVESTIGATION_2026-02-18.md

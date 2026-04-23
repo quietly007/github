@@ -1,0 +1,115 @@
+timestamp_utc=20260420T193118Z
+host=master
+--- os/kernel ---
+PRETTY_NAME="Debian GNU/Linux 12 (bookworm)"
+NAME="Debian GNU/Linux"
+VERSION_ID="12"
+VERSION="12 (bookworm)"
+VERSION_CODENAME=bookworm
+ID=debian
+HOME_URL="https://www.debian.org/"
+SUPPORT_URL="https://www.debian.org/support"
+BUG_REPORT_URL="https://bugs.debian.org/"
+Linux master 6.1.0-44-cloud-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.164-1 (2026-03-09) x86_64 GNU/Linux
+--- uptime/load/mem/disk ---
+ 21:31:18 up 7 days, 56 min,  0 user,  load average: 4.36, 2.96, 2.78
+               total        used        free      shared  buff/cache   available
+Mem:            47Gi       4.4Gi        40Gi       9.3Mi       2.4Gi        42Gi
+Swap:          2.0Gi          0B       2.0Gi
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sda1       985G   33G  912G   4% /
+/dev/sda1       985G   33G  912G   4% /
+/dev/sda1       985G   33G  912G   4% /
+--- docker quick ---
+headscale-admin|goodieshq/headscale-admin:0.26.0|Up 7 days
+headscale-ui|ghcr.io/gurucomputing/headscale-ui:2025.08.23|Up 7 days
+pihole|pihole/pihole:2025.11.1|Up 7 days (healthy)
+traefik|traefik:v3.6.6|Up 7 days (healthy)
+it-tools|corentinth/it-tools:2024.10.22-7ca5933|Up 7 days
+promtail|grafana/promtail:3.4.2|Up 7 days (healthy)
+blackbox|prom/blackbox-exporter:v0.28.0|Up 7 days (healthy)
+cloudflared|cloudflare/cloudflared:2024.12.2|Up 7 days
+default-landing|nginx:1.27-alpine|Up 7 days
+fuckoff-page|nginx:1.27-alpine|Up 7 days (healthy)
+admin-panel|python:3.11-slim|Up 7 days (healthy)
+bouncer-traefik|fbonalair/traefik-crowdsec-bouncer:0.5.0|Up 7 days (healthy)
+crowdsec|crowdsecurity/crowdsec:v1.6.8|Up 7 days (healthy)
+ntfy|binwiederhier/ntfy:v2.16.0|Up 7 days (healthy)
+semaphore|semaphoreui/semaphore:v2.10.22|Up 7 days (healthy)
+authelia|authelia/authelia:4.39.15|Up 7 days (healthy)
+uptime-kuma|f48d816cb746|Up 7 days (healthy)
+prometheus|prom/prometheus:v2.54.1|Up 7 days (healthy)
+loki|grafana/loki:3.3.2|Up 7 days (healthy)
+grafana|grafana/grafana:11.4.0|Up 7 days (healthy)
+alertmanager|prom/alertmanager:v0.27.0|Up 7 days (healthy)
+portainer|portainer/portainer-ce:2.33.6|Up 7 days
+node-exporter|prom/node-exporter:v1.9.0|Up 7 days
+gotify|gotify/server:2.5.0|Up 7 days (healthy)
+cadvisor|gcr.io/cadvisor/cadvisor:v0.52.1|Up 7 days (healthy)
+running_count=25
+--- docker networks ---
+NETWORK ID     NAME              DRIVER    SCOPE
+b3058dd6796e   bridge            bridge    local
+935869819ca9   host              host      local
+0341e55be098   monitoring        bridge    local
+927aa2b70369   none              null      local
+ca56054321aa   pihole_internal   bridge    local
+fb776b4784ae   traefik           bridge    local
+--- alerts/targets ---
+alerts=0
+targets_up=20/20
+--- security ---
+Status: active
+Logging: on (low)
+Default: deny (incoming), allow (outgoing), allow (routed)
+New profiles: skip
+
+To                         Action      From
+--                         ------      ----
+Anywhere                   REJECT IN   103.8.59.250               # by Fail2Ban after 3 attempts against sshd
+Anywhere                   REJECT IN   220.71.199.64              # by Fail2Ban after 3 attempts against sshd
+Anywhere                   REJECT IN   87.212.28.114              # by Fail2Ban after 3 attempts against sshd
+1006/tcp                   ALLOW IN    Anywhere                   # SSH
+80/tcp                     ALLOW IN    Anywhere                   # Headscale ACME
+443/tcp                    ALLOW IN    Anywhere                   # Headscale HTTPS
+8443/tcp                   ALLOW IN    Anywhere                   # headscale
+51820/udp                  ALLOW IN    Anywhere                   # WireGuard
+3478/udp                   ALLOW IN    Anywhere                   # Headscale DERP
+41641/udp                  ALLOW IN    Anywhere                   # Tailscale direct
+Anywhere on tailscale0     ALLOW IN    100.64.0.0/10              # Tailscale VPN
+8085/tcp                   ALLOW IN    172.18.0.0/16              # Traefik to Headscale
+Anywhere on wg0            ALLOW IN    192.168.99.0/24            # Office LAN via WireGuard
+Anywhere on wg0            ALLOW IN    10.10.0.0/30               # WireGuard P2P /30
+Anywhere                   ALLOW IN    100.64.0.0/10              # Tailscale
+81/tcp                     ALLOW IN    Anywhere                   # Headscale ACME alt
+
+53                         ALLOW OUT   Anywhere                   # DNS Outbound
+80/tcp                     ALLOW OUT   Anywhere                   # HTTP Outbound
+443/tcp                    ALLOW OUT   Anywhere                   # HTTPS Outbound
+
+Anywhere on eth0           ALLOW FWD   192.168.99.0/24 on wg0    
+Anywhere on tailscale0     ALLOW FWD   192.168.99.0/24 on wg0    
+192.168.99.0/24 on wg0     ALLOW FWD   100.64.0.0/10 on tailscale0
+Anywhere on eth0           ALLOW FWD   10.10.0.0/30 on wg0       
+Anywhere on tailscale0     ALLOW FWD   10.10.0.0/30 on wg0       
+
+Status
+|- Number of jail:	3
+`- Jail list:	recidive, sshd, traefik-auth
+--- listeners ---
+State  Recv-Q Send-Q Local Address:Port  Peer Address:PortProcess                                      
+LISTEN 0      65536     100.64.0.1:9115       0.0.0.0:*                                                
+LISTEN 0      65536      10.10.0.1:53         0.0.0.0:*                                                
+LISTEN 0      65536     100.64.0.1:53         0.0.0.0:*                                                
+LISTEN 0      65536     100.64.0.1:3100       0.0.0.0:*                                                
+LISTEN 0      128          0.0.0.0:8085       0.0.0.0:*                                                
+LISTEN 0      65536        0.0.0.0:80         0.0.0.0:*                                                
+LISTEN 0      65536        0.0.0.0:443        0.0.0.0:*                                                
+LISTEN 0      128          0.0.0.0:1006       0.0.0.0:*                                                
+LISTEN 0      65536      127.0.0.1:44897      0.0.0.0:*    users:(("code-560a9dba96",pid=319669,fd=11))
+LISTEN 0      65536     100.64.0.1:58436      0.0.0.0:*                                                
+LISTEN 0      65536      127.0.0.1:9000       0.0.0.0:*                                                
+LISTEN 0      128        127.0.0.1:9090       0.0.0.0:*                                                
+LISTEN 0      65536      127.0.0.1:9443       0.0.0.0:*                                                
+LISTEN 0      65536      127.0.0.1:8053       0.0.0.0:*                                                
+LISTEN 0      65536      127.0.0.1:8080       0.0.0.0:*                                                

@@ -39,6 +39,25 @@ No patches — only permanent solutions. Documentation is mandatory.
 
 ---
 
+## DOMAIN ARCHITECTURE — READ THIS FIRST
+
+**Two categories. Never confuse them.**
+
+| Domain | Type | Purpose | Points To |
+|--------|------|---------|----------|
+| **`qui3tly.cloud`** | INTERNAL | VPN backbone, server-to-server, Headscale | Tailnet IPs (100.64.0.x) |
+| **`quietly.its.me`** | PUBLIC | Master client-facing services (behind Traefik) | 213.136.68.108 |
+| **`quietly.online`** | PUBLIC | Lady client-facing services, email | 207.180.251.111 |
+| **`quietly.co.me`** | PUBLIC | Reserved for future client services | TBD |
+
+**Rule**: Headscale (VPN control plane) belongs on `qui3tly.cloud` — NEVER on a public domain behind Traefik.  
+**Lesson**: Feb 17 2026 outage proved that routing Headscale through Traefik on `quietly.its.me` is a SPOF. Headscale must be independent.
+
+Full domain architecture: `~/.docs/01-architecture/NETWORK_ARCHITECTURE.md` (section: DOMAIN ARCHITECTURE)  
+Full FQDN plan + implementation phases: `~/.docs/01-architecture/DOMAIN_STRATEGY.md`
+
+---
+
 ## ARCHITECTURE FACTS
 
 | Component | Type | Location | Don't Confuse |
@@ -46,6 +65,7 @@ No patches — only permanent solutions. Documentation is mandatory.
 | Headscale | NATIVE | `/etc/headscale/` (systemd) | Not Docker |
 | Tailscale | NATIVE | systemd | Not Docker |
 | Cloudflare | TOKEN | Inside Traefik config | No CF container |
+| CloudflareD | DNS-over-HTTPS | Pi-hole sidecar (proxy-dns) | NOT a Cloudflare Tunnel |
 | EdgeRouter | WireGuard | 10.10.0.2 | Not Tailscale |
 
 **DNS Bootstrap**: Master's `/etc/resolv.conf` is IMMUTABLE (`chattr +i`). Uses 1.1.1.1. Never touch it.
@@ -65,7 +85,8 @@ No patches — only permanent solutions. Documentation is mandatory.
 - WireGuard P2P: 10.10.0.0/30 (Master ↔ EdgeRouter)
 - Home LAN: 192.168.1.0/24
 
-DNS: Cloudflare (public) → Pi-hole + dnsmasq (internal) → Headscale MagicDNS (VPN)
+DNS: Cloudflare (public) → Pi-hole + dnsmasq (internal) → Headscale MagicDNS (VPN)  
+Domains: `qui3tly.cloud` = INTERNAL/VPN | `quietly.its.me` / `quietly.online` / `quietly.co.me` = PUBLIC/CLIENTS
 
 ---
 
