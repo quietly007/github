@@ -1,0 +1,55 @@
+### OS / kernel
+Linux lady 6.1.0-42-cloud-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.159-1 (2025-12-30) x86_64 GNU/Linux
+Description:	Debian GNU/Linux 12 (bookworm)
+Release:	12
+
+### uptime
+ 13:40:55 up 64 days, 13:52,  0 user,  load average: 3.68, 3.54, 4.34
+
+### currently installed kernel
+linux-image-6.1.0-34-cloud-amd64 6.1.135-1
+linux-image-6.1.0-42-cloud-amd64 6.1.159-1
+
+### total upgradables
+29
+
+### security upgradables
+16
+
+### security + kernel lines (first 30)
+bind9-host/oldstable-security 1:9.18.47-1~deb12u1 amd64 [upgradable from: 1:9.18.44-1~deb12u1]
+bind9-libs/oldstable-security 1:9.18.47-1~deb12u1 amd64 [upgradable from: 1:9.18.44-1~deb12u1]
+libgdk-pixbuf-2.0-0/oldstable-security 2.42.10+dfsg-1+deb12u4 amd64 [upgradable from: 2.42.10+dfsg-1+deb12u3]
+libgdk-pixbuf2.0-bin/oldstable-security 2.42.10+dfsg-1+deb12u4 amd64 [upgradable from: 2.42.10+dfsg-1+deb12u3]
+libgdk-pixbuf2.0-common/oldstable-security 2.42.10+dfsg-1+deb12u4 all [upgradable from: 2.42.10+dfsg-1+deb12u3]
+libgnutls30/oldstable-security 3.7.9-2+deb12u6 amd64 [upgradable from: 3.7.9-2+deb12u5]
+libnss3/oldstable-security 2:3.87.1-1+deb12u2 amd64 [upgradable from: 2:3.87.1-1+deb12u1]
+libpng16-16/oldstable-security 1.6.39-2+deb12u4 amd64 [upgradable from: 1.6.39-2+deb12u1]
+libssl3/oldstable-security 3.0.19-1~deb12u2 amd64 [upgradable from: 3.0.18-1~deb12u1]
+libtiff6/oldstable-security 4.5.0-6+deb12u4 amd64 [upgradable from: 4.5.0-6+deb12u3]
+linux-image-cloud-amd64/oldstable-security 6.1.164-1 amd64 [upgradable from: 6.1.159-1]
+linux-libc-dev/oldstable-security 6.1.164-1 amd64 [upgradable from: 6.1.159-1]
+openssh-client/oldstable-security 1:9.2p1-2+deb12u9 amd64 [upgradable from: 1:9.2p1-2+deb12u7]
+openssh-server/oldstable-security 1:9.2p1-2+deb12u9 amd64 [upgradable from: 1:9.2p1-2+deb12u7]
+openssh-sftp-server/oldstable-security 1:9.2p1-2+deb12u9 amd64 [upgradable from: 1:9.2p1-2+deb12u7]
+openssl/oldstable-security 3.0.19-1~deb12u2 amd64 [upgradable from: 3.0.18-1~deb12u1]
+
+### disk free on /
+/dev/sda1       985G  215G  730G  23% /
+
+### running container count
+38
+
+### Mailcow status (expect 18 healthy)
+18
+
+### restart policies of running containers
+     18 mailcowdockerized-acme-mailcow-1: always
+     15 mta-sts: unless-stopped
+      5 bouncer-traefik: unless-stopped
+
+### needs-restarting indicator
+no reboot-required flag currently
+
+### last journalctl errors (3h)
+-- No entries --

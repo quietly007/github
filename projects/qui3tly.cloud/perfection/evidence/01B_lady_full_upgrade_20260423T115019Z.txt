@@ -1,0 +1,15 @@
+ systemctl restart systemd-networkd.service
+ systemctl restart systemd-timesyncd.service
+ systemctl restart systemd-udevd.service
+
+Service restarts being deferred:
+ systemctl restart NetworkManager.service
+ systemctl restart systemd-logind.service
+ systemctl restart wpa_supplicant.service
+
+No containers need to be restarted.
+
+User sessions running outdated binaries:
+ qui3tly @ user manager service: systemd[1281231]
+
+No VM guests are running outdated hypervisor (qemu) binaries on this host.

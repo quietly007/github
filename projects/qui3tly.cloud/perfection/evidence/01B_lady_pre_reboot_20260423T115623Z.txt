@@ -1,0 +1,4 @@
+uptime_before:  13:56:24 up 64 days, 14:07,  0 user,  load average: 3.53, 6.01, 6.63
+containers_before: 38
+mailcow_before: 18
+kernel_before: 6.1.0-42-cloud-amd64

@@ -1,0 +1,42 @@
+6.1.0-44-cloud-amd64
+ 14:06:48 up 5 min,  0 user,  load average: 7.26, 8.19, 4.13
+
+=== containers running ===
+38
+=== containers exited ===
+=== mailcow health detail ===
+mailcowdockerized-nginx-mailcow-1	Up 5 minutes
+mailcowdockerized-dovecot-mailcow-1	Up 5 minutes
+mailcowdockerized-mysql-mailcow-1	Up 5 minutes
+mailcowdockerized-redis-mailcow-1	Up 5 minutes
+mailcowdockerized-unbound-mailcow-1	Up 5 minutes (healthy)
+mailcowdockerized-watchdog-mailcow-1	Up 5 minutes
+mailcowdockerized-acme-mailcow-1	Up 5 minutes
+mailcowdockerized-ofelia-mailcow-1	Up 5 minutes
+mailcowdockerized-rspamd-mailcow-1	Up 5 minutes
+mailcowdockerized-postfix-mailcow-1	Up 5 minutes
+mailcowdockerized-php-fpm-mailcow-1	Up 5 minutes
+mailcowdockerized-postfix-tlspol-mailcow-1	Up 5 minutes
+mailcowdockerized-clamd-mailcow-1	Up 5 minutes (healthy)
+mailcowdockerized-netfilter-mailcow-1	Up 5 minutes
+mailcowdockerized-sogo-mailcow-1	Up 5 minutes
+mailcowdockerized-memcached-mailcow-1	Up 5 minutes
+mailcowdockerized-dockerapi-mailcow-1	Up 5 minutes
+mailcowdockerized-olefy-mailcow-1	Up 5 minutes
+
+=== unhealthy anywhere ===
+
+=== critical systemd ===
+active
+active
+active
+active
+active
+
+=== reboot flag ===
+clean
+
+=== load/mem ===
+               total        used        free      shared  buff/cache   available
+Mem:            47Gi       7.0Gi        35Gi       159Mi       4.8Gi        40Gi
+ 14:06:49 up 6 min,  0 user,  load average: 7.26, 8.19, 4.13

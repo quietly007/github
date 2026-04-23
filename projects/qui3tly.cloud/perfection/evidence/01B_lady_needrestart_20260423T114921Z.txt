@@ -1,0 +1,16 @@
+NEEDRESTART-VER: 3.6
+NEEDRESTART-KCUR: 6.1.0-42-cloud-amd64
+NEEDRESTART-KEXP: 6.1.0-42-cloud-amd64
+NEEDRESTART-KSTA: 1
+NEEDRESTART-SVC: condor.service
+NEEDRESTART-SVC: fail2ban.service
+NEEDRESTART-SVC: NetworkManager.service
+NEEDRESTART-SVC: pegasus-service.service
+NEEDRESTART-SVC: systemd-journald.service
+NEEDRESTART-SVC: systemd-logind.service
+NEEDRESTART-SVC: systemd-manager
+NEEDRESTART-SVC: systemd-networkd.service
+NEEDRESTART-SVC: systemd-timesyncd.service
+NEEDRESTART-SVC: systemd-udevd.service
+NEEDRESTART-SVC: wpa_supplicant.service
+NEEDRESTART-SESS: qui3tly @ user manager service
