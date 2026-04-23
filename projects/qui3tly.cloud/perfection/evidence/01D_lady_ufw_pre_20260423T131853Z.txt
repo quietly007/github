@@ -1,0 +1,19 @@
+Status: active
+
+     To                         Action      From
+     --                         ------      ----
+[ 1] 1006/tcp                   ALLOW IN    Anywhere                   # SSH
+[ 2] 60000:61000/udp            ALLOW IN    Anywhere                   # Mosh
+[ 3] 80/tcp                     ALLOW IN    Anywhere                   # HTTP
+[ 4] 443/tcp                    ALLOW IN    Anywhere                   # HTTPS
+[ 5] 41641/udp                  ALLOW IN    Anywhere                   # Tailscale
+[ 6] 25/tcp                     ALLOW IN    Anywhere                   # SMTP
+[ 7] 465/tcp                    ALLOW IN    Anywhere                   # SMTPS
+[ 8] 587/tcp                    ALLOW IN    Anywhere                   # Submission
+[ 9] 993/tcp                    ALLOW IN    Anywhere                   # IMAPS
+[10] 995/tcp                    ALLOW IN    Anywhere                   # POPS
+[11] 4190/tcp                   ALLOW IN    Anywhere                   # ManageSieve
+[12] Anywhere                   ALLOW IN    100.64.0.0/10              # Tailscale VPN
+[13] Anywhere                   ALLOW IN    172.16.0.0/12              # Docker internal
+[14] Anywhere                   ALLOW IN    10.0.0.0/8                 # Docker internal
+

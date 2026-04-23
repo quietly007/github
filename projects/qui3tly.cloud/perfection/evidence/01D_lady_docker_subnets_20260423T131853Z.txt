@@ -1,0 +1,18 @@
+bridge	bridge
+mailcowdockerized_mailcow-network	bridge
+monitoring	bridge
+nextcloud_nextcloud	bridge
+odoo-internal	bridge
+portainer-agent_default	bridge
+traefik	bridge
+unifi_unifi	bridge
+
+### subnets per network ###
+bridge: 172.17.0.0/16 
+mailcowdockerized_mailcow-network: 172.28.1.0/24 
+monitoring: 172.19.0.0/16 
+nextcloud_nextcloud: 172.20.0.0/16 
+odoo-internal: 172.22.0.0/16 
+portainer-agent_default: 172.21.0.0/16 
+traefik: 172.18.0.0/16 
+unifi_unifi: 172.23.0.0/16 
