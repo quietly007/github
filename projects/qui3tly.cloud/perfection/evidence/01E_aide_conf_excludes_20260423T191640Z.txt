@@ -1,0 +1,18 @@
+# Exclude volatile runtime files from AIDE checks
+# Added during perfection sprint 2026-04-23 (Phase 1E)
+
+# Live container databases (uptime-kuma, etc.)
+!/home/qui3tly/\.docker/uptime-kuma/data/.*
+
+# Active log files
+!/home/qui3tly/\.docker/traefik/logs/.*
+
+# VSCode server runtime state
+!/home/qui3tly/\.vscode-server/.*
+
+# Docker volatile container state
+!/var/lib/docker/containers/.*
+!/var/lib/docker/overlay2/.*
+
+# Mailcow logs (if any locally - on master they shouldn't be)
+!/var/lib/docker/volumes/.*/_data/postfix-vol-1/.*
