@@ -24,54 +24,54 @@
 
 ### 1A · Residual public@file bugs (Master) — Feb-16 carryover
 
-- [ ] **R-SEC-0-1** Backup compose files: `cp ~/.docker-compose/<svc>/docker-compose.yaml ~/.docker-compose/<svc>/docker-compose.yaml.pre-perfection` for pihole, headscale-ui, headscale-admin
-- [ ] **R-SEC-0-2** Patch: `sed -i 's/,public@file/,vpn-only@file/g'` on each of the three compose files
-- [ ] **R-SEC-0-3** `docker compose up -d` for each (no recreate — labels update in place)
-- [ ] **R-SEC-0-4** Verify from NON-VPN: `curl -sI` each FQDN → expect 403 / redirect, NOT admin HTML
-- [ ] **R-SEC-0-5** Save outputs → `evidence/master_residual_public_fix_<date>.txt`
+- [x] **R-SEC-0-1** Backup compose files: `cp ~/.docker-compose/<svc>/docker-compose.yaml ~/.docker-compose/<svc>/docker-compose.yaml.pre-perfection` for pihole, headscale-ui, headscale-admin · 2026-04-23 · evidence/01A_vpn_only_live_20260423T105331Z.txt
+- [x] **R-SEC-0-2** Patch: `sed -i 's/,public@file/,vpn-only@file/g'` on each of the three compose files · 2026-04-23 · evidence/01A_vpn_only_live_20260423T105331Z.txt
+- [x] **R-SEC-0-3** `docker compose up -d` for each (no recreate — labels update in place) · 2026-04-23 · evidence/01A_vpn_only_live_20260423T105331Z.txt
+- [x] **R-SEC-0-4** Verify from NON-VPN: `curl -sI` each FQDN → expect 403 / redirect, NOT admin HTML · 2026-04-23 · evidence/01A_vpn_only_live_20260423T105331Z.txt
+- [x] **R-SEC-0-5** Save outputs → `evidence/master_residual_public_fix_<date>.txt` · 2026-04-23 · evidence/01A_vpn_only_live_20260423T105331Z.txt
 
 ### 1B · Lady security patch + reboot (P0-1)
 
-- [ ] **R-SEC-1-1** Pre-patch evidence → `ssh lady "uname -r; apt list --upgradable 2>/dev/null" > evidence/lady_pre_patch_<date>.txt`
-- [ ] **R-SEC-1-2** `ssh lady "apt update && apt upgrade -y"`
-- [ ] **R-SEC-1-3** `ssh lady "reboot"` (2–3 min downtime)
-- [ ] **R-SEC-1-4** Post-reboot: kernel ≥ 6.1.0-44-cloud-amd64, fresh uptime, 38 containers running
-- [ ] **R-SEC-1-5** Prom 20/20 targets restored
-- [ ] **R-SEC-1-6** 0 new Alertmanager alerts
-- [ ] **R-SEC-1-7** Save → `evidence/lady_post_patch_<date>.txt`
+- [x] **R-SEC-1-1** Pre-patch evidence → `ssh lady "uname -r; apt list --upgradable 2>/dev/null" > evidence/lady_pre_patch_<date>.txt` · 2026-04-23 · evidence/01B_lady_final_20260423T120846Z.txt
+- [x] **R-SEC-1-2** `ssh lady "apt update && apt upgrade -y"` · 2026-04-23 · evidence/01B_lady_final_20260423T120846Z.txt
+- [x] **R-SEC-1-3** `ssh lady "reboot"` (2–3 min downtime) · 2026-04-23 · evidence/01B_lady_final_20260423T120846Z.txt
+- [x] **R-SEC-1-4** Post-reboot: kernel ≥ 6.1.0-44-cloud-amd64, fresh uptime, 38 containers running · 2026-04-23 · evidence/01B_lady_final_20260423T120846Z.txt
+- [x] **R-SEC-1-5** Prom 20/20 targets restored · 2026-04-23 · evidence/01B_lady_final_20260423T120846Z.txt
+- [x] **R-SEC-1-6** 0 new Alertmanager alerts · 2026-04-23 · evidence/01B_lady_final_20260423T120846Z.txt
+- [x] **R-SEC-1-7** Save → `evidence/lady_post_patch_<date>.txt` · 2026-04-23 · evidence/01B_lady_final_20260423T120846Z.txt
 
 ### 1C · Lady unscoped listeners + unknown python (P0-3 + P0-4)
 
-- [ ] **R-SEC-2-1** Capture: `ssh lady "ss -tlnp | grep 0.0.0.0" > evidence/lady_listeners_before_<date>.txt`
-- [ ] **R-SEC-2-2** Identify each pid on 9618/6769/4691/2529/30715/5000: `ls -la /proc/<pid>/exe; cat /proc/<pid>/cmdline | tr '\0' ' '`
-- [ ] **R-SEC-2-3** Decide per listener (kill/bind/keep-with-justification); record
-- [ ] **R-SEC-2-4** `systemctl stop condor; systemctl disable condor`
-- [ ] **R-SEC-2-5** `apt remove --purge condor pegasus-wms 2>/dev/null` if installed
-- [ ] **R-SEC-2-6** python3:5000 — **trace before killing**. If UISP → bind 100.64.0.2:5000 in compose. If unknown → kill + investigate before cleanup
-- [ ] **R-SEC-2-7** `ufw deny 9618/tcp; ufw deny 6769/tcp; ufw deny 4691/tcp; ufw deny 2529/tcp; ufw deny 30715/tcp` (keep 6789 if UniFi uses it — document)
-- [ ] **R-SEC-2-8** Re-capture → `evidence/lady_listeners_after_<date>.txt` — only 80, 443, 25, 465, 587, 993, 995, 4190, 1006 on 0.0.0.0 (+ 6789 UniFi if kept)
-- [ ] **R-SEC-2-9** External probe: `nmap -sT -p 9618,6769,4691,2529,30715,5000 207.180.251.111` → closed/filtered
+- [x] **R-SEC-2-1** Capture: `ssh lady "ss -tlnp | grep 0.0.0.0" > evidence/lady_listeners_before_<date>.txt` · 2026-04-23 · evidence/01C_pegasus_post_purge_20260423T131719Z.txt
+- [x] **R-SEC-2-2** Identify each pid on 9618/6769/4691/2529/30715/5000: `ls -la /proc/<pid>/exe; cat /proc/<pid>/cmdline | tr '\0' ' '` · 2026-04-23 · evidence/01C_pegasus_post_purge_20260423T131719Z.txt
+- [x] **R-SEC-2-3** Decide per listener (kill/bind/keep-with-justification); record · 2026-04-23 · evidence/01C_pegasus_post_purge_20260423T131719Z.txt
+- [x] **R-SEC-2-4** `systemctl stop condor; systemctl disable condor` · 2026-04-23 · evidence/01C_pegasus_post_purge_20260423T131719Z.txt
+- [x] **R-SEC-2-5** `apt remove --purge condor pegasus-wms 2>/dev/null` if installed · 2026-04-23 · evidence/01C_pegasus_post_purge_20260423T131719Z.txt
+- [x] **R-SEC-2-6** python3:5000 — **trace before killing**. If UISP → bind 100.64.0.2:5000 in compose. If unknown → kill + investigate before cleanup · 2026-04-23 · evidence/01C_pegasus_post_purge_20260423T131719Z.txt
+- [x] **R-SEC-2-7** `ufw deny 9618/tcp; ufw deny 6769/tcp; ufw deny 4691/tcp; ufw deny 2529/tcp; ufw deny 30715/tcp` (keep 6789 if UniFi uses it — document) · 2026-04-23 · evidence/01C_pegasus_post_purge_20260423T131719Z.txt
+- [x] **R-SEC-2-8** Re-capture → `evidence/lady_listeners_after_<date>.txt` — only 80, 443, 25, 465, 587, 993, 995, 4190, 1006 on 0.0.0.0 (+ 6789 UniFi if kept) · 2026-04-23 · evidence/01C_pegasus_post_purge_20260423T131719Z.txt
+- [x] **R-SEC-2-9** External probe: `nmap -sT -p 9618,6769,4691,2529,30715,5000 207.180.251.111` → closed/filtered · 2026-04-23 · evidence/01C_pegasus_post_purge_20260423T131719Z.txt
 
 ### 1D · Lady UFW broad RFC 1918 rule fix (P1-4)
 
-- [ ] **R-SEC-3-1** Enumerate Docker bridges → `docker network inspect $(docker network ls -q) | jq -r '.[] | "\(.Name): \(.IPAM.Config[0].Subnet // "none")"' > evidence/lady_docker_subnets_<date>.txt`
-- [ ] **R-SEC-3-2** Add specific `ufw allow in from <subnet> comment "<bridge>"` for each
-- [ ] **R-SEC-3-3** `ufw delete allow in from 172.16.0.0/12`
-- [ ] **R-SEC-3-4** `ufw delete allow in from 10.0.0.0/8`
-- [ ] **R-SEC-3-5** Inter-container smoke test: `docker exec traefik wget -q -O- http://crowdsec:8080` or equivalent
-- [ ] **R-SEC-3-6** External service smoke: `curl -sk https://quietly.online/` + `https://mail.quietly.online/`
-- [ ] **R-SEC-3-7** Save `ufw status verbose` → `evidence/lady_ufw_after_<date>.txt`
+- [x] **R-SEC-3-1** Enumerate Docker bridges → `docker network inspect $(docker network ls -q) | jq -r '.[] | "\(.Name): \(.IPAM.Config[0].Subnet // "none")"' > evidence/lady_docker_subnets_<date>.txt` · 2026-04-23 · evidence/01D_lady_ufw_post_20260423T132202Z.txt
+- [x] **R-SEC-3-2** Add specific `ufw allow in from <subnet> comment "<bridge>"` for each · 2026-04-23 · evidence/01D_lady_ufw_post_20260423T132202Z.txt
+- [x] **R-SEC-3-3** `ufw delete allow in from 172.16.0.0/12` · 2026-04-23 · evidence/01D_lady_ufw_post_20260423T132202Z.txt
+- [x] **R-SEC-3-4** `ufw delete allow in from 10.0.0.0/8` · 2026-04-23 · evidence/01D_lady_ufw_post_20260423T132202Z.txt
+- [x] **R-SEC-3-5** Inter-container smoke test: `docker exec traefik wget -q -O- http://crowdsec:8080` or equivalent · 2026-04-23 · evidence/01D_lady_ufw_post_20260423T132202Z.txt
+- [x] **R-SEC-3-6** External service smoke: `curl -sk https://quietly.online/` + `https://mail.quietly.online/` · 2026-04-23 · evidence/01D_lady_ufw_post_20260423T132202Z.txt
+- [x] **R-SEC-3-7** Save `ufw status verbose` → `evidence/lady_ufw_after_<date>.txt` · 2026-04-23 · evidence/01D_lady_ufw_post_20260423T132202Z.txt
 
 ### 1E · Master AIDE repair (P1-1)
 
-- [ ] **R-SEC-4-1** Diagnose: `journalctl -u aide.service -n 50 > evidence/master_aide_failure_<date>.txt`
-- [ ] **R-SEC-4-2** Sanity: `debsums -c 2>/dev/null | head -20`
-- [ ] **R-SEC-4-3** `aideinit` (long-running)
-- [ ] **R-SEC-4-4** `mv /var/lib/aide/aide.db.new /var/lib/aide/aide.db`
-- [ ] **R-SEC-4-5** `systemctl enable --now aide.timer`
-- [ ] **R-SEC-4-6** `systemctl list-timers aide.timer` → confirm active
-- [ ] **R-SEC-4-7** First check: `aide --check 2>&1 | tee evidence/master_aide_check_<date>.txt`
-- [ ] **R-SEC-4-8** Investigate any unexpected changes before closing
+- [x] **R-SEC-4-1** Diagnose: `journalctl -u aide.service -n 50 > evidence/master_aide_failure_<date>.txt` · 2026-04-23 · evidence/01E_summary_20260423T191731Z.md
+- [x] **R-SEC-4-2** Sanity: `debsums -c 2>/dev/null | head -20` · 2026-04-23 · evidence/01E_summary_20260423T191731Z.md
+- [x] **R-SEC-4-3** `aideinit` (long-running) · 2026-04-23 · evidence/01E_summary_20260423T191731Z.md
+- [x] **R-SEC-4-4** `mv /var/lib/aide/aide.db.new /var/lib/aide/aide.db` · 2026-04-23 · evidence/01E_summary_20260423T191731Z.md
+- [x] **R-SEC-4-5** `systemctl enable --now aide.timer` · 2026-04-23 · evidence/01E_summary_20260423T191731Z.md
+- [x] **R-SEC-4-6** `systemctl list-timers aide.timer` → confirm active · 2026-04-23 · evidence/01E_summary_20260423T191731Z.md
+- [x] **R-SEC-4-7** First check: `aide --check 2>&1 | tee evidence/master_aide_check_<date>.txt` · 2026-04-23 · evidence/01E_summary_20260423T191731Z.md
+- [x] **R-SEC-4-8** Investigate any unexpected changes before closing · 2026-04-23 · evidence/01E_summary_20260423T191731Z.md
 
 **Gate-A acceptance:**
 - `apt list --upgradable` (security) empty on Lady

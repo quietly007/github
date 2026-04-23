@@ -1,0 +1,4 @@
+=== pre-reboot 2026-04-23T22:11:48+00:00 ===
+ 00:11:48 up 10:10,  0 user,  load average: 6.49, 6.91, 7.04
+38
+containers running

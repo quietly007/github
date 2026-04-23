@@ -1,0 +1,53 @@
+=== collected 2026-04-23T22:39:23+00:00 ===
+
+############ MASTER ############
+--- uptime + kernel ---
+ 00:39:23 up 20 min,  0 user,  load average: 1.28, 2.40, 2.26
+6.1.0-44-cloud-amd64
+
+--- failed units ---
+  UNIT LOAD ACTIVE SUB DESCRIPTION
+0 loaded units listed.
+
+--- journal priority err+ since boot ---
+-- No entries --
+
+--- docker ps unhealthy ---
+
+--- exited (non-zero) containers ---
+
+--- Prometheus targets down ---
+
+--- Alertmanager firing ---
+total firing: ?
+
+--- cron last runs (Master) ---
+
+############ LADY ############
+uptime:
+ 00:39:25 up 26 min,  0 user,  load average: 6.67, 9.91, 9.92
+
+kernel:
+6.1.0-44-cloud-amd64
+
+failed units:
+  UNIT                 LOAD   ACTIVE SUB    DESCRIPTION
+● mailcow-tlsa.service loaded failed failed Update Mailcow TLSA and MTA-STS DNS records
+
+LOAD   = Reflects whether the unit definition was properly loaded.
+ACTIVE = The high-level unit activation state, i.e. generalization of SUB.
+SUB    = The low-level unit activation state, values depend on unit type.
+1 loaded units listed.
+
+unhealthy docker:
+
+exited (non-zero):
+
+journal err+ since boot:
+Apr 24 00:22:51 lady systemd[1]: Failed to start mailcow-tlsa.service - Update Mailcow TLSA and MTA-STS DNS records.
+
+############ CERT EXPIRIES (next 30 days) ############
+
+--- mail.quietly.online direct check ---
+subject=CN = mail.quietly.online
+notAfter=Apr 28 02:43:40 2026 GMT

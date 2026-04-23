@@ -1,5 +1,11 @@
 # PLAN — qui3tly.cloud
 
+> **HISTORICAL — written 2026-02-17.** Kept for context only.
+> **Live plan is now `perfect/PLAN.md`.**
+> See `perfect/DEEP_ANALYSIS_2026-04-23.md` for how Feb-17 status became Apr-23 reality.
+
+---
+
 > **Approach**: Baseline → Gap Analysis → Fix → Verify → Document  
 > **Rule #0**: NEVER ASSUME — ALWAYS CHECK THE SYSTEM  
 > **Rule**: Don't document broken things. Fix first, document after.  

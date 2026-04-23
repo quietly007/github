@@ -1,0 +1,157 @@
+==== Audit 12 FQDN Sweep v2 — 2026-04-23T23:16:36+00:00 ====
+
+################ FQDN INVENTORY ################
+--- Master (from ~/.docker-compose/**/docker-compose.y*ml) ---
+Host(`admin.quietly.its.me`)
+Host(`alertmanager.quietly.its.me`)
+Host(`auth.quietly.its.me`)
+Host(`gotify.quietly.its.me`)
+Host(`grafana.quietly.its.me`)
+Host(`headscale-admin.quietly.its.me`)
+Host(`headscale.quietly.its.me`)
+Host(`headscale-ui.quietly.its.me`)
+Host(`loki.quietly.its.me`)
+Host(`ntfy.quietly.its.me`)
+Host(`pihole.quietly.its.me`)
+Host(`portainer.quietly.its.me`)
+Host(`prometheus.quietly.its.me`)
+Host(`quietly.its.me`)
+Host(`quietly.online`)
+Host(`semaphore.quietly.its.me`)
+Host(`status.quietly.its.me`)
+Host(`tools.quietly.its.me`)
+Host(`traefik.quietly.its.me`)
+
+--- Lady (from ~/.docker-compose/**/docker-compose.y*ml) ---
+Host(`autoconfig.quietly.online`)
+Host(`autodiscover.quietly.online`)
+Host(`cctv.quietly.online`)
+Host(`cloud.quietly.online`)
+Host(`home.quietly.online`)
+Host(`mail.quietly.online`)
+Host(`mta-sts.quietly.online`)
+Host(`nextcloud.quietly.online`)
+Host(`odoo.quietly.online`)
+Host(`office.quietly.online`)
+Host(`quietly.online`)
+Host(`traefik.quietly.its.me`)
+Host(`traefik.quietly.online`)
+Host(`uisp.quietly.online`)
+Host(`unifi.quietly.online`)
+
+--- Traefik dynamic config (Master) ---
+
+--- Traefik dynamic config (Lady) ---
+
+################ DEDUPLICATED FQDNs (32) ################
+admin.quietly.its.me
+alertmanager.quietly.its.me
+auth.quietly.its.me
+autoconfig.quietly.online
+autodiscover.quietly.online
+cctv.quietly.online
+cloud.quietly.online
+gotify.quietly.its.me
+grafana.quietly.its.me
+headscale-admin.quietly.its.me
+headscale.quietly.its.me
+headscale-ui.quietly.its.me
+home.quietly.online
+loki.quietly.its.me
+mail.quietly.online
+mta-sts.quietly.online
+nextcloud.quietly.online
+ntfy.quietly.its.me
+odoo.quietly.online
+office.quietly.online
+pihole.quietly.its.me
+portainer.quietly.its.me
+prometheus.quietly.its.me
+quietly.its.me
+quietly.online
+semaphore.quietly.its.me
+status.quietly.its.me
+tools.quietly.its.me
+traefik.quietly.its.me
+traefik.quietly.online
+uisp.quietly.online
+unifi.quietly.online
+
+################ DNS RESOLUTION (via 1.1.1.1) ################
+admin.quietly.its.me                     → 213.136.68.108
+alertmanager.quietly.its.me              → 213.136.68.108
+auth.quietly.its.me                      → 213.136.68.108
+autoconfig.quietly.online                → 207.180.251.111
+autodiscover.quietly.online              → 207.180.251.111
+cctv.quietly.online                      → 207.180.251.111
+cloud.quietly.online                     → 207.180.251.111
+gotify.quietly.its.me                    → 213.136.68.108
+grafana.quietly.its.me                   → 213.136.68.108
+headscale-admin.quietly.its.me           → 213.136.68.108
+headscale.quietly.its.me                 → 213.136.68.108
+headscale-ui.quietly.its.me              → 213.136.68.108
+home.quietly.online                      → 207.180.251.111
+loki.quietly.its.me                      → 213.136.68.108
+mail.quietly.online                      → 207.180.251.111
+mta-sts.quietly.online                   → 207.180.251.111
+nextcloud.quietly.online                 → 207.180.251.111
+ntfy.quietly.its.me                      → 213.136.68.108
+odoo.quietly.online                      → 207.180.251.111
+office.quietly.online                    → 207.180.251.111
+pihole.quietly.its.me                    → 213.136.68.108
+portainer.quietly.its.me                 → 213.136.68.108
+prometheus.quietly.its.me                → 213.136.68.108
+quietly.its.me                           → 213.136.68.108
+quietly.online                           → 207.180.251.111
+semaphore.quietly.its.me                 → 213.136.68.108
+status.quietly.its.me                    → 213.136.68.108
+tools.quietly.its.me                     → 213.136.68.108
+traefik.quietly.its.me                   → 213.136.68.108
+traefik.quietly.online                   → 207.180.251.111
+uisp.quietly.online                      → 207.180.251.111
+unifi.quietly.online                     → 207.180.251.111
+
+################ CERT EXPIRY (direct TLS probe) ################
+     4 days  autoconfig.quietly.online
+     4 days  autodiscover.quietly.online
+     4 days  home.quietly.online
+     4 days  mail.quietly.online
+     4 days  mta-sts.quietly.online
+     4 days  quietly.online
+     5 days  cloud.quietly.online
+     5 days  nextcloud.quietly.online
+     5 days  odoo.quietly.online
+     5 days  office.quietly.online
+    10 days  unifi.quietly.online
+    17 days  cctv.quietly.online
+    17 days  traefik.quietly.online
+    17 days  uisp.quietly.online
+    41 days  admin.quietly.its.me
+    41 days  alertmanager.quietly.its.me
+    41 days  auth.quietly.its.me
+    41 days  gotify.quietly.its.me
+    41 days  grafana.quietly.its.me
+    41 days  headscale-admin.quietly.its.me
+    41 days  headscale.quietly.its.me
+    41 days  headscale-ui.quietly.its.me
+    41 days  loki.quietly.its.me
+    41 days  ntfy.quietly.its.me
+    41 days  pihole.quietly.its.me
+    41 days  portainer.quietly.its.me
+    41 days  prometheus.quietly.its.me
+    41 days  quietly.its.me
+    41 days  semaphore.quietly.its.me
+    41 days  status.quietly.its.me
+    41 days  tools.quietly.its.me
+    41 days  traefik.quietly.its.me
+
+################ DOMAIN STRATEGY CONFORMITY ################
+--- *.qui3tly.cloud FQDNs (must NEVER resolve externally) ---
+
+--- counts ---
+  quietly.its.me  : 18
+  quietly.online  : 14
+  qui3tly.cloud   : 0
+  other           : 0
+
+--- 'other' domain FQDNs (check if expected) ---

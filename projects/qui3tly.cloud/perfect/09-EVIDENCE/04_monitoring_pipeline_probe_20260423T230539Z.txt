@@ -1,0 +1,60 @@
+==== 04A/B Monitoring Pipeline Probe — 2026-04-23T23:05:39+00:00 ====
+
+### A1. Prometheus rules loaded
+[
+  "container-resources",
+  "critical-containers",
+  "database-containers",
+  "database-health",
+  "mailcow-health",
+  "mailcow-services",
+  "network-security",
+  "security-monitoring",
+  "service-health",
+  "website-probes",
+  "critical",
+  "warning"
+]
+
+### A2. Specific SSL rules
+[]
+
+### A3. Any alert currently firing (per Prom)
+[]
+
+### A4. Targets health
+{
+  "total": 20,
+  "up": 20,
+  "down": []
+}
+
+### B1. Alertmanager active
+[]
+
+### B2. Alertmanager receivers config
+"global:\n  resolve_timeout: 5m\n  http_config:\n    follow_redirects: true\n    enable_http2: true\n  smtp_hello: localhost\n  smtp_require_tls: true\n  pagerduty_url: https://events.pagerduty.com/v2/enqueue\n  opsgenie_api_url: https://api.opsgenie.com/\n  wechat_api_url: https://qyapi.weixin.qq.com/cgi-bin/\n  victorops_api_url: https://alert.victorops.com/integrations/generic/20131114/alert/\n  telegram_api_url: https://api.telegram.org\n  webex_api_url: https://webexapis.com/v1/messages\nroute:\n  receiver: default\n  group_by:\n  - alertname\n  - cluster\n  - service\n  continue: false\n  routes:\n  - receiver: critical-alerts\n    match:\n      severity: critical\n    continue: true\n  - receiver: warning-alerts\n    match:\n      severity: warning\n    continue: false\n    group_wait: 30s\n    group_interval: 5m\n  - receiver: info-alerts\n    match:\n      severity: info\n    continue: false\n    group_wait: 5m\n    group_interval: 30m\n  group_wait: 10s\n  group_interval: 10s\n  repeat_interval: 12h\ninhibit_rules:\n- source_match:\n    alertname: InstanceDown\n    severity: critical\n  target_match_re:\n    severity: warning|info\n  equal:\n  - instance\nreceivers:\n- name: default\n  webhook_configs:\n  - send_resolved: true\n    http_config:\n      basic_auth:\n        username: qui3tly\n        password: <secret>\n      follow_redirects: true\n      enable_http2: true\n    url: <secret>\n    url_file: \"\"\n    max_alerts: 0\n- name: critical-alerts\n  webhook_configs:\n  - send_resolved: true\n    http_config:\n      basic_auth:\n        username: qui3tly\n        password: <secret>\n      follow_redirects: true\n      enable_http2: true\n    url: <secret>\n    url_file: \"\"\n    max_alerts: 0\n- name: warning-alerts\n  webhook_configs:\n  - send_resolved: true\n    http_config:\n      basic_auth:\n        username: qui3tly\n        password: <secret>"
+
+### B3. Alertmanager cluster status
+{
+  "uptime": "2026-04-23T22:19:36.293Z",
+  "version": "0.27.0",
+  "cluster": "ready"
+}
+
+### B4. Any silences
+[]
+
+### C1. Check for rule matching systemd failed units
+[]
+
+### C2. SSLCertExpiring rules — what expressions?
+[]
+
+### C3. Is blackbox/probe_ssl_earliest_cert_expiry actually being collected?
+jq: error: syntax error, unexpected '/', expecting '}' (Unix shell quoting issues?) at <top-level>, line 1:
+.data.result | [.[] | {instance: .metric.instance, days: ((.value[1] | tonumber) - now) / 86400 | floor}] | sort_by(.days)                                                                                        
+jq: 1 compile error
+
+### C4. Systemd unit state metric present?
+[]

@@ -1,0 +1,28 @@
+==== Audit 12 FQDN Sweep — 2026-04-23T23:15:13+00:00 ====
+L0 read-only. Enumerate every FQDN in Traefik labels, verify DNS resolves, cert chain.
+
+################ FQDN INVENTORY ################
+
+=== master ===
+
+=== lady ===
+
+
+################ DNS RESOLUTION (externally via 1.1.1.1) ################
+
+################ CERT CHECK (TCP 443 direct) ################
+
+################ FQDN DOMAIN STRATEGY CONFORMITY ################
+Per DOMAIN_STRATEGY.md v4:
+  quietly.its.me     = Master admin (VPN behind vpn-only@file)
+  quietly.online     = Lady public
+  qui3tly.cloud      = VPN tailnet only (NEVER public)
+
+--- *.qui3tly.cloud FQDNs (should NEVER resolve externally) ---
+
+--- *.quietly.its.me FQDNs (VPN-only expected) ---
+0
+  (count above)
+
+--- *.quietly.online FQDNs (public expected) ---
+0
