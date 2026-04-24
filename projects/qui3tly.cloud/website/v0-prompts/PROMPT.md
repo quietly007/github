@@ -6,7 +6,7 @@
 
 ## Instructions
 
-Build a single-page landing site for **qui3tly.cloud** — a sovereign, self-hosted private cloud service (mail, files, office, identity, monitoring) for small businesses and independent professionals in Europe.
+Build a single-page landing site for **qui3tly.cloud** — the self-hosted private cloud service operated by **quietly IT Solutions**. — a sovereign, self-hosted private cloud (mail, files, office, identity, monitoring) for small businesses and independent professionals in Europe. Footer must credit the operator: 'operated by quietly IT Solutions'.
 
 ### Stack
 
@@ -19,18 +19,21 @@ Build a single-page landing site for **qui3tly.cloud** — a sovereign, self-hos
 ### Brand tokens (exact values — extracted from actual quietly logos)
 
 ```css
---ink:          #0a0a0a   /* near-black, primary text + hero background base */
---ink-soft:     #222222
---muted:        #6b7280
---line:         #e5e7eb
---paper:        #fafaf9   /* page background */
---accent:       #78f000   /* quietly LIME — signature color */
---accent-deep:  #5ab800   /* lime hover / borders */
---accent-ink:   #304818   /* logo dark-green, used on pale-lime tint */
---accent-tint:  #c0d890   /* pale lime background wash */
+--ink:          #2a2a2a   /* charcoal — primary text */
+--ink-soft:     #4a4a4a
+--muted:        #7a7a7a
+--line:         #d4d4d4
+--paper:        #f5f5f4   /* warm off-white page bg */
+--panel:        #e5e5e3   /* panel / card grey */
+--panel-dark:   #3a3a38   /* dark GREY hero bg — NEVER pure black */
+--panel-deep:   #2a2a28
+--accent:       #90c020   /* brand olive-lime (line art color) */
+--accent-deep:  #6a8f18   /* darker olive */
+--accent-hi:    #78f000   /* bright lime — highlights only, sparingly */
+--accent-tint:  #c0d090   /* sage tint (from logo panel) */
 ```
 
-**Palette rationale**: the quietly brand is a **bold lime green on near-black**. Use lime sparingly — as the single hero color: CTA buttons, active links, proof-metric numbers, underline on nav items. Everything else is achromatic (black/white/grey) so the lime has impact.
+**Palette rationale**: the qui3tly.cloud brand is **olive-lime green line-art on warm grey**. Hero and CTA backgrounds are **charcoal grey (`#3a3a38`), never pure black**. Use the brighter `--accent-hi` lime (#78f000) sparingly — for CTA buttons, live-metric numbers, and active-link underlines only. The olive (#90c020) is the default accent. Everything else is warm greys and off-whites.
 
 Fonts: `Inter` (sans) + `ui-monospace` (mono). Use monospace for numbers-in-metric cards, kickers, and footer.
 
@@ -47,14 +50,14 @@ Use the **negative** lockup on the hero (dark background) and the **primary** lo
 
 Single page, 8 sections in this order:
 
-1. **Hero** — dark gradient (`from-[#0a0a0a] via-[#1a1a1a] to-[#304818]`) with the `logo-negative.png` top-left. Large headline, one-line subtitle, primary CTA button (goes to `mailto:hello@quietly.online`), small monospace stats line at bottom.
+1. **Hero** — dark grey gradient (`from-[#3a3a38] via-[#2a2a28] to-[#1e2a14]`) — NEVER pure black. Place the `logo-mark.svg` top-left, wordmark 'qui3tly.cloud' next to it (white text, with lime #78f000 dot before 'cloud'). Large headline, one-line subtitle, primary CTA button (goes to `mailto:hello@quietly.online`), small monospace stats line at bottom.
 2. **Problem** — white. Five-bullet list of customer pains. Closes with a one-line "There is a third option" in muted italic.
 3. **Solution** — white. Heading, 2-line intro paragraph, then a **three-column card grid** (Sovereign / Accountable / Transparent) each with a short paragraph.
 4. **Stack** — soft paper background. Heading, then an **8-row table** of capabilities (3 columns: Capability / Powered by / Access at). Monospace for "Access at" column.
 5. **Proof** — dark section or distinctive background. **Eight metric cards** in a 4×2 grid, each card: huge monospace number + small uppercase label under it. At the bottom, one sentence + link to the live status page.
 6. **Engagement** — white. Heading, **5-row table** of stages (Stage / Duration / What happens).
 7. **Governance** — paper background. Heading, intro line, **7-item ordered list** of the workflow steps (large numbers), then a small 5-bullet "Clients get:" list.
-8. **CTA** — lime gradient (`from-[#78f000] to-[#304818]`). Large heading. One-line body. Large pill-shaped CTA with `mailto:` link. Small monospace version-line below.
+8. **CTA** — sage-to-olive gradient (`from-[#c0d090] via-[#90c020] to-[#6a8f18]`). Dark charcoal text (#2a2a2a). One-line body. Large pill-shaped CTA with `mailto:` link. Small monospace version-line below.
 
 ### Typography rules
 

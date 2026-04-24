@@ -3,17 +3,22 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  /* ─── qui3tly brand palette (extracted from personal/design/ logos) ─── */
-  --ink:        #0a0a0a;        /* near-black (logo) */
-  --ink-soft:   #222222;
-  --muted:      #6b7280;
-  --line:       #e5e7eb;
-  --paper:      #fafaf9;
-  --accent:     #78f000;        /* quietly lime (primary) */
-  --accent-deep:#5ab800;        /* quietly lime, darker */
-  --accent-ink: #304818;        /* logo dark green */
-  --accent-tint:#c0d890;        /* pale lime background */
-  --green:      #78f000;        /* alias of accent */
+  /* ─── qui3tly.cloud brand palette (from personal/design/ logos) ─── */
+  /* Mark: green line-art (olive + lime) on pale-grey panel.                */
+  /* Never pure black backgrounds — brand is green on GREY.                 */
+  --ink:        #2a2a2a;        /* charcoal — primary text */
+  --ink-soft:   #4a4a4a;
+  --muted:      #7a7a7a;
+  --line:       #d4d4d4;
+  --paper:      #f5f5f4;        /* warm off-white page bg */
+  --panel:      #e5e5e3;        /* panel / card grey */
+  --panel-dark: #3a3a38;        /* dark grey (hero bg — NOT black) */
+  --panel-deep: #2a2a28;        /* deepest grey */
+  --accent:     #90c020;        /* brand olive-lime (logo line color) */
+  --accent-deep:#6a8f18;        /* darker olive */
+  --accent-hi:  #78f000;        /* bright lime (highlights only) */
+  --accent-tint:#c0d090;        /* sage tint (backgrounds, from logo) */
+  --green:      #90c020;
   --amber:      #d97706;
   --red:        #dc2626;
   --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
@@ -109,14 +114,14 @@ em { color: var(--accent-deep); font-style: normal; font-weight: 600; }
 
 /* Cover slide */
 .cover {
-  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 55%, #304818 100%);
+  background: linear-gradient(135deg, #3a3a38 0%, #2a2a28 60%, #1e2a14 100%);
   color: #f1f5f9;
   justify-content: center;
   text-align: left;
   padding: 80px 64px;
 }
 .cover::before, .cover::after { color: rgba(241,245,249,.55); }
-.cover .kicker { color: #78f000; }
+.cover .kicker { color: #c0d090; }
 .cover h1 {
   color: #f8fafc;
   font-size: 60px;
@@ -263,7 +268,7 @@ pre.topo {
 
 /* Closing CTA */
 .cta {
-  background: linear-gradient(135deg, #78f000 0%, #304818 100%);
+  background: linear-gradient(135deg, #c0d090 0%, #90c020 50%, #6a8f18 100%);
   color: #f8fafc;
   text-align: center;
   justify-content: center;
