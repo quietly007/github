@@ -13,8 +13,11 @@ Running production infrastructure behind every document in this folder.
 |----------|-----|------|
 | **Pitch (1-pager)**   | prospects, intros        | [`PITCH.md`](PITCH.md) |
 | **Sales deck (HTML)** | sales meetings, print    | [`presentation/deck.html`](presentation/deck.html) |
+| **Deck generator**    | client decks             | [`presentation/template/`](presentation/template/) (`make`) |
+| **Website source**    | landing page, v0 prompt  | [`website/`](website/) |
 | **System of record**  | engineers, auditors, AIs | `~/.docs/SYSTEM_OF_RECORD.md` |
 | **CCIE topology**     | engineers, auditors      | `~/.docs/01-architecture/CCIE_TOPOLOGY.md` |
+| **Voice guide**       | anyone writing for us    | `~/.docs/00-standards/VOICE.md` |
 
 ## Internal (operational)
 

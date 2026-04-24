@@ -1,0 +1,6 @@
+# v0.dev / Astro / Pandoc exports — keep folder structure, not contents
+build/v0-*/
+build/astro/node_modules/
+build/astro/.astro/
+build/astro/dist/
+build/pandoc/*.html
