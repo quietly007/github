@@ -1,11 +1,14 @@
-# ⚠️  DEPRECATED 2026-04-24
+<!-- DEPRECATED 2026-04-24 -->
+# DEPRECATED — BASELINE reflects 2026-02-16 state only
 
-This `BASELINE/` directory was superseded on 2026-04-24.
+This folder captured project state on 2026-02-16. It is kept as a historical
+snapshot and **must not be used as current truth**.
 
-**Canonical replacements**:
-- Topology / IPs / ports → `~/.docs/01-architecture/CCIE_TOPOLOGY.md`
-- System summary         → `~/.docs/SYSTEM_OF_RECORD.md`
-- Current audit state    → `~/projects/qui3tly.cloud/perfect/`
+Current truth:
 
-Contents here reflect 2026-02-16 state and are NOT live. Do not edit; refer to canonical files above.
-To be archived to `../perfect/_archive/BASELINE_20260216/` in Phase 2 cleanup.
+- Canonical facts → `~/.docs/SYSTEM_OF_RECORD.md`
+- Network/topology → `~/.docs/01-architecture/CCIE_TOPOLOGY.md`
+- Active audit dossier → `~/projects/qui3tly.cloud/audit/` (renamed from `perfect/` on 2026-04-24)
+- Open findings → `~/projects/qui3tly.cloud/audit/07-FINDINGS/TRACKER.md`
+
+This folder was moved here from `projects/qui3tly.cloud/BASELINE/` on 2026-04-24.

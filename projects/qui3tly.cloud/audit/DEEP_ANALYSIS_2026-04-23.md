@@ -1,5 +1,8 @@
 # Deep Analysis — project-wide reconciliation of open work
 
+> **Note [2026-04-24]**: this document reasons about `perfect/` as it existed on 2026-04-23. The folder was renamed to `audit/` on 2026-04-24 — all paths below should be read with that substitution. Historic content preserved verbatim.
+
+
 > **Date**: 2026-04-23 22:45 UTC  (post-kernel-reboot both hosts)
 > **Purpose**: Answer the owner's question: *"we have too many opened situations and uncleared jobs — investigate properly."*
 > **Scope**: Every tracker, plan, audit request, finding, TODO, memory note, session file across the entire workspace is reconciled into **one** list here.

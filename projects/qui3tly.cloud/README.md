@@ -21,7 +21,7 @@ Running production infrastructure behind every document in this folder.
 | Folder | Purpose |
 |--------|---------|
 | [`audit/`](audit/)           | Current audit dossier (10 sections, findings tracker, evidence) |
-| [`audit/_archive/`](audit/_archive/) | Previous audit programs (BASELINE 2026-02-16, perfection, preproduction) |
+| [`audit/_archive/`](audit/_archive/) | Previous audit programs (BASELINE 2026-02-16, perfection_20260421, preproduction_20260420) |
 | [`PLAN.md`](PLAN.md)         | Active roadmap |
 | [`TODO.md`](TODO.md)         | Short-term tasks |
 

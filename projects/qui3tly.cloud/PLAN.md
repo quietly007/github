@@ -1,15 +1,15 @@
 # PLAN — qui3tly.cloud
 
 > **HISTORICAL — written 2026-02-17.** Kept for context only.
-> **Live plan is now `perfect/PLAN.md`.**
-> See `perfect/DEEP_ANALYSIS_2026-04-23.md` for how Feb-17 status became Apr-23 reality.
+> **Live plan is now `audit/PLAN.md`.**
+> See `audit/DEEP_ANALYSIS_2026-04-23.md` for how Feb-17 status became Apr-23 reality.
 
 ---
 
 > **Approach**: Baseline → Gap Analysis → Fix → Verify → Document  
 > **Rule #0**: NEVER ASSUME — ALWAYS CHECK THE SYSTEM  
 > **Rule**: Don't document broken things. Fix first, document after.  
-> **Scope**: Everything in [BASELINE/](BASELINE/) is verified fact. This plan closes the remaining gaps.
+> **Scope**: Everything in [audit/_archive/BASELINE_20260216/](audit/_archive/BASELINE_20260216/) is the 2026-02-16 snapshot. This plan closes the remaining gaps.
 
 ---
 
@@ -248,13 +248,13 @@ Not this project. Deferred.
 | `~/.reports/` | 150+ reports (daily health, weekly security, audits, DR checks) |
 | `~/.docs/00-standards/DOCUMENTATION_STANDARD.md` | MANDATORY documentation format |
 | `~/.docs/00-standards/DOCUMENTATION_QUALITY_CHECKLIST.md` | Quality scoring rubric |
-| [BASELINE/](BASELINE/) | Verified infrastructure snapshot |
+| [audit/_archive/BASELINE_20260216/](audit/_archive/BASELINE_20260216/) | 2026-02-16 snapshot (historical) |
 | [TODO.md](TODO.md) | Active work items |
-| [ARCHIVE/](ARCHIVE/) | Previous project attempts (preserved) |
+| [audit/_archive/](audit/_archive/) | Previous audit programs (BASELINE, preproduction, perfection) |
 
 ---
 
 **Document Version**: 2.0  
 **Based On**: Live system inspection + archived PLAN comparison  
-**Previous Version**: [ARCHIVE/2026-02-16-REBOOT/PLAN-old.md](ARCHIVE/2026-02-16-REBOOT/PLAN-old.md)  
+**Previous Version**: earlier PLAN versions moved to `audit/_archive/`  
 **Standard**: `~/.docs/00-standards/DOCUMENTATION_STANDARD.md`

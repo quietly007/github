@@ -44,7 +44,7 @@ Options for the single restore test we need before GO:
 
 You authored 13 audit requests in January–February; most were not executed. Many overlap with phases here.
 
-**Question**: should the `perfect/` dossier formally close each (cross-link findings, mark as executed here) as part of this work?
+**Question**: should the `audit/` dossier formally close each (cross-link findings, mark as executed here) as part of this work?
 
 > **Answer**:
 

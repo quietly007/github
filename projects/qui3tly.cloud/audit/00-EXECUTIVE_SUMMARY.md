@@ -3,7 +3,7 @@
 > **For**: qui3tly (owner)  
 > **Date**: 2026-04-23  
 > **Reading time**: 2 minutes  
-> **Full dossier**: this folder (`perfect/`)
+> **Full dossier**: this folder (`audit/`)
 
 ---
 

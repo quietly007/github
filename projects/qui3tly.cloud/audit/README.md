@@ -1,4 +1,4 @@
-# perfect/ — Production Readiness Dossier
+# audit/ — Production Readiness Dossier (renamed from perfect/ on 2026-04-24)
 
 > **Project**: qui3tly.cloud  
 > **Author**: GitHub Copilot (Claude) under qui3tly ownership  
@@ -52,7 +52,7 @@ Everything in this folder is derived from **real command output**, recorded as r
 - Docs standard: `~/.docs/00-standards/DOCUMENTATION_STANDARD.md`
 - Phase template: `~/.docs/00-standards/PHASE_COMPLETION_TEMPLATE.md`
 - Existing audits: `~/personal/audits/01..13_AUDIT_REQUEST_*.md`
-- Prior work: `~/projects/qui3tly.cloud/BASELINE/`, `preproduction/`, `perfection/`
+- Prior work: `audit/_archive/BASELINE_20260216/`, `audit/_archive/preproduction_20260420/`, `audit/_archive/perfection_20260421/`
 
 ---
 
