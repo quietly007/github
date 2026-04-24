@@ -6,10 +6,26 @@ og_image: "assets/og.png"
 canonical_url: "https://www.quietly.online"
 contact_email: "hello@quietly.online"
 locale: "en"
+
 brand:
-  color_ink: "#0f172a"
-  color_accent: "#0ea5e9"
-  color_accent_deep: "#0369a1"
-  color_paper: "#fafaf9"
+  # ── from personal/design/ logos (extracted by color analysis 2026-04-24) ──
+  color_ink:         "#0a0a0a"   # near-black (primary text, hero bg base)
+  color_ink_soft:    "#222222"
+  color_muted:       "#6b7280"
+  color_line:        "#e5e7eb"
+  color_paper:       "#fafaf9"   # page bg
+  color_accent:      "#78f000"   # quietly lime — primary accent
+  color_accent_deep: "#5ab800"   # lime, darker (hover, borders)
+  color_accent_ink:  "#304818"   # logo dark green (on pale-lime)
+  color_accent_tint: "#c0d890"   # pale lime (background wash)
   font_sans: "Inter, system-ui, sans-serif"
   font_mono: "ui-monospace, SF Mono, Menlo, monospace"
+
+assets:
+  logo_primary:         "assets/logo-black.jpg"       # lockup on white
+  logo_negative:        "assets/logo-negative.png"    # lockup for dark bg
+  logo_mark:            "assets/logo-mark.png"        # symbol only
+  favicon_32:           "assets/favicon-32.jpg"
+  favicon_192:          "assets/favicon-192.jpg"
+  apple_touch_icon:     "assets/apple-touch-icon.jpg"
+  og_card:              "assets/og.png"               # TO CREATE (1200×630)

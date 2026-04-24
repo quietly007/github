@@ -3,14 +3,17 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --ink:        #0f172a;        /* slate-900 */
-  --ink-soft:   #334155;        /* slate-700 */
-  --muted:      #64748b;        /* slate-500 */
-  --line:       #e2e8f0;        /* slate-200 */
+  /* ─── qui3tly brand palette (extracted from personal/design/ logos) ─── */
+  --ink:        #0a0a0a;        /* near-black (logo) */
+  --ink-soft:   #222222;
+  --muted:      #6b7280;
+  --line:       #e5e7eb;
   --paper:      #fafaf9;
-  --accent:     #0ea5e9;        /* sky-500 */
-  --accent-deep:#0369a1;        /* sky-700 */
-  --green:      #16a34a;
+  --accent:     #78f000;        /* quietly lime (primary) */
+  --accent-deep:#5ab800;        /* quietly lime, darker */
+  --accent-ink: #304818;        /* logo dark green */
+  --accent-tint:#c0d890;        /* pale lime background */
+  --green:      #78f000;        /* alias of accent */
   --amber:      #d97706;
   --red:        #dc2626;
   --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
@@ -106,14 +109,14 @@ em { color: var(--accent-deep); font-style: normal; font-weight: 600; }
 
 /* Cover slide */
 .cover {
-  background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0369a1 100%);
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 55%, #304818 100%);
   color: #f1f5f9;
   justify-content: center;
   text-align: left;
   padding: 80px 64px;
 }
 .cover::before, .cover::after { color: rgba(241,245,249,.55); }
-.cover .kicker { color: #7dd3fc; }
+.cover .kicker { color: #78f000; }
 .cover h1 {
   color: #f8fafc;
   font-size: 60px;
@@ -260,7 +263,7 @@ pre.topo {
 
 /* Closing CTA */
 .cta {
-  background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);
+  background: linear-gradient(135deg, #78f000 0%, #304818 100%);
   color: #f8fafc;
   text-align: center;
   justify-content: center;
@@ -309,4 +312,18 @@ hr.divider {
   h2 { font-size: 22pt; }
   p.lead { font-size: 14pt; }
   .metric .num { font-size: 28pt; }
+}
+
+/* ─── brand mark placement ─── */
+.slide .logo {
+  position: absolute;
+  top: 24px;
+  left: 32px;
+  height: 36px;
+  width: auto;
+  opacity: 0.95;
+}
+.slide.cover .logo { height: 48px; }
+@media print {
+  .slide .logo { height: 32px; }
 }
