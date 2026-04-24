@@ -118,34 +118,48 @@ p.tag { color: var(--muted); font-size: 13px; }
 strong { color: var(--ink); font-weight: 600; }
 em { color: var(--accent-deep); font-style: normal; font-weight: 600; }
 
-/* Cover slide */
+/* Cover slide — pure black brand background, per vizit karta */
 .cover {
-  background: linear-gradient(135deg, #231f20 0%, #1a1718 70%, #111012 100%);
-  color: #f1f5f9;
+  background: #000000;
+  color: #f8fafc;
   justify-content: center;
   text-align: left;
-  padding: 80px 64px;
+  padding: 60px 64px;
 }
-.cover::before, .cover::after { color: rgba(241,245,249,.55); }
-.cover .kicker { color: #C4DF9B; }
+.cover::before, .cover::after { color: #8DC63F; opacity: 0.75; }
+.cover .kicker {
+  color: #8DC63F;
+  font-weight: 700;
+  margin-top: 8px;
+  margin-bottom: 18px;
+}
 .cover h1 {
   color: #f8fafc;
-  font-size: 60px;
-  line-height: 1;
+  font-size: 72px;
+  line-height: 0.98;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  margin-bottom: 20px;
+}
+.cover h1 .dot-cloud {
+  color: #8DC63F;
 }
 .cover .subtitle {
   font-size: 22px;
   color: #cbd5e1;
-  max-width: 60ch;
+  max-width: 62ch;
   margin-top: 12px;
+  line-height: 1.45;
 }
 .cover .meta {
-  margin-top: 44px;
+  margin-top: 38px;
   font-family: var(--mono);
   font-size: 13px;
-  color: #94a3b8;
+  color: #8DC63F;
   letter-spacing: .04em;
+  line-height: 1.7;
 }
+.cover .meta strong { color: #C4DF9B; font-weight: 700; }
 
 /* Two-column */
 .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 44px; flex: 1; }
@@ -272,27 +286,54 @@ pre.topo {
   white-space: pre;
 }
 
-/* Closing CTA */
+/* Closing CTA — same treatment as cover: black bg, green accents */
 .cta {
-  background: linear-gradient(135deg, #C4DF9B 0%, #8DC63F 55%, #6fa02e 100%);
+  background: #000000;
   color: #f8fafc;
   text-align: center;
   justify-content: center;
-  padding: 80px 64px;
+  padding: 60px 64px;
 }
-.cta::before, .cta::after { color: rgba(248,250,252,.55); }
-.cta h1 { color: #f8fafc; font-size: 46px; }
+.cta::before, .cta::after { color: #8DC63F; opacity: 0.75; }
+.cta .kicker { color: #8DC63F; font-weight: 700; }
+.cta h1 {
+  color: #f8fafc;
+  font-size: 56px;
+  line-height: 1.05;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.cta h1 em { color: #8DC63F; font-style: normal; }
+.cta .subtitle {
+  color: #cbd5e1;
+  font-size: 20px;
+  max-width: 64ch;
+  margin: 8px auto 0;
+  line-height: 1.45;
+}
 .cta .email {
   display: inline-block;
-  margin-top: 28px;
-  padding: 14px 28px;
-  border: 2px solid #f8fafc;
+  margin-top: 32px;
+  padding: 14px 32px;
+  border: 2px solid #8DC63F;
   border-radius: 999px;
   font-family: var(--mono);
   font-size: 18px;
-  color: #f8fafc;
+  font-weight: 600;
+  color: #8DC63F;
   text-decoration: none;
+  transition: background 0.2s;
 }
+.cta .email:hover { background: rgba(141, 198, 63, 0.12); }
+.cta .meta {
+  margin-top: 40px;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: #8DC63F;
+  letter-spacing: .04em;
+  line-height: 1.7;
+}
+.cta .meta strong { color: #C4DF9B; font-weight: 700; }
 
 hr.divider {
   border: 0;
@@ -334,14 +375,41 @@ hr.divider {
   width: auto;
   display: block;
 }
-.slide.cover .logo {
+/* Cover/CTA lockup: logo + "IT Solutions" tagline, centered & BIG */
+.slide.cover .brand-lockup,
+.slide.cta .brand-lockup {
   position: static;
-  margin: 0 auto 24px;
-  height: 140px;
-  display: block;
+  margin: 0 0 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
 }
-.slide.cta .logo { height: 56px; }
+.slide.cta .brand-lockup { align-items: center; }
+.slide.cover .brand-lockup .logo,
+.slide.cta .brand-lockup .logo {
+  position: static;
+  height: 240px;
+  width: auto;
+  display: block;
+  margin: 0;
+}
+.slide.cover .brand-lockup .tagline,
+.slide.cta .brand-lockup .tagline {
+  font-family: var(--sans);
+  font-size: 22px;
+  font-weight: 500;
+  color: #8DC63F;
+  letter-spacing: 0.45em;
+  text-transform: uppercase;
+  margin-top: -8px;
+  padding-left: 6px;
+}
+.slide.cta .brand-lockup .tagline { padding-left: 0; }
 @media print {
   .slide .logo { height: 44px; }
-  .slide.cover .logo { height: 120px; }
+  .slide.cover .brand-lockup .logo,
+  .slide.cta .brand-lockup .logo { height: 200px; }
+  .slide.cover .brand-lockup .tagline,
+  .slide.cta .brand-lockup .tagline { font-size: 20px; }
 }
