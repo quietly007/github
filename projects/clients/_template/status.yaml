@@ -1,0 +1,11 @@
+client: "<slug>"
+legal_name: "<legal>"
+stage: prospect
+since: "2026-01-01"
+services: []
+value_eur_monthly: 0
+contract_ref: ""
+primary_contact:
+  name: ""
+  email: ""
+template_version: "1.0.0"

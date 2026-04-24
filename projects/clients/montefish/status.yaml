@@ -1,0 +1,15 @@
+client: "montefish"
+legal_name: "Montefish (provisional)"
+stage: proposal
+since: "2026-01-26"
+last_contact: "2026-01-28"
+services:
+  - hosting
+  - mail
+value_eur_monthly: null  # TBD on signature
+contract_ref: ""
+primary_contact:
+  name: ""
+  email: ""
+notes: "Multilingual proposal delivered EN/SR/RU. Reality analysis kept internal."
+template_version: "1.0.0"

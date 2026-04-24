@@ -1,0 +1,15 @@
+client: "norma"
+legal_name: "Norma"
+stage: live
+since: "2026-02-03"
+last_contact: ""
+services:
+  - nextcloud
+  - onlyoffice
+value_eur_monthly: null
+contract_ref: ""
+primary_contact:
+  name: ""
+  email: ""
+notes: "Live on lady. Onboarding docs under onboarding/."
+template_version: "1.0.0"

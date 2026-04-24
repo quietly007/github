@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>qui3tly.cloud — sovereign cloud for humans</title>
+<link rel="stylesheet" href="deck.css" />
+</head>
+<body>
+
+<!-- ============ SLIDE 1 — COVER ============ -->
+<section class="slide cover" data-n="01">
+  <div class="kicker">sales deck · v1.0 · 2026-04-24</div>
+  <h1>qui3tly.cloud</h1>
+  <p class="subtitle">Sovereign, self-hosted cloud for humans and small businesses. Mail, collaboration, identity, monitoring — on infrastructure you control.</p>
+  <div class="meta">Operated by one engineer · 2 hosts · ~64 containers · 14/14 certificates valid · 20/20 monitoring targets up</div>
+</section>
+
+<!-- ============ SLIDE 2 — THE PROBLEM ============ -->
+<section class="slide" data-n="02">
+  <div class="kicker">the problem</div>
+  <h2>Small teams are paying US SaaS rent — and losing sovereignty</h2>
+  <div class="cols">
+    <div>
+      <ul class="dots">
+        <li>Your mail lives on someone else's server in another jurisdiction.</li>
+        <li>Your documents travel through three sub-processors you didn't vet.</li>
+        <li>A "pricing update" email doubles your bill, and the only response is a help-center chatbot.</li>
+        <li>Your data export option is a 40 GB ZIP with no structure.</li>
+        <li>When something breaks, a queue of 2 000 people is ahead of you.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Meanwhile, the alternatives fail too</h3>
+      <p>"Self-hosted" usually means a weekend GitHub repo a developer set up once, with no monitoring, no policy, no documented recovery, and no one on call.</p>
+      <p class="tag">There is a third option.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 3 — THE ANSWER ============ -->
+<section class="slide" data-n="03">
+  <div class="kicker">what qui3tly.cloud is</div>
+  <h2>Operated infrastructure. Documented to CCIE standard. European-hosted. One phone number.</h2>
+  <p class="lead">A production-grade private cloud — mail, files, office, identity, monitoring — run by the engineer who built it, governed by a 16-file policy base, audited live against the running system.</p>
+  <hr class="divider" />
+  <div class="cols-3">
+    <div class="card"><h3>Sovereign</h3><p>EU-located infrastructure, authoritative DNS on Cloudflare, no US shadow processor on the data path.</p></div>
+    <div class="card"><h3>Accountable</h3><p>Append-only mutation log. Every change is backed up, approved, verified, and recorded.</p></div>
+    <div class="card"><h3>Transparent</h3><p>Live-verified network topology. No vendor lock-in. Data export in open formats at any time.</p></div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 4 — WHAT YOU GET ============ -->
+<section class="slide" data-n="04">
+  <div class="kicker">the stack</div>
+  <h2>Eight capabilities, one operator, one bill</h2>
+  <table>
+    <thead><tr><th>Capability</th><th>Powered by</th><th>You access it at</th></tr></thead>
+    <tbody>
+      <tr><td>Email + calendar + contacts</td><td>Mailcow (Postfix + Dovecot + SOGo)</td><td><code>mail.your-domain</code></td></tr>
+      <tr><td>File sync + share + photos</td><td>Nextcloud</td><td><code>cloud.your-domain</code></td></tr>
+      <tr><td>Online office — docx/xlsx/pptx</td><td>OnlyOffice</td><td><code>office.your-domain</code></td></tr>
+      <tr><td>Single sign-on + 2FA</td><td>Authelia</td><td><code>auth.your-domain</code></td></tr>
+      <tr><td>Monitoring + status page</td><td>Prometheus + Grafana + Uptime Kuma</td><td><code>status.your-domain</code></td></tr>
+      <tr><td>Push notifications</td><td>Gotify + ntfy</td><td>mobile app</td></tr>
+      <tr><td>Private VPN / remote access</td><td>Tailscale / Headscale</td><td>invitation</td></tr>
+      <tr><td>Audit + governance evidence</td><td>Immutable JSONL trail</td><td>quarterly report</td></tr>
+    </tbody>
+  </table>
+  <p class="tag">All services behind Traefik with automatic Let's Encrypt certificates. DNSSEC on every domain. SPF + DKIM + DMARC + MTA-STS + TLSA on every mail server.</p>
+</section>
+
+<!-- ============ SLIDE 5 — ARCHITECTURE ============ -->
+<section class="slide" data-n="05">
+  <div class="kicker">the architecture (honest version)</div>
+  <h2>Two hosts. Five network planes. Zero guesswork.</h2>
+  <pre class="topo">
+                          +----------------------------+
+                          |      PUBLIC INTERNET       |
+                          +-----+-----------------+----+
+                                |                 |
+                   eth0         |                 |         eth0
+           213.136.68.108/24    |                 |   207.180.251.111/18
+                                |                 |
+                      +---------+---------+   +---+-------------+
+                      |      MASTER       |   |      LADY       |
+                      | Debian 12, 12 vCPU|   | Debian 12       |
+                      | 25 containers     |   | ~39 containers  |
+                      | headscale, pihole |   | mailcow, cloud, |
+                      | prometheus, ...   |   | office, odoo    |
+                      +--+-------+--------+   +-------+---------+
+                         |       |                    |
+                         |   tailscale0 100.64.0.1  <->  100.64.0.2 tailscale0
+                         |                                       (control plane VPN)
+                         |
+                    wg0 10.10.0.1/30
+                         |
+                         v  WireGuard tunnel
+                   +-----+------+
+                   | EdgeRouter |  -->  Home / Office LAN 192.168.99.0/24
+                   +------------+
+  </pre>
+  <p class="tag">Every IP, interface, MTU, bridge, and listener is documented in <code>.docs/01-architecture/CCIE_TOPOLOGY.md</code> — generated from live box inspection, verified 2026-04-24.</p>
+</section>
+
+<!-- ============ SLIDE 6 — PROOF POINTS ============ -->
+<section class="slide" data-n="06">
+  <div class="kicker">live status (2026-04-24)</div>
+  <h2>The numbers — live, not aspirational</h2>
+  <div class="cols-4">
+    <div class="metric"><span class="num">64</span><span class="label">containers in production</span></div>
+    <div class="metric"><span class="num ok">14 / 14</span><span class="label">TLS certs valid & auto-renewing</span></div>
+    <div class="metric"><span class="num ok">20 / 20</span><span class="label">monitoring targets up</span></div>
+    <div class="metric"><span class="num ok">53</span><span class="label">alert rules, fleet health OK</span></div>
+    <div class="metric"><span class="num">0</span><span class="label">active alerts</span></div>
+    <div class="metric"><span class="num ok">100%</span><span class="label">mail deliverability to Gmail / Outlook / Yahoo</span></div>
+    <div class="metric"><span class="num">16</span><span class="label">governance policies enforced</span></div>
+    <div class="metric"><span class="num">~1000</span><span class="label">mutations logged (append-only)</span></div>
+  </div>
+  <hr class="divider" />
+  <p class="tag">No marketing math. These values are generated by scraping the running infrastructure at the time this deck was rendered.</p>
+</section>
+
+<!-- ============ SLIDE 7 — WHY US ============ -->
+<section class="slide" data-n="07">
+  <div class="kicker">six reasons this is different</div>
+  <h2>What an operated cloud actually looks like</h2>
+  <div class="cols-3">
+    <div class="card"><h3>1 · Actually operated</h3><p>64 containers live, 24/7, with documented policy and an immutable audit trail.</p></div>
+    <div class="card"><h3>2 · CCIE-grade docs</h3><p>Tables + ASCII + diagrams. A blind engineer, a new hire, and an AI agent all get identical answers.</p></div>
+    <div class="card"><h3>3 · Governance first</h3><p>Every change: backup → plan → approve → implement → verify → document. Seven steps, no exceptions.</p></div>
+    <div class="card"><h3>4 · Transparent changes</h3><p>Every mutation in an append-only JSONL log. Clients can request quarterly audit access.</p></div>
+    <div class="card"><h3>5 · European jurisdiction</h3><p>EU infrastructure, DNSSEC-protected domains. No hidden US sub-processor.</p></div>
+    <div class="card"><h3>6 · One human</h3><p>You call an engineer. Not a ticket queue. Not a chatbot.</p></div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 8 — WHO IT'S FOR / NOT FOR ============ -->
+<section class="slide" data-n="08">
+  <div class="kicker">fit</div>
+  <h2>A good fit for you if…</h2>
+  <div class="cols">
+    <div>
+      <h3 class="ok">YES — call us</h3>
+      <ul class="checks">
+        <li>Small business, 5–50 users</li>
+        <li>Independent professional — lawyer, doctor, architect — with confidentiality duty</li>
+        <li>You've had enough of SaaS price creep and outages</li>
+        <li>You need real GDPR posture, not a checkbox</li>
+        <li>You want one phone number to call</li>
+        <li>You value infrastructure you can export from in under a day</li>
+      </ul>
+    </div>
+    <div>
+      <h3 class="bad">NO — we're not your answer</h3>
+      <ul class="dots">
+        <li>Fortune-500 scale — you need a real SRE team</li>
+        <li>You want a self-service SaaS signup page — we deliberately don't have one</li>
+        <li>You need the "latest fancy AI feature" — we deliver reliable, not trendy</li>
+        <li>You want lock-in — our value proposition is the opposite</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 9 — ENGAGEMENT ============ -->
+<section class="slide" data-n="09">
+  <div class="kicker">how we work</div>
+  <h2>Five stages, no surprises</h2>
+  <table>
+    <thead><tr><th>Stage</th><th>Duration</th><th>What happens</th><th>Output</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Discovery</strong></td><td>30 min, free</td><td>We understand your stack, needs, constraints.</td><td>Fit / no-fit answer</td></tr>
+      <tr><td><strong>Proposal</strong></td><td>1 week</td><td>Fixed-scope SOW, pricing, timeline.</td><td>Signed SOW</td></tr>
+      <tr><td><strong>Onboarding</strong></td><td>2–4 weeks</td><td>DNS cutover, user provisioning, data migration, training.</td><td>Live service + runbook</td></tr>
+      <tr><td><strong>Live</strong></td><td>ongoing</td><td>Monthly check-ins, quarterly reports, 24/7 on-call.</td><td>Quarterly audit + monthly invoice</td></tr>
+      <tr><td><strong>Offboarding</strong> <span class="tag">(optional, always available)</span></td><td>2 weeks</td><td>Full data export in open formats. No lock-in.</td><td>ZIP of your data, cleanly structured</td></tr>
+    </tbody>
+  </table>
+  <hr class="divider" />
+  <p>Pricing is <em>fixed monthly</em> based on user count and service set. No per-GB pricing, no egress fees, no "API overage" surprises.</p>
+</section>
+
+<!-- ============ SLIDE 10 — REFERENCES ============ -->
+<section class="slide" data-n="10">
+  <div class="kicker">references</div>
+  <h2>Currently serving</h2>
+  <div class="cols">
+    <div class="card">
+      <h3>Norma</h3>
+      <p><strong>Live since Feb 2026.</strong> Nextcloud + OnlyOffice for a small team. Zero user-facing incidents in 60+ days. Onboarding guides shipped with every seat.</p>
+    </div>
+    <div class="card">
+      <h3>Montefish</h3>
+      <p><strong>Proposal phase.</strong> Hosting + mail concept, delivered in three languages — English, Serbian, Russian — in A4 print-ready format. Signature pending.</p>
+    </div>
+  </div>
+  <hr class="divider" />
+  <h3>Also visible</h3>
+  <p>Every service qui3tly.cloud offers to clients, we run for ourselves first — <code>mail.quietly.online</code>, <code>cloud.quietly.online</code>, <code>office.quietly.online</code>, <code>auth.quietly.its.me</code>, <code>status.quietly.its.me</code>. You can probe them right now.</p>
+</section>
+
+<!-- ============ SLIDE 11 — GOVERNANCE ============ -->
+<section class="slide" data-n="11">
+  <div class="kicker">governance — the un-sexy bit that matters</div>
+  <h2>How we make changes without breaking your service</h2>
+  <div class="cols">
+    <div>
+      <h3>The 7-step change workflow</h3>
+      <ul class="dots">
+        <li><strong>1.</strong> Investigate — read-only</li>
+        <li><strong>2.</strong> Test in isolation</li>
+        <li><strong>3.</strong> Backup current state</li>
+        <li><strong>4.</strong> Present plan + risk + rollback</li>
+        <li><strong>5.</strong> Approval — explicit, level-gated</li>
+        <li><strong>6.</strong> Implement + verify health</li>
+        <li><strong>7.</strong> Document — immutable log entry</li>
+      </ul>
+    </div>
+    <div>
+      <h3>What clients see</h3>
+      <ul class="checks">
+        <li>Monthly health summary</li>
+        <li>Quarterly audit-trail digest</li>
+        <li>Change-window notification 48 h ahead</li>
+        <li>Incident post-mortems with root cause + remediation</li>
+        <li>Read-only access to your portion of the mutation log, on request</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SLIDE 12 — CTA ============ -->
+<section class="slide cta" data-n="12">
+  <div class="kicker">next step</div>
+  <h1>Calm infrastructure<br/>for people with work to do.</h1>
+  <p class="subtitle">30-minute discovery call. No slides. No commitment. We tell you honestly if qui3tly.cloud is the right answer — or who, if anyone, is.</p>
+  <a class="email" href="mailto:hello@quietly.online">hello@quietly.online</a>
+  <div class="meta">v1.0 · live-verified 2026-04-24 · built on qui3tly.cloud itself</div>
+</section>
+
+</body>
+</html>
