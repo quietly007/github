@@ -314,16 +314,19 @@ hr.divider {
   .metric .num { font-size: 28pt; }
 }
 
-/* ─── brand mark placement ─── */
+/* ─── brand mark placement (inline SVG, lime-filled via currentColor) ─── */
 .slide .logo {
   position: absolute;
-  top: 24px;
-  left: 32px;
-  height: 36px;
+  top: 28px;
+  left: 36px;
+  height: 44px;
   width: auto;
-  opacity: 0.95;
+  color: var(--accent);
+  fill: currentColor;
+  opacity: 0.98;
 }
-.slide.cover .logo { height: 48px; }
+.slide.cover .logo { height: 64px; color: #78f000; }
+.slide.cta .logo { color: #ffffff; }
 @media print {
-  .slide .logo { height: 32px; }
+  .slide .logo { height: 36px; }
 }

@@ -38,7 +38,7 @@ Fonts: `Inter` (sans) + `ui-monospace` (mono). Use monospace for numbers-in-metr
 
 - Primary (for white/light backgrounds): `assets/logo-black.jpg` — lockup in black
 - Negative (for dark/accent backgrounds): `assets/logo-negative.png` — lockup in white + lime
-- Mark only (favicon / small placements): `assets/logo-mark.png`
+- Mark only (vector, recolor with `currentColor`): `assets/logo-mark.svg`  (raster fallback: `logo-mark.png`)
 - Favicon: `assets/favicon-32.jpg` / `assets/apple-touch-icon.jpg`
 
 Use the **negative** lockup on the hero (dark background) and the **primary** lockup on the nav bar (light background). Do not recolor or restyle the logo.
@@ -73,7 +73,7 @@ Content is supplied in 8 Markdown files named `01-hero.md` through `08-cta.md` (
 - Single `app/page.tsx` plus `app/globals.css` with the brand tokens.
 - No client-side JS unless strictly necessary.
 - Build should work with `pnpm build && pnpm start`.
-- OG card reads: `og_title + og_description` from `copy/meta.yaml`.
+- OG card: `assets/og.png` (1200×630, pre-rendered) — set `og:image` to it. Title/description from `copy/meta.yaml`.
 
 ### Do NOT
 
