@@ -2,14 +2,44 @@ client: "norma"
 legal_name: "Norma"
 stage: live
 since: "2026-02-03"
-last_contact: ""
+last_contact: "2026-04-24"
 services:
   - nextcloud
   - onlyoffice
+  - vpn
 value_eur_monthly: null
 contract_ref: ""
 primary_contact:
   name: ""
   email: ""
-notes: "Live on lady. Onboarding docs under onboarding/."
+branches:
+  - name: "HQ"
+    location: "Budva, Lazi bb"
+    lan_cidr: "192.168.110.0/24"
+    tailscale_ip: "100.64.0.4"
+    hostname_alias: "norma-hq"
+    router: "MikroTik RouterOS 7 (latest)"
+    onboarded: "2026-04-24"
+  - name: "Retail"
+    location: "Budva, Lazi bb"
+    lan_cidr: "192.168.111.0/24"
+    tailscale_ip: null
+    hostname_alias: "norma-retail"
+    router: null
+    onboarded: null
+  - name: "Ceramics"
+    location: "Obilaznica pored Parme"
+    lan_cidr: "192.168.112.0/24"
+    tailscale_ip: null
+    hostname_alias: "norma-ceramics"
+    router: null
+    onboarded: null
+  - name: "Warehouse"
+    location: "Lastva Grbaljska bb"
+    lan_cidr: "192.168.113.0/24"
+    tailscale_ip: null
+    hostname_alias: "norma-warehouse"
+    router: null
+    onboarded: null
+notes: "Live on lady (Nextcloud+OnlyOffice). VPN rollout started 2026-04-24 with HQ branch."
 template_version: "1.0.0"
