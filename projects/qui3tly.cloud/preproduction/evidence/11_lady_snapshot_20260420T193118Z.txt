@@ -1,0 +1,133 @@
+timestamp_utc=20260420T193118Z
+host=lady
+--- os/kernel ---
+PRETTY_NAME="Debian GNU/Linux 12 (bookworm)"
+NAME="Debian GNU/Linux"
+VERSION_ID="12"
+VERSION="12 (bookworm)"
+VERSION_CODENAME=bookworm
+ID=debian
+HOME_URL="https://www.debian.org/"
+SUPPORT_URL="https://www.debian.org/support"
+BUG_REPORT_URL="https://bugs.debian.org/"
+Linux lady 6.1.0-42-cloud-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.1.159-1 (2025-12-30) x86_64 GNU/Linux
+--- uptime/load/mem/disk ---
+ 21:31:20 up 61 days, 21:42,  0 user,  load average: 4.68, 2.85, 2.59
+               total        used        free      shared  buff/cache   available
+Mem:            47Gi       8.9Gi        24Gi       180Mi        14Gi        38Gi
+Swap:          2.0Gi          0B       2.0Gi
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sda1       985G  215G  731G  23% /
+/dev/sda1       985G  215G  731G  23% /
+/dev/sda1       985G  215G  731G  23% /
+--- docker quick ---
+portainer-agent|portainer/agent:2.24.1|Up 6 days
+mysqld-exporter|prom/mysqld-exporter:v0.16.0|Up 6 days
+cadvisor|gcr.io/cadvisor/cadvisor:v0.52.1|Up 6 days (healthy)
+node-exporter|prom/node-exporter:v1.9.0|Up 6 days
+crowdsec|crowdsecurity/crowdsec:v1.6.8|Up 6 days (healthy)
+traefik|traefik:v3.6.6|Up 2 months
+nextcloud|lscr.io/linuxserver/nextcloud:29.0.7|Up 5 hours (healthy)
+onlyoffice-documentserver|onlyoffice/documentserver:8.2.0|Up 2 months
+nextcloud-db|lscr.io/linuxserver/mariadb:10.11.8|Up 2 months (healthy)
+nextcloud-redis|redis:7.4-alpine|Up 2 months (healthy)
+uisp|nico640/docker-unms|Up 2 months
+promtail|grafana/promtail:3.4.2|Up 2 months
+odoo-db|postgres:16-alpine|Up 2 months (healthy)
+odoo|odoo:17.0|Up 2 months (healthy)
+bouncer-traefik|fbonalair/traefik-crowdsec-bouncer:0.5.0|Up 2 months (healthy)
+unifi|lscr.io/linuxserver/unifi-network-application:8.6.9|Up 2 months
+unifi-db|mongo:7.0|Up 2 months (healthy)
+fuckoff-page|nginx:1.27-alpine|Up 2 months (healthy)
+mailcowdockerized-nginx-mailcow-1|ghcr.io/mailcow/nginx:1.05|Up 2 months
+mailcowdockerized-dovecot-mailcow-1|ghcr.io/mailcow/dovecot:2.3.21.1|Up 2 months
+mailcowdockerized-mysql-mailcow-1|mariadb:10.11|Up 2 months
+mailcowdockerized-redis-mailcow-1|redis:7.4.6-alpine|Up 2 months
+mailcowdockerized-unbound-mailcow-1|ghcr.io/mailcow/unbound:1.24|Up 4 weeks (healthy)
+homeassistant|lscr.io/linuxserver/homeassistant:2024.12.5|Up 2 months
+mta-sts|nginx:1.27-alpine|Up 2 months
+mailcowdockerized-watchdog-mailcow-1|ghcr.io/mailcow/watchdog:2.09|Up 2 months
+mailcowdockerized-acme-mailcow-1|ghcr.io/mailcow/acme:1.94|Up 2 months
+mailcowdockerized-ofelia-mailcow-1|mcuadros/ofelia:0.3.20|Up 2 months
+mailcowdockerized-rspamd-mailcow-1|ghcr.io/mailcow/rspamd:2.4|Up 4 weeks
+mailcowdockerized-postfix-mailcow-1|ghcr.io/mailcow/postfix:3.7.11|Up 2 months
+mailcowdockerized-php-fpm-mailcow-1|ghcr.io/mailcow/phpfpm:8.2.29|Up 2 months
+mailcowdockerized-postfix-tlspol-mailcow-1|ghcr.io/mailcow/postfix-tlspol:1.8.22|Up 2 months
+mailcowdockerized-clamd-mailcow-1|ghcr.io/mailcow/clamd:1.71|Up 2 months (healthy)
+mailcowdockerized-netfilter-mailcow-1|ghcr.io/mailcow/netfilter:1.63|Up 2 months
+mailcowdockerized-sogo-mailcow-1|ghcr.io/mailcow/sogo:5.12.4|Up 2 months
+mailcowdockerized-memcached-mailcow-1|memcached:alpine|Up 2 months
+mailcowdockerized-dockerapi-mailcow-1|ghcr.io/mailcow/dockerapi:2.11|Up 2 months
+mailcowdockerized-olefy-mailcow-1|ghcr.io/mailcow/olefy:1.15|Up 2 months
+running_count=38
+--- docker networks ---
+NETWORK ID     NAME                                DRIVER    SCOPE
+535db50fe0b6   bridge                              bridge    local
+62aaf1bd64f1   host                                host      local
+6f2bb298e843   mailcowdockerized_mailcow-network   bridge    local
+12d346c9fe84   monitoring                          bridge    local
+44fe5bc60875   nextcloud_nextcloud                 bridge    local
+c4ef8993f58d   none                                null      local
+f49159028a5d   odoo-internal                       bridge    local
+f9e210a1a2f7   portainer-agent_default             bridge    local
+64228b449149   traefik                             bridge    local
+f55304df6a53   unifi_unifi                         bridge    local
+--- security ---
+Status: active
+Logging: on (low)
+Default: deny (incoming), allow (outgoing), deny (routed)
+New profiles: skip
+
+To                         Action      From
+--                         ------      ----
+1006/tcp                   ALLOW IN    Anywhere                   # SSH
+60000:61000/udp            ALLOW IN    Anywhere                   # Mosh
+80/tcp                     ALLOW IN    Anywhere                   # HTTP
+443/tcp                    ALLOW IN    Anywhere                   # HTTPS
+41641/udp                  ALLOW IN    Anywhere                   # Tailscale
+25/tcp                     ALLOW IN    Anywhere                   # SMTP
+465/tcp                    ALLOW IN    Anywhere                   # SMTPS
+587/tcp                    ALLOW IN    Anywhere                   # Submission
+993/tcp                    ALLOW IN    Anywhere                   # IMAPS
+995/tcp                    ALLOW IN    Anywhere                   # POPS
+4190/tcp                   ALLOW IN    Anywhere                   # ManageSieve
+Anywhere                   ALLOW IN    100.64.0.0/10              # Tailscale VPN
+Anywhere                   ALLOW IN    172.16.0.0/12              # Docker internal
+Anywhere                   ALLOW IN    10.0.0.0/8                 # Docker internal
+
+Status
+|- Number of jail:	3
+`- Jail list:	recidive, sshd, traefik-auth
+--- listeners ---
+State  Recv-Q Send-Q Local Address:Port  Peer Address:PortProcess                                                                                  
+LISTEN 0      65536      127.0.0.1:7654       0.0.0.0:*                                                                                            
+LISTEN 0      65536      127.0.0.1:8080       0.0.0.0:*                                                                                            
+LISTEN 0      65536     100.64.0.2:46590      0.0.0.0:*                                                                                            
+LISTEN 0      4096         0.0.0.0:30715      0.0.0.0:*                                                                                            
+LISTEN 0      65536     100.64.0.2:9100       0.0.0.0:*                                                                                            
+LISTEN 0      65536     100.64.0.2:9104       0.0.0.0:*                                                                                            
+LISTEN 0      65536     100.64.0.2:9001       0.0.0.0:*                                                                                            
+LISTEN 0      65536      127.0.0.1:110        0.0.0.0:*                                                                                            
+LISTEN 0      65536      127.0.0.1:143        0.0.0.0:*                                                                                            
+LISTEN 0      65536     100.64.0.2:6060       0.0.0.0:*                                                                                            
+LISTEN 0      65536     100.64.0.2:8081       0.0.0.0:*                                                                                            
+LISTEN 0      65536     100.64.0.2:8082       0.0.0.0:*                                                                                            
+LISTEN 0      65536      127.0.0.1:13306      0.0.0.0:*                                                                                            
+LISTEN 0      65536      127.0.0.1:8843       0.0.0.0:*                                                                                            
+LISTEN 0      65536      127.0.0.1:8880       0.0.0.0:*                                                                                            
+LISTEN 0      65536      127.0.0.1:19991      0.0.0.0:*                                                                                            
+LISTEN 0      4096         0.0.0.0:9618       0.0.0.0:*                                                                                            
+LISTEN 0      65536        0.0.0.0:6789       0.0.0.0:*                                                                                            
+LISTEN 0      4096         0.0.0.0:6769       0.0.0.0:*                                                                                            
+LISTEN 0      65536        0.0.0.0:4190       0.0.0.0:*                                                                                            
+LISTEN 0      4096         0.0.0.0:4691       0.0.0.0:*                                                                                            
+LISTEN 0      128          0.0.0.0:5000       0.0.0.0:*    users:(("python3",pid=26417,fd=6),("python3",pid=26417,fd=5),("python3",pid=26313,fd=5))
+LISTEN 0      4096         0.0.0.0:2529       0.0.0.0:*                                                                                            
+LISTEN 0      65536        0.0.0.0:80         0.0.0.0:*                                                                                            
+LISTEN 0      65536        0.0.0.0:25         0.0.0.0:*                                                                                            
+LISTEN 0      65536        0.0.0.0:465        0.0.0.0:*                                                                                            
+LISTEN 0      65536        0.0.0.0:443        0.0.0.0:*                                                                                            
+LISTEN 0      65536        0.0.0.0:587        0.0.0.0:*                                                                                            
+LISTEN 0      65536        0.0.0.0:995        0.0.0.0:*                                                                                            
+LISTEN 0      65536        0.0.0.0:993        0.0.0.0:*                                                                                            
+LISTEN 0      128          0.0.0.0:1006       0.0.0.0:*                                                                                            

@@ -1,0 +1,178 @@
+# Systemd snapshot - 2026-04-23T20:20:05+00:00
+
+========== MASTER failed units ==========
+  UNIT LOAD ACTIVE SUB DESCRIPTION
+0 loaded units listed.
+
+========== MASTER enabled services (not generator/static) ==========
+UNIT FILE                          STATE   PRESET
+acct.service                       enabled enabled
+apparmor.service                   enabled enabled
+auditd.service                     enabled enabled
+containerd.service                 enabled enabled
+cron.service                       enabled enabled
+docker.service                     enabled enabled
+e2scrub_reap.service               enabled enabled
+exit-nat.service                   enabled enabled
+fail2ban.service                   enabled enabled
+getty@.service                     enabled enabled
+headscale.service                  enabled enabled
+ModemManager.service               enabled enabled
+NetworkManager-dispatcher.service  enabled enabled
+NetworkManager-wait-online.service enabled enabled
+NetworkManager.service             enabled enabled
+ssh.service                        enabled enabled
+systemd-network-generator.service  enabled enabled
+systemd-networkd.service           enabled enabled
+systemd-pstore.service             enabled enabled
+systemd-timesyncd.service          enabled enabled
+tailscaled.service                 enabled enabled
+ufw.service                        enabled enabled
+wpa_supplicant.service             enabled enabled
+docker.socket                      enabled enabled
+systemd-networkd.socket            enabled enabled
+uuidd.socket                       enabled enabled
+machines.target                    enabled enabled
+remote-fs.target                   enabled enabled
+aide.timer                         enabled enabled
+apt-daily-upgrade.timer            enabled enabled
+apt-daily.timer                    enabled enabled
+dpkg-db-backup.timer               enabled enabled
+e2scrub_all.timer                  enabled enabled
+fstrim.timer                       enabled enabled
+logrotate.timer                    enabled enabled
+lynis.timer                        enabled enabled
+man-db.timer                       enabled enabled
+security-updates.timer             enabled enabled
+service-monitor.timer              enabled enabled
+system-backup.timer                enabled enabled
+
+40 unit files listed.
+
+========== MASTER timers ==========
+NEXT                         LEFT          LAST                         PASSED       UNIT                         ACTIVATES
+Thu 2026-04-23 22:21:34 CEST 1min 25s left Thu 2026-04-23 22:16:34 CEST 3min 34s ago service-monitor.timer        service-monitor.service
+Fri 2026-04-24 00:00:00 CEST 1h 39min left Thu 2026-04-23 00:00:01 CEST 22h ago      dpkg-db-backup.timer         dpkg-db-backup.service
+Fri 2026-04-24 00:00:00 CEST 1h 39min left Thu 2026-04-23 00:00:01 CEST 22h ago      logrotate.timer              logrotate.service
+Fri 2026-04-24 00:00:00 CEST 1h 39min left Thu 2026-04-23 00:00:01 CEST 22h ago      security-updates.timer       security-updates.service
+Fri 2026-04-24 00:18:05 CEST 1h 57min left Thu 2026-04-23 00:09:55 CEST 22h ago      aide.timer                   aide.service
+Fri 2026-04-24 02:12:47 CEST 3h 52min left Thu 2026-04-23 09:13:08 CEST 13h ago      man-db.timer                 man-db.service
+Fri 2026-04-24 06:38:09 CEST 8h left       Thu 2026-04-23 06:53:44 CEST 15h ago      apt-daily-upgrade.timer      apt-daily-upgrade.service
+Fri 2026-04-24 06:55:11 CEST 8h left       Thu 2026-04-23 18:40:46 CEST 3h 39min ago apt-daily.timer              apt-daily.service
+Fri 2026-04-24 20:50:33 CEST 22h left      Thu 2026-04-23 20:50:33 CEST 1h 29min ago systemd-tmpfiles-clean.timer systemd-tmpfiles-clean.service
+Sun 2026-04-26 03:10:26 CEST 2 days left   Sun 2026-04-19 03:10:17 CEST 4 days ago   e2scrub_all.timer            e2scrub_all.service
+Sun 2026-04-26 03:22:49 CEST 2 days left   Sun 2026-04-19 03:25:00 CEST 4 days ago   lynis.timer                  lynis.service
+Mon 2026-04-27 00:00:00 CEST 3 days left   Mon 2026-04-20 00:00:01 CEST 3 days ago   system-backup.timer          system-backup.service
+Mon 2026-04-27 00:38:13 CEST 3 days left   Mon 2026-04-20 01:21:40 CEST 3 days ago   fstrim.timer                 fstrim.service
+
+13 timers listed.
+Pass --all to see loaded but inactive timers, too.
+
+========== Master mailcow-tlsa last run (tail) ==========
+-- No entries --
+
+========== Master wait-online unit state (doc claims masked) ==========
+Warning: The unit file, source configuration file or drop-ins of systemd-networkd-wait-online.service changed on disk. Run 'systemctl daemon-reload' to reload units.
+○ systemd-networkd-wait-online.service
+     Loaded: masked (Reason: Unit systemd-networkd-wait-online.service is masked.)
+    Drop-In: /etc/systemd/system/systemd-networkd-wait-online.service.d
+             └─override.conf
+     Active: inactive (dead)
+
+========== LADY failed units ==========
+  UNIT                 LOAD   ACTIVE SUB    DESCRIPTION
+● mailcow-tlsa.service loaded failed failed Update Mailcow TLSA and MTA-STS DNS records
+
+LOAD   = Reflects whether the unit definition was properly loaded.
+ACTIVE = The high-level unit activation state, i.e. generalization of SUB.
+SUB    = The low-level unit activation state, values depend on unit type.
+1 loaded units listed.
+
+========== LADY enabled services (top) ==========
+UNIT FILE                          STATE   PRESET
+apparmor.service                   enabled enabled
+auditd.service                     enabled enabled
+containerd.service                 enabled enabled
+cron.service                       enabled enabled
+docker.service                     enabled enabled
+e2scrub_reap.service               enabled enabled
+fail2ban.service                   enabled enabled
+getty@.service                     enabled enabled
+ModemManager.service               enabled enabled
+NetworkManager-dispatcher.service  enabled enabled
+NetworkManager-wait-online.service enabled enabled
+NetworkManager.service             enabled enabled
+ssh.service                        enabled enabled
+systemd-network-generator.service  enabled enabled
+systemd-networkd.service           enabled enabled
+systemd-pstore.service             enabled enabled
+systemd-timesyncd.service          enabled enabled
+tailscaled.service                 enabled enabled
+ufw.service                        enabled enabled
+unattended-upgrades.service        enabled enabled
+wpa_supplicant.service             enabled enabled
+docker.socket                      enabled enabled
+systemd-networkd.socket            enabled enabled
+uuidd.socket                       enabled enabled
+remote-fs.target                   enabled enabled
+apt-daily-upgrade.timer            enabled enabled
+apt-daily.timer                    enabled enabled
+dpkg-db-backup.timer               enabled enabled
+e2scrub_all.timer                  enabled enabled
+fstrim.timer                       enabled enabled
+mailcow-tlsa.timer                 enabled enabled
+man-db.timer                       enabled enabled
+
+32 unit files listed.
+
+========== LADY timers ==========
+NEXT                         LEFT          LAST                         PASSED     UNIT                         ACTIVATES
+Fri 2026-04-24 00:00:00 CEST 1h 39min left -                            -          dpkg-db-backup.timer         dpkg-db-backup.service
+Fri 2026-04-24 05:19:03 CEST 6h left       Thu 2026-04-23 06:04:00 CEST 16h ago    apt-daily.timer              apt-daily.service
+Fri 2026-04-24 06:28:06 CEST 8h left       Thu 2026-04-23 06:23:31 CEST 15h ago    apt-daily-upgrade.timer      apt-daily-upgrade.service
+Fri 2026-04-24 11:09:10 CEST 12h left      Thu 2026-04-23 10:34:20 CEST 11h ago    man-db.timer                 man-db.service
+Fri 2026-04-24 14:10:49 CEST 15h left      Thu 2026-04-23 14:10:49 CEST 8h ago     mailcow-tlsa.timer           mailcow-tlsa.service
+Fri 2026-04-24 14:15:56 CEST 15h left      Thu 2026-04-23 14:15:56 CEST 8h ago     systemd-tmpfiles-clean.timer systemd-tmpfiles-clean.service
+Sun 2026-04-26 03:10:04 CEST 2 days left   Sun 2026-04-19 03:10:43 CEST 4 days ago e2scrub_all.timer            e2scrub_all.service
+Mon 2026-04-27 00:51:48 CEST 3 days left   Mon 2026-04-20 01:29:09 CEST 3 days ago fstrim.timer                 fstrim.service
+
+8 timers listed.
+Pass --all to see loaded but inactive timers, too.
+
+========== Lady wait-online state ==========
+○ systemd-networkd-wait-online.service
+     Loaded: masked (Reason: Unit systemd-networkd-wait-online.service is masked.)
+     Active: inactive (dead)
+
+========== Lady mailcow-tlsa last run ==========
+Apr 22 00:02:02 lady mailcow-dns-update[984402]:   key.pem: 3243 bytes
+Apr 22 00:02:02 lady mailcow-dns-update[984402]: Reloading Postfix and Dovecot...
+Apr 22 00:02:02 lady mailcow-dns-update[984402]: You may need to restart mailcow containers manually
+Apr 22 00:02:03 lady mailcow-dns-update[984428]: Cloudflare API error: {"success":false,"errors":[{"code":9109,"message":"Invalid access token"}],"messages":[],"result":null}
+Apr 22 00:02:03 lady systemd[1]: mailcow-tlsa.service: Main process exited, code=exited, status=1/FAILURE
+Apr 22 00:02:03 lady systemd[1]: mailcow-tlsa.service: Failed with result 'exit-code'.
+Apr 22 00:02:03 lady systemd[1]: Failed to start mailcow-tlsa.service - Update Mailcow TLSA and MTA-STS DNS records.
+Apr 23 00:02:03 lady systemd[1]: Starting mailcow-tlsa.service - Update Mailcow TLSA and MTA-STS DNS records...
+Apr 23 00:02:05 lady mailcow-dns-update[3884062]: Warning: Failed to reload services: Command '['docker', 'exec', 'postfix-mailcow', 'postfix', 'reload']' returned non-zero exit status 1.
+Apr 23 00:02:05 lady mailcow-dns-update[3884062]: Certificate extracted to /home/qui3tly/.docker/mailcow/data/assets/ssl/mail.quietly.online/
+Apr 23 00:02:05 lady mailcow-dns-update[3884062]:   cert.pem: 3945 bytes
+Apr 23 00:02:05 lady mailcow-dns-update[3884062]:   key.pem: 3243 bytes
+Apr 23 00:02:05 lady mailcow-dns-update[3884062]: Reloading Postfix and Dovecot...
+Apr 23 00:02:05 lady mailcow-dns-update[3884062]: You may need to restart mailcow containers manually
+Apr 23 00:02:06 lady mailcow-dns-update[3884115]: Cloudflare API error: {"success":false,"errors":[{"code":9109,"message":"Invalid access token"}],"messages":[],"result":null}
+Apr 23 00:02:06 lady systemd[1]: mailcow-tlsa.service: Main process exited, code=exited, status=1/FAILURE
+Apr 23 00:02:06 lady systemd[1]: mailcow-tlsa.service: Failed with result 'exit-code'.
+Apr 23 00:02:06 lady systemd[1]: Failed to start mailcow-tlsa.service - Update Mailcow TLSA and MTA-STS DNS records.
+Apr 23 00:02:06 lady systemd[1]: mailcow-tlsa.service: Consumed 1.487s CPU time.
+-- Boot ad51386bcfa0430d81c97d2bf787e0e2 --
+Apr 23 14:10:49 lady systemd[1]: Starting mailcow-tlsa.service - Update Mailcow TLSA and MTA-STS DNS records...
+Apr 23 14:10:49 lady mailcow-dns-update[39867]: Warning: Failed to reload services: Command '['docker', 'exec', 'postfix-mailcow', 'postfix', 'reload']' returned non-zero exit status 1.
+Apr 23 14:10:49 lady mailcow-dns-update[39867]: Certificate extracted to /home/qui3tly/.docker/mailcow/data/assets/ssl/mail.quietly.online/
+Apr 23 14:10:49 lady mailcow-dns-update[39867]:   cert.pem: 3945 bytes
+Apr 23 14:10:49 lady mailcow-dns-update[39867]:   key.pem: 3243 bytes
+Apr 23 14:10:49 lady mailcow-dns-update[39867]: Reloading Postfix and Dovecot...
+Apr 23 14:10:49 lady mailcow-dns-update[39867]: You may need to restart mailcow containers manually
+Apr 23 14:10:50 lady mailcow-dns-update[39880]: Cloudflare API error: {"success":false,"errors":[{"code":9109,"message":"Invalid access token"}],"messages":[],"result":null}
+Apr 23 14:10:50 lady systemd[1]: mailcow-tlsa.service: Main process exited, code=exited, status=1/FAILURE
+Apr 23 14:10:50 lady systemd[1]: mailcow-tlsa.service: Failed with result 'exit-code'.
+Apr 23 14:10:50 lady systemd[1]: Failed to start mailcow-tlsa.service - Update Mailcow TLSA and MTA-STS DNS records.
