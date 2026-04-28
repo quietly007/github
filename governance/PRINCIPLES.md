@@ -57,3 +57,5 @@ Binding principles for all agent and human activity in this workspace.
 - Any governance change requires explicit user approval and must follow `.governance/WORKFLOWS.md`.
 - Every governance change must be logged to `.copilot/memories.jsonl` and recorded in `.governance/CHANGELOG.md`.
 - See `.governance/LOCKDOWN_POLICY.md`.
+
+_Last reviewed: 2026-04-27 by Infra Ops governance spot-check (P3-1)._

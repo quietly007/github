@@ -17,3 +17,10 @@ projects/**/.DS_Store
 **/.vscode/
 **/*.swp
 **/*.swo
+
+# Duplicate workspace imports (canonical lives in /home/qui3tly/custom-agents)
+projects/qui3tly.cloud/custom agents/
+projects/qui3tly.cloud/Infra Ops/
+projects/qui3tly.cloud/copilot-shared/
+projects/qui3tly.cloud/AUDITOR_AGENT.md
+projects/qui3tly.cloud/AUDITOR_AGENT.md.bak

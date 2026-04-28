@@ -131,3 +131,5 @@ Before SSH-impacting changes:
 - Analyze error logs thoroughly
 - **Never assume anything works without checking logs**
 - **Never confirm anything works without complete log analysis**
+
+_Last reviewed: 2026-04-27 by Infra Ops governance spot-check (P3-1)._

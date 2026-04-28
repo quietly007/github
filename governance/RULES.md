@@ -165,3 +165,5 @@ After EVERY service installation or server setup:
 5. **Push to Git** — All changes committed and pushed before session ends.
 
 **No installation is complete until it's reproducible via Ansible.**
+
+_Last reviewed: 2026-04-27 by Infra Ops governance spot-check (P3-1)._
