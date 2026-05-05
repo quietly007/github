@@ -1,13 +1,21 @@
 client: "montefish"
-legal_name: "Montefish (provisional)"
-stage: proposal
+legal_name: "Montefish d.o.o."
+stage: contract
 since: "2026-01-26"
-last_contact: "2026-01-28"
+last_contact: "2026-05-01"
 services:
   - hosting
   - mail
-value_eur_monthly: null  # TBD on signature
-contract_ref: ""
+  - cctv
+  - access_control
+  - time_evidence
+  - accounting
+  - mobile_apps
+  - nextcloud
+value_eur_monthly: 750  # net; gross 907.50 (21% VAT); 6-month advance €5,445.00 paid at signing
+contract_ref: "MF-2026-001"
+contract_date: "2026-05-01"
+contract_signatory_client: "Dejan Krstović"
 primary_contact:
   name: ""
   email: ""

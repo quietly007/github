@@ -1,16 +1,21 @@
 client: "norma"
-legal_name: "Norma"
-stage: live
-since: "2026-02-03"
-last_contact: "2026-04-24"
+legal_name: "Norma d.o.o."
+stage: contract
+since: "2026-01-01"
+last_contact: "2026-05-01"
 services:
   - nextcloud
   - onlyoffice
   - vpn
-value_eur_monthly: null
-contract_ref: ""
+  - mail
+  - hosting
+value_eur_monthly: 1000  # net; gross 1210.00 (21% VAT); 3-month advance €3,630.00 paid at signing
+contract_ref: "NR-2026-001"
+contract_date: "2026-05-01"
+contract_effective: "2026-01-01"
+contract_signatory_client: "Dejan Rajković"
 primary_contact:
-  name: ""
+  name: "Dejan Rajković"
   email: ""
 branches:
   - name: "HQ"
